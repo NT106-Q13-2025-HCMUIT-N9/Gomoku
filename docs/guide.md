@@ -102,15 +102,15 @@ Giúp cả nhóm biết ai làm gì, rõ ràng và thống nhất.
 **Trong đó:**
 
 - `[loại]`: `feature`, `bugfix`, `hotfix`
-- `[tên-viết-tắt]`: viết tắt tên thành viên (ví dụ: Anh Tuấn → `at`, Bình Minh → `bm`)
+- `[tên-viết-tắt]`: viết tắt tên thành viên
 - `[mô-tả-ngắn]`: mô tả ngắn gọn, dùng dấu `-` thay cho khoảng trắng
 
 **Ví dụ:**
 
-- feature/tt/login-screen-ui → Thiên Trường làm UI màn hình Login
-- feature/at/gameplay-logic → Anh Tuấn làm logic ván đấu
-- bugfix/ht/fix-null-password → Hoàng Tuấn sửa lỗi password null
-- hotfix/tu/fix-demo-crash → Tú sửa lỗi crash khi demo
+- **`feature/truong/login-screen-ui` → Phan Thiên Trường làm UI màn hình Login**
+- **`feature/tuan-huynh/gameplay-logic` → Huỳnh Anh Tuấn làm logic ván đấu**
+- **`hotfix/tuan-hoang/fix-null-password` → Hoàng Đức Anh Tuấn sửa lỗi password null**
+- **`hotfix/tu/fix-demo-crash` → Phan Anh Tú sửa lỗi crash khi demo**
 
 <br>
 <br>

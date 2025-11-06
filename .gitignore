@@ -1,1 +1,5 @@
 .vs/
+Gomoku_Client/obj/
+Gomoku_Client/bin/
+Gomoku_Server/bin/
+Gomoku_Server/obj/

@@ -56,5 +56,45 @@ namespace Gomoku_Client
             else
                 PasswordPlaceholder.Visibility = Visibility.Visible;
         }
+
+        private void SignUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            SignUpUserInterface SignUp = new SignUpUserInterface();
+            // Sao chép vị trí và kích thước
+            SignUp.Left = this.Left;
+            SignUp.Top = this.Top;
+            SignUp.Width = this.Width;
+            SignUp.Height = this.Height;
+            SignUp.WindowState = this.WindowState;
+
+            // 1. Ẩn Window hiện tại ngay lập tức
+            this.Hide();
+
+            // 2. Hiển thị Window mới
+            SignUp.Show();
+
+            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
+            this.Close();
+        }
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            ForgotPasswordUI ForgotUI = new ForgotPasswordUI();
+            // Sao chép vị trí và kích thước
+            ForgotUI.Left = this.Left;
+            ForgotUI.Top = this.Top;
+            ForgotUI.Width = this.Width;
+            ForgotUI.Height = this.Height;
+            ForgotUI.WindowState = this.WindowState;
+
+            // 1. Ẩn Window hiện tại ngay lập tức
+            this.Hide();
+
+            // 2. Hiển thị Window mới
+            ForgotUI.Show();
+
+            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
+            this.Close();
+        }
     }
 }

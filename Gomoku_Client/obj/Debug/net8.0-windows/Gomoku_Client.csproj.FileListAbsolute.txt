@@ -1,4 +1,3 @@
-C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\MainWindow.g.cs
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\App.g.cs
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\GeneratedInternalTypeHelper.g.cs
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\Gomoku_Client_MarkupCompile.cache
@@ -8,7 +7,6 @@ C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\bin\Debug
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\bin\Debug\net8.0-windows\Gomoku_Client.runtimeconfig.json
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\bin\Debug\net8.0-windows\Gomoku_Client.dll
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\bin\Debug\net8.0-windows\Gomoku_Client.pdb
-C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\MainWindow.baml
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\Gomoku_Client.g.resources
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\Gomoku_Client.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\Gomoku_Client.AssemblyInfoInputs.cache
@@ -20,3 +18,9 @@ C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\Gomoku_Client.pdb
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\Gomoku_Client.genruntimeconfig.cache
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\ref\Gomoku_Client.dll
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\MainWindow.g.cs
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\MainWindow.baml
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\SignUpUserInterface.g.cs
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\SignUpUserInterface.baml
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\ForgotPasswordUI.g.cs
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\ForgotPasswordUI.baml

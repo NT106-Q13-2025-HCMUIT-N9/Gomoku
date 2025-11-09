@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\LENOVO\\Desktop\\Code\\LTMCB\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj": {}
+    "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj": {}
   },
   "projects": {
-    "C:\\Users\\LENOVO\\Desktop\\Code\\LTMCB\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj": {
+    "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\LENOVO\\Desktop\\Code\\LTMCB\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj",
+        "projectUniqueName": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj",
         "projectName": "Gomoku_Server",
-        "projectPath": "C:\\Users\\LENOVO\\Desktop\\Code\\LTMCB\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj",
-        "packagesPath": "C:\\Users\\LENOVO\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\LENOVO\\Desktop\\Code\\LTMCB\\Gomoku\\Gomoku_Server\\obj\\",
+        "projectPath": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Server\\Gomoku_Server.csproj",
+        "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Server\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\LENOVO\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -65,7 +65,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

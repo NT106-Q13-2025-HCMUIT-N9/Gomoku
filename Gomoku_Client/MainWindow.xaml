@@ -4,9 +4,199 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gomoku_Client"
+        xmlns:converters="clr-namespace:Gomoku_Client.Converters"
+        Icon="\Assets\Gomoku.ico"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Gomoku" Height="800" Width="1600">
 
+    <Window.Resources>
+        <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
+        <Style x:Key="BlueButton" TargetType="Button">
+            <Setter Property="Background" Value="#0078D7"/>
+            <!-- Xanh dương -->
+            <Setter Property="Foreground" Value="White"/>
+            <!-- Chữ trắng -->
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="BorderBrush" Value="#005A9E"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="22">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#005A9E"/>
+                                <!-- Tối lại khi hover -->
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#004578"/>
+                                <!-- Nhấn xuống -->
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="WhiteBlueButton" TargetType="Button">
+            <Setter Property="Background" Value="White"/>
+            <!-- Nền trắng -->
+            <Setter Property="Foreground" Value="#0078D7"/>
+            <!-- Chữ xanh -->
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="BorderBrush" Value="#0078D7"/>
+            <!-- Viền xanh -->
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="22">
+                            <!-- Bo góc -->
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- Hiệu ứng hover và nhấn -->
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#E5F1FB"/>
+                                <!-- Xanh nhạt khi hover -->
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#CCE4F7"/>
+                                <!-- Đậm hơn khi nhấn -->
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Background="#F0F0F0" >
+        <Border Background="#F9F9F9"
+                BorderBrush="#0078D7"
+                BorderThickness="2"
+                CornerRadius="22"
+                Padding="20"
+                Width="410"
+                Height="300"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="Đăng nhập vào Gomoku"
+                       Grid.Row="0"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="#0078D7"  
+                       FontFamily="Segoe UI"
+                       FontSize="24"         
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
+
+                <TextBlock Grid.Row="4" 
+                           FontFamily="Segoe UI"
+                           FontSize="14"
+                           FontWeight="SemiBold" 
+                           HorizontalAlignment="Left" 
+                           Margin="10,12,0,0" 
+                           Height="20" 
+                           VerticalAlignment="Top">
+                    <Hyperlink NavigateUri="https://google.com"
+                               RequestNavigate="Hyperlink_RequestNavigate">
+                        Quên tên đăng nhập hay mật khẩu?
+                    </Hyperlink>
+                </TextBlock>
+
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" >
+                    <Button Style="{StaticResource BlueButton}"
+                            Content="Đăng Nhập"
+                            Width="180" Height="40"
+                            Margin="0,0,0,0"/>
+                    <Button Style="{StaticResource WhiteBlueButton}"
+                            Content="Đăng Ký"
+                            Width="180" Height="40"
+                            Margin="5,0,0,0"/>
+                </StackPanel>
+
+                <Border Grid.Row="1"
+                        Background="#F3F3F3"
+                        CornerRadius="8"
+                        BorderBrush="#CCCCCC"
+                        BorderThickness="1"
+                        Padding="2">
+                    <TextBox x:Name="UsernameBox"
+                             Height="36"
+                             FontSize="14"
+                             Padding="10,7"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Foreground="Gray"
+                             FontFamily="Segoe UI"
+                             FontWeight="SemiBold"
+                             FontStyle="Normal"
+                             Text="Tên người dùng"
+                             GotFocus="UsernameBox_GotFocus"
+                             LostFocus="UsernameBox_LostFocus"/>
+                </Border>
+
+                <Border Grid.Row="2"
+                    Background="#F3F3F3"
+                    CornerRadius="8"
+                    BorderBrush="#CCCCCC"
+                    BorderThickness="1"
+                    Padding="2" Margin="0,15,0,0">
+                    <Grid>
+                        <PasswordBox x:Name="PasswordBox"
+                            Height="36"
+                            FontSize="14"
+                            Padding="10,7"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="Black"
+                            FontFamily="Segoe UI"
+                            FontWeight="SemiBold"
+                            FontStyle="Normal"
+                            PasswordChanged="PasswordBox_PasswordChanged"/>
+                        <TextBlock x:Name="PasswordPlaceholder"
+                            Text="Mật khẩu"
+                            Foreground="Gray"
+                            FontSize="14"
+                            FontFamily="Segoe UI"
+                            FontWeight="SemiBold"
+                            VerticalAlignment="Center"
+                            Margin="12,0,0,0"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding ElementName=PasswordBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

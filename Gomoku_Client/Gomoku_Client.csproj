@@ -8,4 +8,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Assets\Gomoku.ico" />
+    <None Remove="Assets\Login_Background.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Gomoku.ico" />
+    <Resource Include="Assets\Login_Background.png" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,15 @@
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\bin\Debug\net8.0\Gomoku_Server.exe
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\bin\Debug\net8.0\Gomoku_Server.deps.json
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\bin\Debug\net8.0\Gomoku_Server.runtimeconfig.json
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\bin\Debug\net8.0\Gomoku_Server.dll
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\bin\Debug\net8.0\Gomoku_Server.pdb
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.AssemblyInfoInputs.cache
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.AssemblyInfo.cs
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.csproj.CoreCompileInputs.cache
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.sourcelink.json
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.dll
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\refint\Gomoku_Server.dll
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.pdb
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\Gomoku_Server.genruntimeconfig.cache
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Server\obj\Debug\net8.0\ref\Gomoku_Server.dll

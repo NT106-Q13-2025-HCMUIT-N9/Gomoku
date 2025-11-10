@@ -1,5 +1,7 @@
 ﻿using Firebase.Auth;
 using Gomoku_Client.Model;
+using Gomoku_Client.ViewModel;
+using Google.Cloud.Firestore;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -119,17 +121,35 @@ namespace Gomoku_Client
                     return;
                 }
 
-                var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+                CollectionReference collection = FirebaseInfo.DB.Collection("UserInfo");
+                QuerySnapshot snapshot = await collection.WhereEqualTo("Email", email).GetSnapshotAsync();
+                if(snapshot.Documents.Count == 0)
+                {
+                    MessageBox.Show($"Lỗi: Email này chưa có tài khoản", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
-                MainGameUI mainGame = new MainGameUI();
-                mainGame.Left = this.Left;
-                mainGame.Top = this.Top;
-                mainGame.Width = this.Width;
-                mainGame.Height = this.Height;
-                mainGame.WindowState = this.WindowState;
-                this.Hide();
-                mainGame.Show();
-                this.Close();
+                foreach(DocumentSnapshot doc in snapshot.Documents)
+                {
+                    if (HashFunc.HashString(password) == doc.GetValue<string>("Password"))
+                    {
+                        var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+
+                        MainGameUI mainGame = new MainGameUI();
+                        mainGame.Left = this.Left;
+                        mainGame.Top = this.Top;
+                        mainGame.Width = this.Width;
+                        mainGame.Height = this.Height;
+                        mainGame.WindowState = this.WindowState;
+                        this.Hide();
+                        mainGame.Show();
+                        this.Close();
+                        return;
+                    }
+                }
+
+                MessageBox.Show($"Lỗi: Sai mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
             catch (FirebaseAuthException ex)
             {

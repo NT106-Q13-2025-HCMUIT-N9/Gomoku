@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Gomoku_Client.Model;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -86,10 +88,13 @@ namespace Gomoku_Client
             SetPasswordGrid.Visibility = Visibility.Visible;
         }
 
-        private void SendOTP_Click(object sender, RoutedEventArgs e)
+        private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
             GetEmailGrid.Visibility = Visibility.Collapsed;
             GetOTPGrid.Visibility = Visibility.Visible;
+
+            await FirebaseInfo.AuthClient.ResetEmailPasswordAsync(EmailBox.Text);
+            Debug.WriteLine("Sike");
         }
 
         private void Back_From_OPTGrid_Click(object sender, RoutedEventArgs e)
@@ -100,8 +105,6 @@ namespace Gomoku_Client
 
         private void Set_Password_Click(object sender, RoutedEventArgs e)
         {
-
-
             MainWindow main = new MainWindow();
             // Sao chép vị trí và kích thước
             main.Left = this.Left;

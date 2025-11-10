@@ -1,8 +1,11 @@
 ﻿using Firebase.Auth;
 using Gomoku_Client.Model;
+using Google.Cloud.Firestore;
+using Grpc.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Gomoku_Client.ViewModel;
 
 namespace Gomoku_Client
 {
@@ -138,6 +142,15 @@ namespace Gomoku_Client
                 }
 
                 var temp = await FirebaseInfo.AuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
+
+                CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
+                UserDataModel doc = new UserDataModel
+                {
+                    Username = username,
+                    Email = email,
+                    Password = HashFunc.HashString(password)
+                };
+                await user_collection.AddAsync(doc);
                 MessageBox.Show("Đăng kí thành công", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 MainWindow main = new MainWindow();

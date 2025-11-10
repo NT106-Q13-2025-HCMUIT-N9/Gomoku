@@ -2,6 +2,7 @@
 using Firebase.Auth.Providers;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Firestore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,15 +20,12 @@ namespace Gomoku_Client.Model
 
         private static object lock_app = new object();
         private static object lock_auth = new object();
+        private static object lock_db = new object();
 
-        private static string _projectId = " Gomoku-ltmcb";
+        private static string _projectId = "gomoku-ltmcb";
         private static string? _api_key = null;
 
-        private static FirebaseAuthProvider[] _authProvider =
-        [
-            new GoogleProvider().AddScopes("email"),
-            new EmailProvider()
-        ];
+        private static FirestoreDb? _db = null; 
 
         private static FirebaseAuthClient? _authClient = null;
 
@@ -35,7 +33,20 @@ namespace Gomoku_Client.Model
 
         public static string ProjectId { get => _projectId; }
 
-        public static FirebaseAuthProvider[] AuthProviders { get => _authProvider; }
+        public static FirestoreDb DB
+        {
+            get
+            {
+                lock (lock_db)
+                {
+                    if(_db == null)
+                    {
+                        _db = FirestoreDb.Create(_projectId);
+                    }
+                    return _db;
+                }
+            }
+        }
 
         public static FirebaseAuthClient AuthClient
         {
@@ -49,7 +60,11 @@ namespace Gomoku_Client.Model
                         {
                             ApiKey = FirebaseInfo.ApiKey,
                             AuthDomain = "gomoku-ltmcb.firebaseapp.com",
-                            Providers = _authProvider
+                            Providers = new FirebaseAuthProvider[]
+                            {
+                                new GoogleProvider().AddScopes("email"),
+                                new EmailProvider()
+                            }
                         };
 
                         _authClient = new FirebaseAuthClient(config);

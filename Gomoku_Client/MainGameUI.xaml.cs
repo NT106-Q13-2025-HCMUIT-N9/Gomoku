@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Firebase.Auth;
+using Gomoku_Client.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,22 +28,25 @@ namespace Gomoku_Client
 
         private void SignOut_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow main = new MainWindow();
-            // Sao chép vị trí và kích thước
-            main.Left = this.Left;
-            main.Top = this.Top;
-            main.Width = this.Width;
-            main.Height = this.Height;
-            main.WindowState = this.WindowState;
+            try
+            {
+                FirebaseInfo.AuthClient.SignOut();
+                MainWindow main = new MainWindow();
+                // Sao chép vị trí và kích thước
+                main.Left = this.Left;
+                main.Top = this.Top;
+                main.Width = this.Width;
+                main.Height = this.Height;
+                main.WindowState = this.WindowState;
 
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
-
-            // 2. Hiển thị Window mới
-            main.Show();
-
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+                this.Hide();
+                main.Show();
+                this.Close();
+            }
+            catch (FirebaseAuthException ex)
+            {
+                MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

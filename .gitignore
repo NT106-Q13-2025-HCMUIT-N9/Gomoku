@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Visual Studio Code
 .vscode/
 
@@ -52,3 +53,10 @@ packages/
 *.[Pp]ublish.xml
 *.build.cs
 [Oo]bj/
+=======
+.vs/
+Gomoku_Client/obj/
+Gomoku_Client/bin/
+Gomoku_Server/bin/
+Gomoku_Server/obj/
+>>>>>>> 8bbf098f825b2ef7ddef2e6b3903593971d6aa9b

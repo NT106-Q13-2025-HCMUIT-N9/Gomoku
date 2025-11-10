@@ -22,6 +22,7 @@ namespace Gomoku_Client
       ///test
       ///MainMenu menu = new MainMenu();
       ///menu.Show();
+
         }
 
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Firebase.Auth;
+using Gomoku_Client.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,10 +62,6 @@ namespace Gomoku_Client
             }
         }
 
-        
-
-        
-
         private void GoBack_Click(object sender, RoutedEventArgs e)
         {
             MainWindow main = new MainWindow();
@@ -98,6 +96,64 @@ namespace Gomoku_Client
                 PasswordConfirmPlaceholder.Visibility = Visibility.Collapsed;
             else
                 PasswordConfirmPlaceholder.Visibility = Visibility.Visible;
+        }
+
+        private async void DangKi_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string username = UsernameBox.Text;
+                string password = PasswordBox.Password;
+                string email = EmailBox.Text;
+                string re_password = PasswordConfirmBox.Password;
+
+                if(password != re_password)
+                {
+                    MessageBox.Show($"Lỗi: Nhập lại mật khẩu không chính xác", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(username))
+                {
+                    MessageBox.Show($"Lỗi: Vui lòng nhập tên người dùng", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    MessageBox.Show($"Lỗi: Vui lòng nhập một email", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(password))
+                {
+                    MessageBox.Show($"Lỗi: Vui lòng nhập mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(re_password))
+                {
+                    MessageBox.Show($"Lỗi: Vui lòng nhập lại mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                var temp = await FirebaseInfo.AuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
+                MessageBox.Show("Đăng kí thành công", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                MainWindow main = new MainWindow();
+                main.Left = this.Left;
+                main.Top = this.Top;
+                main.Width = this.Width;
+                main.Height = this.Height;
+                main.WindowState = this.WindowState;
+                this.Hide();
+                main.Show();
+                this.Close();
+            }
+            catch (FirebaseAuthException ex)
+            {
+                MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

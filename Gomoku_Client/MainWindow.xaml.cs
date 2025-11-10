@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using Firebase.Auth;
+using Gomoku_Client.Model;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -31,21 +34,21 @@ namespace Gomoku_Client
             e.Handled = true;
         }
 
-        private void UsernameBox_GotFocus(object sender, RoutedEventArgs e)
+        private void EmailBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (UsernameBox.Text == "Tên người dùng")
+            if (EmailBox.Text == "Email")
             {
-                UsernameBox.Text = "";
-                UsernameBox.Foreground = Brushes.Black;
+                EmailBox.Text = "";
+                EmailBox.Foreground = Brushes.Black;
             }
         }
 
-        private void UsernameBox_LostFocus(object sender, RoutedEventArgs e)
+        private void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(UsernameBox.Text))
+            if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
-                UsernameBox.Text = "Tên người dùng";
-                UsernameBox.Foreground = Brushes.Gray;
+                EmailBox.Text = "Tên người dùng";
+                EmailBox.Foreground = Brushes.Gray;
             }
         }
 
@@ -97,24 +100,41 @@ namespace Gomoku_Client
             this.Close();
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            MainGameUI mainGame = new MainGameUI();
-            // Sao chép vị trí và kích thước
-            mainGame.Left = this.Left;
-            mainGame.Top = this.Top;
-            mainGame.Width = this.Width;
-            mainGame.Height = this.Height;
-            mainGame.WindowState = this.WindowState;
+            try
+            {
+                string password = PasswordBox.Password;
+                string email = EmailBox.Text;
 
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
+                if (string.IsNullOrEmpty(email))
+                {
+                    MessageBox.Show($"Lỗi: Vui lòng nhập một email", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
-            // 2. Hiển thị Window mới
-            mainGame.Show();
+                if (string.IsNullOrEmpty(password))
+                {
+                    MessageBox.Show($"Lỗi: Vui lòng nhập mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+                var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+
+                MainGameUI mainGame = new MainGameUI();
+                mainGame.Left = this.Left;
+                mainGame.Top = this.Top;
+                mainGame.Width = this.Width;
+                mainGame.Height = this.Height;
+                mainGame.WindowState = this.WindowState;
+                this.Hide();
+                mainGame.Show();
+                this.Close();
+            }
+            catch (FirebaseAuthException ex)
+            {
+                MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }

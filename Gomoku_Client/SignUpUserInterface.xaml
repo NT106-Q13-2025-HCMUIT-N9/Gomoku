@@ -238,7 +238,7 @@
                     <Button Style="{StaticResource BlueButton}"
                      Content="Đăng Ký Mới"
                      Width="180" Height="40"
-                     Margin="5,0,0,0"/>
+                     Margin="5,0,0,0" Click="DangKi_Click"/>
                 </StackPanel>
             </Grid>
         </Border>

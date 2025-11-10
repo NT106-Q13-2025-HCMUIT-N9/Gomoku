@@ -60,23 +60,9 @@ namespace Gomoku_Client
             }
         }
 
-        private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (PasswordBox.Text == "Mật khẩu")
-            {
-                PasswordBox.Text = "";
-                PasswordBox.Foreground = Brushes.Black;
-            }
-        }
+        
 
-        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(PasswordBox.Text))
-            {
-                PasswordBox.Text = "Mật khẩu";
-                PasswordBox.Foreground = Brushes.Gray;
-            }
-        }
+        
 
         private void GoBack_Click(object sender, RoutedEventArgs e)
         {
@@ -96,6 +82,22 @@ namespace Gomoku_Client
 
             // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
             this.Close();
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (PasswordBox.Password.Length > 0)
+                PasswordPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                PasswordPlaceholder.Visibility = Visibility.Visible;
+        }
+
+        private void PasswordConfirmBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (PasswordConfirmBox.Password.Length > 0)
+                PasswordConfirmPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                PasswordConfirmPlaceholder.Visibility = Visibility.Visible;
         }
     }
 }

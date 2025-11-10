@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\Gomoku.ico" />
+    <None Remove="Assets\history_icon.png" />
+    <None Remove="Assets\home_icon.png" />
+    <None Remove="Assets\Login_Background.png" />
+    <None Remove="Assets\play_icon.png" />
+    <None Remove="Assets\settings_icon.png" />
+    <None Remove="Assets\social_icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Gomoku.ico" />
+    <Resource Include="Assets\history_icon.png" />
+    <Resource Include="Assets\home_icon.png" />
+    <Resource Include="Assets\Login_Background.png" />
+    <Resource Include="Assets\play_icon.png" />
+    <Resource Include="Assets\settings_icon.png" />
+    <Resource Include="Assets\social_icon.png" />
+  </ItemGroup>
+
+</Project>

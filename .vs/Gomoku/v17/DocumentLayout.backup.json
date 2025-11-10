@@ -3,28 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\signupuserinterface.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\signupuserinterface.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\forgotpasswordui.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\forgotpasswordui.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\signupuserinterface.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\signupuserinterface.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\mainwindow.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\mainwindow.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
       "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\maingameui.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\maingameui.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\forgotpasswordui.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\forgotpasswordui.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|c:\\users\\acer\\desktop\\importantfile\\projectgomoku\\gomoku\\gomoku_client\\maingameui.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2403D7ED-7616-41F8-BE59-2F3F8972F010}|Gomoku_Client\\Gomoku_Client.csproj|solutionrelative:gomoku_client\\maingameui.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,80 +26,56 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "ForgotPasswordUI.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\ForgotPasswordUI.xaml.cs",
-              "RelativeDocumentMoniker": "Gomoku_Client\\ForgotPasswordUI.xaml.cs",
-              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\ForgotPasswordUI.xaml.cs",
-              "RelativeToolTip": "Gomoku_Client\\ForgotPasswordUI.xaml.cs",
-              "ViewState": "AgIAABYAAAAAAAAAAAAgwFUAAAAbAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Gomoku_Client\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainWindow.xaml.cs*",
+              "RelativeToolTip": "Gomoku_Client\\MainWindow.xaml.cs*",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAHAAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-09T17:12:11.377Z"
+              "WhenOpened": "2025-11-10T11:52:10.935Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ForgotPasswordUI.xaml",
-              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\ForgotPasswordUI.xaml",
-              "RelativeDocumentMoniker": "Gomoku_Client\\ForgotPasswordUI.xaml",
-              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\ForgotPasswordUI.xaml",
-              "RelativeToolTip": "Gomoku_Client\\ForgotPasswordUI.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-11-09T17:01:58.957Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "SignUpUserInterface.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\SignUpUserInterface.xaml.cs",
-              "RelativeDocumentMoniker": "Gomoku_Client\\SignUpUserInterface.xaml.cs",
-              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\SignUpUserInterface.xaml.cs",
-              "RelativeToolTip": "Gomoku_Client\\SignUpUserInterface.xaml.cs",
-              "ViewState": "AgIAAEUAAAAAAAAAAAAmwGUAAAAFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-09T17:15:22.634Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "SignUpUserInterface.xaml",
-              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\SignUpUserInterface.xaml",
-              "RelativeDocumentMoniker": "Gomoku_Client\\SignUpUserInterface.xaml",
-              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\SignUpUserInterface.xaml*",
-              "RelativeToolTip": "Gomoku_Client\\SignUpUserInterface.xaml*",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2025-11-09T16:40:14.019Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainWindow.xaml",
               "RelativeDocumentMoniker": "Gomoku_Client\\MainWindow.xaml",
-              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainWindow.xaml",
-              "RelativeToolTip": "Gomoku_Client\\MainWindow.xaml",
+              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainWindow.xaml*",
+              "RelativeToolTip": "Gomoku_Client\\MainWindow.xaml*",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
               "WhenOpened": "2025-11-09T16:58:35.363Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "MainWindow.xaml.cs",
-              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainWindow.xaml.cs",
-              "RelativeDocumentMoniker": "Gomoku_Client\\MainWindow.xaml.cs",
-              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainWindow.xaml.cs",
-              "RelativeToolTip": "Gomoku_Client\\MainWindow.xaml.cs",
-              "ViewState": "AgIAABcAAAAAAAAAAAAAAD0AAABDAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "MainGameUI.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainGameUI.xaml.cs",
+              "RelativeDocumentMoniker": "Gomoku_Client\\MainGameUI.xaml.cs",
+              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainGameUI.xaml.cs",
+              "RelativeToolTip": "Gomoku_Client\\MainGameUI.xaml.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAWwCsAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-01T13:03:19.187Z",
+              "WhenOpened": "2025-11-10T11:51:57.279Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MainGameUI.xaml",
+              "DocumentMoniker": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainGameUI.xaml",
+              "RelativeDocumentMoniker": "Gomoku_Client\\MainGameUI.xaml",
+              "ToolTip": "C:\\Users\\ACER\\Desktop\\ImportantFile\\ProjectGomoku\\Gomoku\\Gomoku_Client\\MainGameUI.xaml*",
+              "RelativeToolTip": "Gomoku_Client\\MainGameUI.xaml*",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2025-11-10T11:47:11.317Z",
               "EditorCaption": ""
             }
           ]

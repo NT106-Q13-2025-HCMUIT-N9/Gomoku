@@ -98,24 +98,6 @@ namespace Gomoku_Client
             GetEmailGrid.Visibility = Visibility.Visible;
         }
 
-        private void NewPasswordBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (NewPasswordBox.Text == "Mật khẩu mới")
-            {
-                NewPasswordBox.Text = "";
-                NewPasswordBox.Foreground = Brushes.Black;
-            }
-        }
-
-        private void NewPasswordBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(OTPBox.Text))
-            {
-                NewPasswordBox.Text = "Mật khẩu mới";
-                NewPasswordBox.Foreground = Brushes.Gray;
-            }
-        }
-
         private void Set_Password_Click(object sender, RoutedEventArgs e)
         {
 
@@ -142,6 +124,22 @@ namespace Gomoku_Client
         {
             SetPasswordGrid.Visibility = Visibility.Collapsed;
             GetOTPGrid.Visibility = Visibility.Visible;
+        }
+
+        private void NewPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (NewPasswordBox.Password.Length > 0)
+                NewPasswordPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                NewPasswordPlaceholder.Visibility = Visibility.Visible;
+        }
+
+        private void NewPasswordConfirmBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            if (NewPasswordConfirmBox.Password.Length > 0)
+                NewPasswordConfirmPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                NewPasswordConfirmPlaceholder.Visibility = Visibility.Visible;
         }
     }
 }

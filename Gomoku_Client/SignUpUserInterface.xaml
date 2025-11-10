@@ -225,7 +225,7 @@
                             VerticalAlignment="Center"
                             Margin="12,0,0,0"
                             IsHitTestVisible="False"
-                            Visibility="{Binding ElementName=PasswordBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
+                            Visibility="{Binding ElementName=PasswordConfirmBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
                     </Grid>
                 </Border>
 

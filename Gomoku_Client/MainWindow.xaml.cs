@@ -96,5 +96,25 @@ namespace Gomoku_Client
             // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
             this.Close();
         }
+
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainGameUI mainGame = new MainGameUI();
+            // Sao chép vị trí và kích thước
+            mainGame.Left = this.Left;
+            mainGame.Top = this.Top;
+            mainGame.Width = this.Width;
+            mainGame.Height = this.Height;
+            mainGame.WindowState = this.WindowState;
+
+            // 1. Ẩn Window hiện tại ngay lập tức
+            this.Hide();
+
+            // 2. Hiển thị Window mới
+            mainGame.Show();
+
+            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
+            this.Close();
+        }
     }
 }

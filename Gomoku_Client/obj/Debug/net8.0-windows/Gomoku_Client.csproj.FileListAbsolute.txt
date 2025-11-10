@@ -24,3 +24,5 @@ C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\SignUpUserInterface.baml
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\ForgotPasswordUI.g.cs
 C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\ForgotPasswordUI.baml
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\MainGameUI.g.cs
+C:\Users\ACER\Desktop\ImportantFile\ProjectGomoku\Gomoku\Gomoku_Client\obj\Debug\net8.0-windows\MainGameUI.baml

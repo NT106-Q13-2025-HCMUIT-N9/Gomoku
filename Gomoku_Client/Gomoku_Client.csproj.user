@@ -5,6 +5,9 @@
     <Compile Update="ForgotPasswordUI.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="MainGameUI.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="SignUpUserInterface.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Gomoku_Client.ViewModel;
+using System.Runtime.CompilerServices;
 
 namespace Gomoku_Client
 {
@@ -142,6 +143,7 @@ namespace Gomoku_Client
                 }
 
                 var temp = await FirebaseInfo.AuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
+                await UserAction.SendVeriAsync(await temp.User.GetIdTokenAsync());
 
                 CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
                 UserDataModel doc = new UserDataModel
@@ -151,7 +153,8 @@ namespace Gomoku_Client
                     Password = HashFunc.HashString(password)
                 };
                 await user_collection.AddAsync(doc);
-                MessageBox.Show("Đăng kí thành công", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                MessageBox.Show("Đăng kí thành công. Vui lòng kiểm tra email về thông tin đăng nhập", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 MainWindow main = new MainWindow();
                 main.Left = this.Left;
@@ -166,6 +169,10 @@ namespace Gomoku_Client
             catch (FirebaseAuthException ex)
             {
                 MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (AuthException ex)
+            {
+                MessageBox.Show($"Lỗi: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

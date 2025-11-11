@@ -2,6 +2,7 @@
 using Gomoku_Client.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace Gomoku_Client
             try
             {
                 FirebaseInfo.AuthClient.SignOut();
+
                 MainWindow main = new MainWindow();
                 // Sao chép vị trí và kích thước
                 main.Left = this.Left;

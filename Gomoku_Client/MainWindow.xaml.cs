@@ -2,6 +2,7 @@
 using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -104,11 +105,10 @@ namespace Gomoku_Client
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            string password = PasswordBox.Password;
+            string email = EmailBox.Text;
             try
             {
-                string password = PasswordBox.Password;
-                string email = EmailBox.Text;
-
                 if (string.IsNullOrEmpty(email))
                 {
                     MessageBox.Show($"Lỗi: Vui lòng nhập một email", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -121,40 +121,28 @@ namespace Gomoku_Client
                     return;
                 }
 
-                CollectionReference collection = FirebaseInfo.DB.Collection("UserInfo");
-                QuerySnapshot snapshot = await collection.WhereEqualTo("Email", email).GetSnapshotAsync();
-                if(snapshot.Documents.Count == 0)
-                {
-                    MessageBox.Show($"Lỗi: Email này chưa có tài khoản", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
 
-                foreach(DocumentSnapshot doc in snapshot.Documents)
-                {
-                    if (HashFunc.HashString(password) == doc.GetValue<string>("Password"))
-                    {
-                        var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
-
-                        MainGameUI mainGame = new MainGameUI();
-                        mainGame.Left = this.Left;
-                        mainGame.Top = this.Top;
-                        mainGame.Width = this.Width;
-                        mainGame.Height = this.Height;
-                        mainGame.WindowState = this.WindowState;
-                        this.Hide();
-                        mainGame.Show();
-                        this.Close();
-                        return;
-                    }
-                }
-
-                MessageBox.Show($"Lỗi: Sai mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                MainGameUI mainGame = new MainGameUI();
+                mainGame.Left = this.Left;
+                mainGame.Top = this.Top;
+                mainGame.Width = this.Width;
+                mainGame.Height = this.Height;
+                mainGame.WindowState = this.WindowState;
+                this.Hide();
+                mainGame.Show();
+                this.Close();
             }
-            catch (FirebaseAuthException ex)
+            catch (FirebaseAuthException)
             {
-                MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                try
+                {
+                    await UserAction.LoginEmailtAsync(email, password);
+                }
+                catch (AuthException auth_ex)
+                {
+                    MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Gomoku_Client.Model;
+using Gomoku_Client.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -90,11 +91,15 @@ namespace Gomoku_Client
 
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
-            GetEmailGrid.Visibility = Visibility.Collapsed;
-            GetOTPGrid.Visibility = Visibility.Visible;
-
-            await FirebaseInfo.AuthClient.ResetEmailPasswordAsync(EmailBox.Text);
-            Debug.WriteLine("Sike");
+            try
+            {
+                await UserAction.SendResetAsync(EmailBox.Text);
+                MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (AuthException auth_ex)
+            {
+                MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void Back_From_OPTGrid_Click(object sender, RoutedEventArgs e)

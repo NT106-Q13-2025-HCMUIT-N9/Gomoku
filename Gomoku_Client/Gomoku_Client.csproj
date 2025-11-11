@@ -8,4 +8,20 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Assets\Gomoku.ico" />
+    <None Remove="Assets\Login_Background.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
+    <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
+    <PackageReference Include="Google.Cloud.Firestore" Version="3.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\Gomoku.ico" />
+    <Resource Include="Assets\Login_Background.png" />
+  </ItemGroup>
+
 </Project>

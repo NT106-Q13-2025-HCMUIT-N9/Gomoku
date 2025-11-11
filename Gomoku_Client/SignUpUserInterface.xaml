@@ -92,6 +92,12 @@
     </Window.Resources>
 
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+                Stretch="UniformToFill"
+                Opacity="0.3"/>
+        </Grid.Background>
+        
         <Border Background="#F9F9F9"
              BorderBrush="#0078D7"
              BorderThickness="2"

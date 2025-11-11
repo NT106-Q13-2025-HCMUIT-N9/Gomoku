@@ -88,7 +88,13 @@
 
     </Window.Resources>
 
-    <Grid Background="#F0F0F0" >
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+        Stretch="UniformToFill"
+        Opacity="0.3"/>
+        </Grid.Background>
+        
         <Button Style="{StaticResource BlueButton}"
             Content="Đăng xuất"
             Width="180" Height="40"

@@ -7,7 +7,8 @@
         xmlns:converters="clr-namespace:Gomoku_Client.Converters"
         Icon="\Assets\Gomoku.ico"
         mc:Ignorable="d"
-        Title="Gomoku" Height="800" Width="1600">
+        Title="Gomoku" Height="800" Width="1600"
+        WindowState="Maximized">
 
     <Window.Resources>
         <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
@@ -90,7 +91,13 @@
 
     </Window.Resources>
 
-    <Grid Background="#F0F0F0" >
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+                        Stretch="UniformToFill"
+                        Opacity="0.3"/>
+        </Grid.Background>
+        
         <Border Background="#F9F9F9"
                 BorderBrush="#0078D7"
                 BorderThickness="2"
@@ -129,7 +136,7 @@
                            Height="20" 
                            VerticalAlignment="Top">
                     <Hyperlink Click="Hyperlink_Click">
-                        Quên tên đăng nhập hay mật khẩu?
+                        Quên mật khẩu?
                     </Hyperlink>
                 </TextBlock>
 

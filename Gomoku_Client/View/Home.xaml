@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Gomoku_Client"
         mc:Ignorable="d"
         Icon="\Assets\Gomoku.ico"
-        Title="Gomoku" Height="800" Width="1600">
+        Title="Gomoku" Height="720" Width="1280" WindowStyle="SingleBorderWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Window.Resources>
         <Style x:Key="BlueButton" TargetType="Button">

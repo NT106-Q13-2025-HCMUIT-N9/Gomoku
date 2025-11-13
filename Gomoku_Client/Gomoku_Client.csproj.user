@@ -2,13 +2,13 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup />
   <ItemGroup>
-    <Compile Update="ForgotPasswordUI.xaml.cs">
+    <Compile Update="View\ForgotPassword.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="MainGameUI.xaml.cs">
+    <Compile Update="View\Home.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="SignUpUserInterface.xaml.cs">
+    <Compile Update="View\SignUp.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

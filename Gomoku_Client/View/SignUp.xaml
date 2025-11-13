@@ -9,7 +9,7 @@
         Icon="\Assets\Gomoku.ico"
         Title="Đăng kí tài khoản"
         Background="#F0F0F0" 
-        Height="800" Width="1600">
+        ResizeMode ="NoResize" Height="720" Width="1280" WindowStyle="SingleBorderWindow" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
         <Style x:Key="BlueButton" TargetType="Button">
@@ -91,7 +91,7 @@
 
     </Window.Resources>
 
-    <Grid>
+    <Grid Width="1280" Height="720">
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Login_Background.png" 
                 Stretch="UniformToFill"

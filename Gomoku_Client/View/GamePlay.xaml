@@ -1,0 +1,184 @@
+﻿<Window x:Class="Gomoku_Client.View.GamePlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gomoku Online"
+        Height="720" Width="1280"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="#F0F0F0">
+
+    <Window.Resources>
+        
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
+        
+
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="250"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0" VerticalAlignment="Top">
+            <Border Style="{StaticResource PlayerPanelStyle}">
+                <StackPanel>
+                    <TextBlock Text="NGƯỜI CHƠI 1"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Foreground="#0078D7"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,10"/>
+                    <!--
+                    <Grid Width="100" Height="100" HorizontalAlignment="Center" Margin="0,0,0,10">
+                        <Ellipse Stroke="#0078D7" StrokeThickness="3">
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="/Assets/player1.png" Stretch="UniformToFill"/>
+                            </Ellipse.Fill>
+                        </Ellipse>    
+                    </Grid>
+                    -->
+                    
+
+                    <Border Width="100" Height="100" 
+
+                            BorderBrush="#1976D2" BorderThickness="3"
+                            
+                            HorizontalAlignment="Center" Margin="0,0,0,10">
+
+                        <Image Source="/Assets/player1.png" Stretch="UniformToFill" RenderTransformOrigin="1.919,0.572"/>
+
+                    </Border>
+
+                   
+                    <TextBlock x:Name="Player1Name" Text="Player 1"
+                               FontSize="16" FontWeight="Bold"
+                               Foreground="#333" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="Player1Rank" Text="★ 1500"
+                               FontSize="13" Foreground="#888"
+                               HorizontalAlignment="Center" Margin="0,5,0,10"/>
+
+                    <Border Style="{StaticResource SubPanelBackground}">
+                        <StackPanel>
+                            <TextBlock Text="THỜI GIAN" FontSize="12" Foreground="#555" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="Player1Timer" Text="05:00"
+                                       FontSize="28" FontWeight="Bold"
+                                       Foreground="#0078D7"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Column="1" Margin="20,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Style="{StaticResource PlayerPanelStyle}" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock x:Name="GameStatusText"
+                               Text="Lượt của Player 1"
+                               FontSize="18" FontWeight="Bold"
+                               Foreground="#0078D7"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="GameInfoText"
+                               Text="Trận đấu đang diễn ra"
+                               FontSize="12" Foreground="#777"
+                               HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="1" Background="#FDEBD0" 
+                    BorderBrush="#0078D7"
+                    BorderThickness="2"
+                    CornerRadius="22"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid x:Name="BoardGrid" Width="560" Height="560" Margin="10">
+                    <Canvas x:Name="BoardCanvas"/>
+                    <UniformGrid x:Name="BoardUniformGrid" Rows="15" Columns="15" Background="Transparent"/>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+                <Button x:Name="SurrenderButton" Content="Đầu Hàng"
+                        Style="{StaticResource DangerButton}" Width="160" Margin="5" Height="40"/>
+                <Button x:Name="ExitButton" Content="Thoát"
+                        Style="{StaticResource DangerButton}" Width="160" Margin="5" Height="40"/>
+            </StackPanel>
+
+        </Grid>
+
+        <StackPanel Grid.Column="2" VerticalAlignment="Top">
+            <Border Style="{StaticResource PlayerPanelStyle}">
+                <StackPanel>
+                    <TextBlock Text="NGƯỜI CHƠI 2"
+                               FontSize="16" FontWeight="Bold"
+                               Foreground="#0078D7"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,10"/>
+                    <Grid Width="100" Height="100" HorizontalAlignment="Center" Margin="0,0,0,10">
+                        <Ellipse Stroke="#0078D7" StrokeThickness="3">
+                            <Ellipse.Fill>
+                                <ImageBrush ImageSource="/Assets/player2.png" Stretch="UniformToFill"/>
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Grid>
+
+                    <TextBlock x:Name="Player2Name" Text="Player 2"
+                               FontSize="16" FontWeight="Bold"
+                               Foreground="#333" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="Player2Rank" Text="★ 1520"
+                               FontSize="13" Foreground="#888"
+                               HorizontalAlignment="Center" Margin="0,5,0,10"/>
+
+                    <Border Style="{StaticResource SubPanelBackground}">
+                        <StackPanel>
+                            <TextBlock Text="THỜI GIAN" FontSize="12" Foreground="#555" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="Player2Timer" Text="05:00"
+                                       FontSize="28" FontWeight="Bold"
+                                       Foreground="#0078D7"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource PlayerPanelStyle}">
+                <StackPanel>
+                    <TextBlock Text="CHAT" FontSize="14" FontWeight="Bold" 
+                               Foreground="#0078D7"
+                               HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <ScrollViewer Height="120" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10">
+                        <TextBlock x:Name="ChatMessages" TextWrapping="Wrap" Foreground="#555" FontSize="12"/>
+                    </ScrollViewer>
+
+                    <Border Background="#F3F3F3"
+                            CornerRadius="8"
+                            BorderBrush="#CCCCCC"
+                            BorderThickness="1"
+                            Padding="2">
+                        <TextBox x:Name="ChatInput"
+                                 Height="30"
+                                 FontSize="12"
+                                 Padding="10,5"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 Foreground="#333"
+                                 FontFamily="Segoe UI"
+                                 FontWeight="SemiBold"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,5 +1,6 @@
 ﻿using Firebase.Auth;
 using Gomoku_Client.Model;
+using Gomoku_Client.View;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
 using System.Diagnostics;

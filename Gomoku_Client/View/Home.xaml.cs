@@ -1,5 +1,6 @@
 ﻿using Firebase.Auth;
 using Gomoku_Client.Model;
+using Gomoku_Client.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -49,6 +50,13 @@ namespace Gomoku_Client
             {
                 MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void Play_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            new GamePlay().Show();
+            this.Close();
         }
     }
 }

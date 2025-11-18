@@ -97,7 +97,8 @@
                         Opacity="0.3"/>
         </Grid.Background>
 
-        <Border Background="#F9F9F9"
+        <Border x:Name="MainBorder" 
+                Background="#F9F9F9"
                 BorderBrush="#0078D7"
                 BorderThickness="2"
                 CornerRadius="22"
@@ -106,8 +107,10 @@
                 Height="300"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
-            <Grid>
+            <Grid x:Name="EmailBorder1">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -116,6 +119,7 @@
 
                 </Grid.RowDefinitions>
 
+                <!-- Label đăng nhập -->
                 <TextBlock Text="Đăng nhập vào Gomoku"
                        Grid.Row="0"
                        HorizontalAlignment="Center"
@@ -126,12 +130,13 @@
                        FontWeight="Bold"
                        Margin="0,0,0,20"/>
 
-                <TextBlock Grid.Row="4" 
+                <!-- Quên mật khẩu -->
+                <TextBlock Grid.Row="6" 
                            FontFamily="Segoe UI"
                            FontSize="14"
                            FontWeight="SemiBold" 
-                           HorizontalAlignment="Left" 
-                           Margin="10,12,0,0" 
+                           HorizontalAlignment="Right" 
+                           Margin="0,12,35,0" 
                            Height="20" 
                            VerticalAlignment="Top">
                     <Hyperlink Click="Hyperlink_Click">
@@ -139,24 +144,42 @@
                     </Hyperlink>
                 </TextBlock>
 
-                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" >
+                <!-- Đăng ký tài khoản -->
+                <TextBlock Grid.Row="6" 
+                   FontFamily="Segoe UI"
+                   FontSize="14"
+                   FontWeight="SemiBold" 
+                   HorizontalAlignment="Left" 
+                   Margin="16,12,0,0" 
+                   Height="20" 
+                   VerticalAlignment="Top">
+                    <Hyperlink Click="SignUp_Click">
+                        Đăng ký tài khoản mới
+                    </Hyperlink>
+                </TextBlock>
+
+                <!-- Hai nút -->
+                <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" >
                     <Button Style="{StaticResource BlueButton}"
                             Content="Đăng Nhập"
                             Width="180" Height="40"
                             Margin="0,0,0,0" Click="LoginButton_Click"/>
                     <Button Style="{StaticResource WhiteBlueButton}"
-                            Content="Đăng Ký"
+                            Content="Thoát"
                             Width="180" Height="40"
-                            Margin="5,0,0,0" Click="SignUpButton_Click"/>
+                            Margin="5,0,0,0" Click="ExitButton_Click"/>
                 </StackPanel>
 
-                <Border Grid.Row="1"
+                <!-- Email box -->
+                <Border x:Name="EmailBorder"
+                        Grid.Row="1"
                         Background="#F3F3F3"
                         CornerRadius="8"
                         BorderBrush="#CCCCCC"
                         BorderThickness="1"
                         Padding="2">
-                    <TextBox x:Name="EmailBox"
+                    <StackPanel>
+                        <TextBox x:Name="EmailBox"
                              Height="36"
                              FontSize="14"
                              Padding="10,7"
@@ -168,16 +191,58 @@
                              FontStyle="Normal"
                              Text="Email"
                              GotFocus="EmailBox_GotFocus"
-                             LostFocus="EmailBox_LostFocus"/>
+                             LostFocus="EmailBox_LostFocus">
+                        </TextBox>
+                        <TextBlock x:Name="EmailError"
+                           Foreground="Red"
+                           FontSize="12"
+                           Visibility="Collapsed"/>
+                    </StackPanel>
+
+
                 </Border>
 
-                <Border Grid.Row="2"
+                <!-- Thông báo sai Email -->
+                <TextBlock x:Name="EmailNotFoundText" 
+                   Text="Không tìm thấy tài khoản với email này"
+                   Grid.Row="2"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Foreground="Red"  
+                   FontFamily="Segoe UI"
+                   FontSize="12"         
+                   FontWeight="Bold"
+                   Margin="9,0,0,0"
+                   Visibility="Collapsed"/>
+
+                <!-- Thông báo sai Password -->
+                <TextBlock x:Name="WrongPassText" 
+                   Text="Mật khẩu không được dưới 6 ký tự"
+                   Grid.Row="2"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Foreground="Red"  
+                   FontFamily="Segoe UI"
+                   FontSize="12"         
+                   FontWeight="Bold"
+                   Margin="9,0,0,0"
+                   Visibility="Collapsed"/>
+
+                <!-- Password box -->
+                <Border x:Name="PasswordBorder" 
+                    Grid.Row="3"
                     Background="#F3F3F3"
                     CornerRadius="8"
                     BorderBrush="#CCCCCC"
                     BorderThickness="1"
-                    Padding="2" Margin="0,15,0,0">
+                    Padding="2" 
+                    Margin="0,15,0,0">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="35"/>
+                            <!-- cho nút 👁 -->
+                        </Grid.ColumnDefinitions>
                         <PasswordBox x:Name="PasswordBox"
                             Height="36"
                             FontSize="14"
@@ -188,7 +253,11 @@
                             FontFamily="Segoe UI"
                             FontWeight="SemiBold"
                             FontStyle="Normal"
-                            PasswordChanged="PasswordBox_PasswordChanged"/>
+                            PreviewKeyDown="PasswordBox_PreviewKeyDown"
+                            PasswordChanged="PasswordBox_PasswordChanged" 
+                            LostFocus="PasswordBox_LostFocus"
+                            Grid.ColumnSpan="2"/>
+                        
                         <TextBlock x:Name="PasswordPlaceholder"
                             Text="Mật khẩu"
                             Foreground="Gray"
@@ -198,7 +267,32 @@
                             VerticalAlignment="Center"
                             Margin="12,0,0,0"
                             IsHitTestVisible="False"
-                            Visibility="{Binding ElementName=PasswordBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
+                            Visibility="{Binding ElementName=PasswordBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}" 
+                            Grid.ColumnSpan="2"/>
+
+                        <TextBox x:Name="PasswordVisible"
+                             Height="36"
+                             FontSize="14"
+                             Padding="10,7"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Foreground="Black"
+                             FontFamily="Segoe UI"
+                             FontWeight="SemiBold"
+                             Visibility="Collapsed"
+                             PreviewKeyDown="PasswordVisible_PreviewKeyDown"
+                             Grid.ColumnSpan="2"/>
+
+                        <Button x:Name="TogglePasswordBtn"
+                            Grid.Column="1"
+                            Content="👁"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Width="30"
+                            Height="30"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Click="TogglePasswordBtn_Click"/>
                     </Grid>
                 </Border>
             </Grid>

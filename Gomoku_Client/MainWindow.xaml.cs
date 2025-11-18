@@ -46,12 +46,44 @@ namespace Gomoku_Client
             }
         }
 
+        bool isWrongEmail = false;
         private void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
-                EmailBox.Text = "Tên người dùng";
+                EmailBox.Text = "Email";
                 EmailBox.Foreground = Brushes.Gray;
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                if(isWrongEmail == true)
+                {
+                    MainBorder.Height -= 15;
+                    isWrongEmail = false;
+                }
+                return;
+            }
+
+            if (true)
+            {
+                EmailNotFoundText.Text = "Email không hợp lệ";
+                EmailBox.BorderBrush = Brushes.Red;
+                EmailNotFoundText.Visibility = Visibility.Visible;
+                MainBorder.Height += 15;
+                // Email không tồn tại → viền đỏ
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+
+                isWrongEmail = true;
+            }
+            else if (true)
+            {
+                EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                EmailBox.BorderBrush = Brushes.Red;
+                EmailNotFoundText.Visibility = Visibility.Visible;
+                MainBorder.Height += 15;
+                // Email không tồn tại → viền đỏ
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+
+                isWrongEmail = true;
             }
         }
 
@@ -142,7 +174,79 @@ namespace Gomoku_Client
                 catch (AuthException auth_ex)
                 {
                     MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }            }
+                }
+            }
+        }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void SignUp_Click(object sender, RoutedEventArgs e)
+        {
+            SignUpUserInterface SignUp = new SignUpUserInterface();
+            SignUp.Left = this.Left;
+            SignUp.Top = this.Top;
+            SignUp.Width = this.Width;
+            SignUp.Height = this.Height;
+            SignUp.WindowState = this.WindowState;
+            this.Hide();
+            SignUp.Show();
+            this.Close();
+        }
+
+        private bool isShowing = false;
+        private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isShowing)
+            {
+                // Hiện mật khẩu
+                PasswordVisible.Text = PasswordBox.Password;
+                PasswordVisible.Visibility = Visibility.Visible;
+                PasswordBox.Visibility = Visibility.Collapsed;
+
+                TogglePasswordBtn.Content = "🙈";
+            }
+            else
+            {
+                // Ẩn mật khẩu
+                PasswordBox.Password = PasswordVisible.Text;
+                PasswordBox.Visibility = Visibility.Visible;
+                PasswordVisible.Visibility = Visibility.Collapsed;
+
+                TogglePasswordBtn.Content = "👁";
+            }
+
+            isShowing = !isShowing;
+        }
+
+        private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true; // chặn phím Space
+            }
+        }
+
+        private void PasswordVisible_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (PasswordBox.Password.Length == 0)
+            {
+                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+            }
+            else if (PasswordBox.Password.Length < 6)
+            {
+                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+            }
         }
     }
 }

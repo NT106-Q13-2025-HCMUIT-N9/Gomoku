@@ -6,98 +6,221 @@
         xmlns:local="clr-namespace:Gomoku_Client"
         mc:Ignorable="d"
         Icon="\Assets\Gomoku.ico"
-        Title="Gomoku" Height="720" Width="1280" WindowStyle="SingleBorderWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-
+        Title="Gomoku" Height="720" Width="1280" 
+        WindowStyle="SingleBorderWindow" 
+        WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize"
+        Background="#0F1923">
     <Window.Resources>
-        <Style x:Key="BlueButton" TargetType="Button">
-            <Setter Property="Background" Value="#0078D7"/>
-            <!-- Xanh dương -->
-            <Setter Property="Foreground" Value="White"/>
-            <!-- Chữ trắng -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="BorderBrush" Value="#005A9E"/>
-            <Setter Property="BorderThickness" Value="2"/>
+        <Style x:Key="MenuItem" TargetType="RadioButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#ECE8E1"/>
+            <Setter Property="FontFamily" Value="Impact"/>
+            <Setter Property="FontSize" Value="200"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,8,0,8"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="22">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                        </Border>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid Background="Transparent">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <Rectangle x:Name="Bullet" Width="4" Height="4" 
+                                   Fill="{TemplateBinding Foreground}" 
+                                   RenderTransformOrigin="0.5,0.5" 
+                                   Margin="0,0,20,0" 
+                                   VerticalAlignment="Center">
+                                    <Rectangle.RenderTransform>
+                                        <RotateTransform Angle="45"/>
+                                    </Rectangle.RenderTransform>
+                                </Rectangle>
+
+                                <ContentPresenter x:Name="ContentText"
+                                          HorizontalAlignment="Left" 
+                                          VerticalAlignment="Center"
+                                          RenderTransformOrigin="0,0.5">
+                                    <ContentPresenter.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform x:Name="ScaleTransform" ScaleX="1.0" ScaleY="1.0"/>
+                                            <TranslateTransform x:Name="TranslateTransform" X="0" Y="0"/>
+                                        </TransformGroup>
+                                    </ContentPresenter.RenderTransform>
+                                </ContentPresenter>
+                            </StackPanel>
+                        </Grid>
+
                         <ControlTemplate.Triggers>
+                            <!-- animation -->
+                            <!-- hover -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#005A9E"/>
-                                <!-- Tối lại khi hover -->
+                                <Setter Property="Foreground" Value="White"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="1.25"
+                                                     Duration="0:0:0.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1.25"
+                                                     Duration="0:0:0.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="1.0"
+                                                     Duration="0:0:0.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1.0"
+                                                     Duration="0:0:0.2">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#004578"/>
-                                <!-- Nhấn xuống -->
+                            <!-- selected -->
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="#2F6BFF"/>
+                                <Setter Property="Margin" Value="0,30,0,30"/>
+                                <Setter TargetName="Bullet" Property="Visibility" Value="Collapsed"/>
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="2.5"
+                                                     Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="2.5"
+                                                     Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <DoubleAnimation Storyboard.TargetName="TranslateTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="20"
+                                                     Duration="0:0:0.3">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                            <ThicknessAnimation Storyboard.TargetProperty="Margin"
+                                                        To="0,30,0,30"
+                                                        Duration="0:0:0.3">
+                                                <ThicknessAnimation.EasingFunction>
+                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                </ThicknessAnimation.EasingFunction>
+                                            </ThicknessAnimation>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleX"
+                                                     To="1.0"
+                                                     Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                     Storyboard.TargetProperty="ScaleY"
+                                                     To="1.0"
+                                                     Duration="0:0:0.2"/>
+                                            <DoubleAnimation Storyboard.TargetName="TranslateTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="0"
+                                                     Duration="0:0:0.2"/>
+                                            <ThicknessAnimation Storyboard.TargetProperty="Margin"
+                                                        To="0,8,0,8"
+                                                        Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <!-- end of animation -->
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter Property="Opacity" Value="0.8"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="WhiteBlueButton" TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-            <!-- Nền trắng -->
-            <Setter Property="Foreground" Value="#0078D7"/>
-            <!-- Chữ xanh -->
+
+        <Style x:Key="SubButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#ECE8E1"/>
             <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontSize" Value="18"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="BorderBrush" Value="#0078D7"/>
-            <!-- Viền xanh -->
-            <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="22">
-                            <!-- Bo góc -->
-                            <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
+                        <Border Background="{TemplateBinding Background}" Padding="10,5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
-
-                        <!-- Hiệu ứng hover và nhấn -->
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#E5F1FB"/>
-                                <!-- Xanh nhạt khi hover -->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#CCE4F7"/>
-                                <!-- Đậm hơn khi nhấn -->
+                                <Setter Property="Foreground" Value="#FF4655"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-
     </Window.Resources>
 
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Login_Background.png" 
-        Stretch="UniformToFill"
-        Opacity="0.3"/>
+                        Stretch="UniformToFill" 
+                        Opacity="0.4"/>
         </Grid.Background>
-        
-        <Button Style="{StaticResource BlueButton}"
-            Content="Đăng xuất"
-            Width="180" Height="40"
-            Margin="5,0,0,0" Click="SignOut_Click"/>
+
+        <Grid>
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                    <GradientStop Color="#0F1923" Offset="0.0"/>
+                    <GradientStop Color="#CC0F1923" Offset="0.3"/>
+                    <GradientStop Color="Transparent" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+        </Grid>
+
+        <Viewbox HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0" Stretch="Uniform" Height="500">
+            <StackPanel Width="152">
+                <RadioButton Content="PLAY" Style="{StaticResource MenuItem}" GroupName="Menu" VerticalAlignment="Center"/>
+                <RadioButton Content="HISTORY" Style="{StaticResource MenuItem}" GroupName="Menu"/>
+                <RadioButton Content="CONNECTION" Style="{StaticResource MenuItem}" GroupName="Menu"/>
+                <RadioButton Content="SETTINGS" Style="{StaticResource MenuItem}" GroupName="Menu"/>
+                <RadioButton Content="QUIT" Style="{StaticResource MenuItem}" GroupName="Menu"/>
+            </StackPanel>
+        </Viewbox>
     </Grid>
 </Window>

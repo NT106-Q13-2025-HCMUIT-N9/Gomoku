@@ -68,7 +68,7 @@ namespace Gomoku_Client
                 EmailNotFoundText.Text = "Email không hợp lệ";
                 EmailBox.BorderBrush = Brushes.Red;
                 EmailNotFoundText.Visibility = Visibility.Visible;
-                MainBorder.Height += 15;
+                if(isWrongEmail == false) MainBorder.Height += 15;
                 // Email không tồn tại → viền đỏ
                 EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
 
@@ -79,7 +79,7 @@ namespace Gomoku_Client
                 EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
                 EmailBox.BorderBrush = Brushes.Red;
                 EmailNotFoundText.Visibility = Visibility.Visible;
-                MainBorder.Height += 15;
+                if (isWrongEmail == false) MainBorder.Height += 15;
                 // Email không tồn tại → viền đỏ
                 EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
 
@@ -239,14 +239,7 @@ namespace Gomoku_Client
 
         private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (PasswordBox.Password.Length == 0)
-            {
-                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-            }
-            else if (PasswordBox.Password.Length < 6)
-            {
-                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Red);
-            }
+            
         }
     }
 }

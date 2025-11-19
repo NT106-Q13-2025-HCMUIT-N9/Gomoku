@@ -14,9 +14,6 @@ namespace Gomoku_Client.Model
         public string Username { get; set; }
 
         [FirestoreProperty]
-        public string Password { get; set; }
-
-        [FirestoreProperty]
         public string Email { get; set; }
     }
 }

@@ -1,23 +1,12 @@
 ﻿using Firebase.Auth;
 using Gomoku_Client.Model;
+using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
-using Grpc.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Gomoku_Client.ViewModel;
-using System.Runtime.CompilerServices;
 
 namespace Gomoku_Client
 {
@@ -41,7 +30,7 @@ namespace Gomoku_Client
         }
 
         bool isWrongUsername = false;
-        private void UsernameBox_LostFocus(object sender, RoutedEventArgs e)
+        private async void UsernameBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(UsernameBox.Text))
             {
@@ -54,14 +43,35 @@ namespace Gomoku_Client
                     MainBorder.Height -= 15;
                     isWrongUsername = false;
                 }
-            }
-
-            else if(true)
+            }else if (UsernameBox.Text == "Tên người dùng")
             {
+                UsernameMsg.Text = "Vui lòng nhập vào một username";
                 UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Red);
                 UsernameMsg.Visibility = Visibility.Visible;
-                if(!isWrongUsername) MainBorder.Height += 15;
+                if (!isWrongUsername) MainBorder.Height += 15;
                 isWrongUsername = true;
+            }
+            else
+            {
+                if (await Validate.IsUsernamExists(UsernameBox.Text))
+                {
+                    UsernameMsg.Text = "Username đã tồn tại. Vui lòng chọn một username khác";
+                    UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                    UsernameMsg.Visibility = Visibility.Visible;
+                    if (!isWrongUsername) MainBorder.Height += 15;
+                    isWrongUsername = true;
+                }
+                else
+                {
+                    UsernameBox.Foreground = Brushes.Gray;
+                    UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                    UsernameMsg.Visibility = Visibility.Collapsed;
+                    if (isWrongUsername == true)
+                    {
+                        MainBorder.Height -= 15;
+                        isWrongUsername = false;
+                    }
+                }
             }
         }
 
@@ -75,7 +85,7 @@ namespace Gomoku_Client
         }
 
         bool isWrongEmail = false;
-        private void EmailBox_LostFocus(object sender, RoutedEventArgs e)
+        private async void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
@@ -89,23 +99,37 @@ namespace Gomoku_Client
                     isWrongEmail = false;
                 }
             }
-
-            else if (true)
+            else if (!Validate.IsValidEmail(EmailBox.Text))
             {
-                EmailMsg.Text = "Email không hợp lệ";
+                EmailMsg.Text = "Vui lòng nhập đúng định dạng email";
                 EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
                 EmailMsg.Visibility = Visibility.Visible;
                 if (!isWrongEmail) MainBorder.Height += 15;
                 isWrongEmail = true;
             }
-
-            else if (true)
+            else
             {
-                EmailMsg.Text = "Email đã liên kết với một tài khoản";
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
-                EmailMsg.Visibility = Visibility.Visible;
-                if (!isWrongEmail) MainBorder.Height += 15;
-                isWrongEmail = true;
+                CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
+                QuerySnapshot query_result = await user_collection.WhereEqualTo("Email", EmailBox.Text).GetSnapshotAsync();
+                if(query_result.Count != 0)
+                {
+                    EmailMsg.Text = "Email đã liên kết với một tài khoản khác. Vui lòng nhập email khác";
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                    EmailMsg.Visibility = Visibility.Visible;
+                    if (!isWrongEmail) MainBorder.Height += 15;
+                    isWrongEmail = true;
+                }
+                else
+                {
+                    EmailBox.Foreground = Brushes.Gray;
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                    EmailMsg.Visibility = Visibility.Collapsed;
+                    if (isWrongEmail == true)
+                    {
+                        MainBorder.Height -= 15;
+                        isWrongEmail = false;
+                    }
+                }
             }
         }
 
@@ -154,33 +178,20 @@ namespace Gomoku_Client
                 string email = EmailBox.Text;
                 string re_password = PasswordConfirmBox.Password;
 
-                if(password != re_password)
+                UsernameBox_LostFocus(sender, e);
+                EmailBox_LostFocus(sender, e);
+                PasswordBox_LostFocus(sender, e);
+                PasswordConfirmBox_LostFocus(sender, e);
+
+                if(string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(re_password))
                 {
-                    MessageBox.Show($"Lỗi: Nhập lại mật khẩu không chính xác", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Debug.WriteLine("Empty");
                     return;
                 }
 
-                if (string.IsNullOrEmpty(username))
+                if(isWrongEmail || isWrongPassword || isWrongUsername || isWrongConfirmPass)
                 {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập tên người dùng", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(email))
-                {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập một email", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(password))
-                {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(re_password))
-                {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập lại mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    Debug.WriteLine("Invail sign up");
                     return;
                 }
 
@@ -191,8 +202,7 @@ namespace Gomoku_Client
                 UserDataModel doc = new UserDataModel
                 {
                     Username = username,
-                    Email = email,
-                    Password = HashFunc.HashString(password)
+                    Email = email
                 };
                 await user_collection.AddAsync(doc);
 
@@ -219,9 +229,17 @@ namespace Gomoku_Client
         }
 
         bool isWrongPassword = false;
-        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+
+        private void PasswordVisible_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (PasswordBox.Password.Length == 0)
+            if (PasswordVisible.Text.Length < 6)
+            {
+                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordMsg.Visibility = Visibility.Visible;
+                if (!isWrongPassword) MainBorder.Height += 15;
+                isWrongPassword = true;
+            }
+            else
             {
                 PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
                 PasswordMsg.Visibility = Visibility.Collapsed;
@@ -231,14 +249,17 @@ namespace Gomoku_Client
                     isWrongPassword = false;
                 }
             }
-            else if (PasswordBox.Password.Length < 6)
+        }
+
+        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (PasswordBox.Password.Length < 6)
             {
                 PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Red);
                 PasswordMsg.Visibility = Visibility.Visible;
                 if (!isWrongPassword) MainBorder.Height += 15;
                 isWrongPassword = true;
             }
-
             else
             {
                 PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
@@ -293,27 +314,23 @@ namespace Gomoku_Client
         }
 
         bool isWrongConfirmPass = false;
-        private void PasswordConfirmBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (PasswordConfirmBox.Password.Length == 0)
-            {
-                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                PasswordConfirmMsg.Visibility = Visibility.Collapsed;
-                if (isWrongConfirmPass == true)
-                {
-                    MainBorder.Height -= 15;
-                    isWrongConfirmPass = false;
-                }
-            }
 
-            else if(PasswordConfirmBox.Password != PasswordBox.Password)
+        private void PasswordConfirmVisible_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (PasswordConfirmVisible.Text.Length == 0)
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordConfirmMsg.Visibility = Visibility.Visible;
+                isWrongConfirmPass = true;
+            }
+            else if (PasswordConfirmBox.Password != PasswordBox.Password && PasswordConfirmBox.Password != PasswordVisible.Text
+                    && PasswordConfirmVisible.Text != PasswordBox.Password && PasswordConfirmVisible.Text != PasswordVisible.Text)
             {
                 PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
                 PasswordConfirmMsg.Visibility = Visibility.Visible;
                 if (!isWrongConfirmPass) MainBorder.Height += 15;
                 isWrongConfirmPass = true;
             }
-
             else
             {
                 PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
@@ -321,8 +338,36 @@ namespace Gomoku_Client
                 if (isWrongConfirmPass == true)
                 {
                     MainBorder.Height -= 15;
-                    isWrongConfirmPass = false;
                 }
+                isWrongConfirmPass = false;
+            }
+        }
+
+        private void PasswordConfirmBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (PasswordConfirmBox.Password.Length == 0 && PasswordConfirmVisible.Text.Length == 0)
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordConfirmMsg.Visibility = Visibility.Visible;
+                isWrongConfirmPass = true;
+            }
+            else if(PasswordConfirmBox.Password != PasswordBox.Password && PasswordConfirmBox.Password != PasswordVisible.Text
+                    && PasswordConfirmVisible.Text != PasswordBox.Password && PasswordConfirmVisible.Text != PasswordVisible.Text)
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordConfirmMsg.Visibility = Visibility.Visible;
+                if (!isWrongConfirmPass) MainBorder.Height += 15;
+                isWrongConfirmPass = true;
+            }
+            else
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                PasswordConfirmMsg.Visibility = Visibility.Collapsed;
+                if (isWrongConfirmPass == true)
+                {
+                    MainBorder.Height -= 15;
+                }
+                isWrongConfirmPass = false;
             }
         }
 

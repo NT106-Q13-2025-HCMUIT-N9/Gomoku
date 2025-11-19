@@ -112,6 +112,8 @@ namespace Gomoku_Client.Model
             {
                 Credential = CredentialFactory.FromFile<ServiceAccountCredential>(fullPath).ToGoogleCredential()
             });
+
+            _db = FirestoreDb.Create(_projectId);
         }
     }
 }

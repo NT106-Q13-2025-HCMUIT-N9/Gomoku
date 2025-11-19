@@ -145,7 +145,7 @@
     
     
 
-    <!--Button trên trang chủ  -->
+    <!-- Button trên trang chủ  -->
     <Style x:Key="ValorantMenuItem" TargetType="RadioButton">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="#ECE8E1"/>
@@ -297,11 +297,10 @@
         </Setter>
     </Style>
 
+    <!-- Style riêng cho button "CHƠI" trên trang chủ, kế thừa từ ValorantMenuItem -->
     <Style x:Key="ValorantMenuMainItem" TargetType="RadioButton" 
        BasedOn="{StaticResource ValorantMenuItem}">
-
         <Setter Property="Foreground" Value="#FF4655"/>
-
         <Setter Property="FontSize" Value="80"/>
     </Style>
 

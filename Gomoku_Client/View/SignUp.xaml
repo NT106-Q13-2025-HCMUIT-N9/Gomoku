@@ -253,6 +253,7 @@
                              FontWeight="SemiBold"
                              Visibility="Collapsed"
                              PreviewKeyDown="PasswordVisible_PreviewKeyDown"
+                             TextChanged="PasswordVisible_TextChanged"
                              Grid.ColumnSpan="2"
                              LostFocus="PasswordVisible_LostFocus"/>
 
@@ -331,6 +332,7 @@
                              FontWeight="SemiBold"
                              Visibility="Collapsed"
                              PreviewKeyDown="PasswordConfirmVisible_PreviewKeyDown"
+                             TextChanged="PasswordConfirmVisible_TextChanged"
                              Grid.ColumnSpan="2"
                              LostFocus="PasswordConfirmVisible_LostFocus"/>
 

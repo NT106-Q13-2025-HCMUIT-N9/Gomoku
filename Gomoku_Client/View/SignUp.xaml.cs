@@ -43,7 +43,8 @@ namespace Gomoku_Client
                     MainBorder.Height -= 15;
                     isWrongUsername = false;
                 }
-            }else if (UsernameBox.Text == "Tên người dùng")
+            }
+            if (UsernameBox.Text == "Tên người dùng")
             {
                 UsernameMsg.Text = "Vui lòng nhập vào một username";
                 UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Red);
@@ -87,17 +88,15 @@ namespace Gomoku_Client
         bool isWrongEmail = false;
         private async void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(EmailBox.Text))
+            if (string.IsNullOrWhiteSpace(EmailBox.Text) || EmailBox.Text == "Email")
             {
                 EmailBox.Text = "Email";
                 EmailBox.Foreground = Brushes.Gray;
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                EmailMsg.Visibility = Visibility.Collapsed;
-                if (isWrongEmail == true)
-                {
-                    MainBorder.Height -= 15;
-                    isWrongEmail = false;
-                }
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                EmailMsg.Text = "Email không được để trống";
+                EmailMsg.Visibility = Visibility.Visible;
+                if (!isWrongEmail) MainBorder.Height += 15;
+                isWrongEmail = true;
             }
             else if (!Validate.IsValidEmail(EmailBox.Text))
             {
@@ -232,27 +231,6 @@ namespace Gomoku_Client
 
         private void PasswordVisible_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (PasswordVisible.Text.Length < 6)
-            {
-                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Red);
-                PasswordMsg.Visibility = Visibility.Visible;
-                if (!isWrongPassword) MainBorder.Height += 15;
-                isWrongPassword = true;
-            }
-            else
-            {
-                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                PasswordMsg.Visibility = Visibility.Collapsed;
-                if (isWrongPassword == true)
-                {
-                    MainBorder.Height -= 15;
-                    isWrongPassword = false;
-                }
-            }
-        }
-
-        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
-        {
             if (PasswordBox.Password.Length < 6)
             {
                 PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Red);
@@ -269,6 +247,72 @@ namespace Gomoku_Client
                     MainBorder.Height -= 15;
                     isWrongPassword = false;
                 }
+            }
+
+            if (PasswordBox.Password != PasswordConfirmBox.Password && PasswordConfirmBox.Password.Length != 0)
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                if (!isWrongConfirmPass)
+                {
+                    MainBorder.Height += 15;
+                    isWrongConfirmPass = true;
+                }
+                PasswordConfirmMsg.Text = "Mật khẩu không khớp";
+                PasswordConfirmMsg.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                PasswordConfirmMsg.Visibility = Visibility.Collapsed;
+                if (isWrongConfirmPass == true)
+                {
+                    MainBorder.Height -= 15;
+                }
+                isWrongConfirmPass = false;
+            }
+        }
+
+        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (PasswordBox.Password.Length < 6)
+            {
+                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordMsg.Visibility = Visibility.Visible;
+                if (!isWrongPassword) MainBorder.Height += 15;
+                isWrongPassword = true;
+            }
+
+            else
+            {
+                PasswordBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                PasswordMsg.Visibility = Visibility.Collapsed;
+                if (isWrongPassword == true)
+                {
+                    MainBorder.Height -= 15;
+                    isWrongPassword = false;
+                }
+            }
+
+            if (PasswordBox.Password != PasswordConfirmBox.Password && PasswordConfirmBox.Password.Length != 0)
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                if (!isWrongConfirmPass)
+                {
+                    MainBorder.Height += 15;
+                    isWrongConfirmPass = true;
+                }
+                PasswordConfirmMsg.Text = "Mật khẩu không khớp";
+                PasswordConfirmMsg.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                PasswordConfirmMsg.Visibility = Visibility.Collapsed;
+                if (isWrongConfirmPass == true)
+                {
+                    MainBorder.Height -= 15;
+                }
+                isWrongConfirmPass = false;
             }
         }
 
@@ -320,13 +364,7 @@ namespace Gomoku_Client
             if (PasswordConfirmVisible.Text.Length == 0)
             {
                 PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
-                PasswordConfirmMsg.Visibility = Visibility.Visible;
-                isWrongConfirmPass = true;
-            }
-            else if (PasswordConfirmBox.Password != PasswordBox.Password && PasswordConfirmBox.Password != PasswordVisible.Text
-                    && PasswordConfirmVisible.Text != PasswordBox.Password && PasswordConfirmVisible.Text != PasswordVisible.Text)
-            {
-                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordConfirmMsg.Text = "Xác nhận mật khẩu không được để trống";
                 PasswordConfirmMsg.Visibility = Visibility.Visible;
                 if (!isWrongConfirmPass) MainBorder.Height += 15;
                 isWrongConfirmPass = true;
@@ -341,6 +379,15 @@ namespace Gomoku_Client
                 }
                 isWrongConfirmPass = false;
             }
+
+            if (PasswordConfirmBox.Password != PasswordBox.Password)
+            {
+                PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordConfirmMsg.Text = "Mâtk khẩu không khớp";
+                PasswordConfirmMsg.Visibility = Visibility.Visible;
+                if (!isWrongConfirmPass) MainBorder.Height += 15;
+                isWrongConfirmPass = true;
+            }
         }
 
         private void PasswordConfirmBox_LostFocus(object sender, RoutedEventArgs e)
@@ -348,13 +395,15 @@ namespace Gomoku_Client
             if (PasswordConfirmBox.Password.Length == 0 && PasswordConfirmVisible.Text.Length == 0)
             {
                 PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordConfirmMsg.Text = "Xác nhận mật khẩu không được để trống";
                 PasswordConfirmMsg.Visibility = Visibility.Visible;
+                if (!isWrongConfirmPass) MainBorder.Height += 15;
                 isWrongConfirmPass = true;
             }
-            else if(PasswordConfirmBox.Password != PasswordBox.Password && PasswordConfirmBox.Password != PasswordVisible.Text
-                    && PasswordConfirmVisible.Text != PasswordBox.Password && PasswordConfirmVisible.Text != PasswordVisible.Text)
+            else if(PasswordConfirmBox.Password != PasswordBox.Password)
             {
                 PasswordConfirmBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                PasswordConfirmMsg.Text = "Mật khẩu không khớp";
                 PasswordConfirmMsg.Visibility = Visibility.Visible;
                 if (!isWrongConfirmPass) MainBorder.Height += 15;
                 isWrongConfirmPass = true;
@@ -410,6 +459,24 @@ namespace Gomoku_Client
             }
 
             isShowingConfirmPass = !isShowingConfirmPass;
+        }
+
+        private void PasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            PasswordBox.Password = PasswordVisible.Text;
+            if (PasswordBox.Password.Length > 0)
+                PasswordPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                PasswordPlaceholder.Visibility = Visibility.Visible;
+        }
+
+        private void PasswordConfirmVisible_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            PasswordConfirmBox.Password = PasswordConfirmVisible.Text;
+            if (PasswordConfirmBox.Password.Length > 0)
+                PasswordConfirmPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                PasswordConfirmPlaceholder.Visibility = Visibility.Visible;
         }
     }
 }

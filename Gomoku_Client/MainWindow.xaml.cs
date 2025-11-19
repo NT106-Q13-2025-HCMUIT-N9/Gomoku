@@ -241,5 +241,14 @@ namespace Gomoku_Client
         {
             
         }
+
+        private void PasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            PasswordBox.Password = PasswordVisible.Text;
+            if (PasswordBox.Password.Length > 0)
+                PasswordPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                PasswordPlaceholder.Visibility = Visibility.Visible;
+        }
     }
 }

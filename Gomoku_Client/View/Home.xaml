@@ -7,193 +7,16 @@
         mc:Ignorable="d"
         Icon="\Assets\Gomoku.ico"
         Title="Gomoku" Height="720" Width="1280" 
-        WindowStyle="SingleBorderWindow" 
+        WindowStyle="None" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize"
         Background="#0F1923">
     <Window.Resources>
-        <Style x:Key="ValorantMenuItem" TargetType="RadioButton">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#ECE8E1"/>
-            <Setter Property="FontFamily" Value="Impact"/>
-            <Setter Property="FontSize" Value="50"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Margin" Value="0,8,0,8"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RadioButton">
-                        <Grid Background="Transparent">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Rectangle x:Name="Bullet" Width="8" Height="8" 
-                                   Fill="{TemplateBinding Foreground}" 
-                                   RenderTransformOrigin="0.5,0.5" 
-                                   Margin="0,0,20,0" 
-                                   VerticalAlignment="Center">
-                                    <Rectangle.RenderTransform>
-                                        <RotateTransform Angle="45"/>
-                                    </Rectangle.RenderTransform>
-                                </Rectangle>
-
-                                <Viewbox x:Name="ContentViewbox" 
-                                 HorizontalAlignment="Left"
-                                 Width="200" Height="50"
-                                 Stretch="Uniform">
-                                    <ContentPresenter x:Name="ContentText"
-                                              HorizontalAlignment="Left" 
-                                              VerticalAlignment="Center">
-                                        <ContentPresenter.RenderTransform>
-                                            <TranslateTransform x:Name="TranslateTransform" X="0" Y="0"/>
-                                        </ContentPresenter.RenderTransform>
-                                    </ContentPresenter>
-                                </Viewbox>
-                            </StackPanel>
-                        </Grid>
-
-                        <ControlTemplate.Triggers>
-                            <!-- Hover Animation -->
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="White"/>
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Width"
-                                                     To="250"
-                                                     Duration="0:0:0.2">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <QuadraticEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Height"
-                                                     To="62.5"
-                                                     Duration="0:0:0.2">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <QuadraticEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Width"
-                                                     To="200"
-                                                     Duration="0:0:0.2">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <QuadraticEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Height"
-                                                     To="50"
-                                                     Duration="0:0:0.2">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <QuadraticEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
-
-                            <!-- Selected Animation -->
-                            <Trigger Property="IsChecked" Value="True">
-                                <Setter Property="Foreground" Value="#2F6BFF"/>
-                                <Setter TargetName="Bullet" Property="Visibility" Value="Collapsed"/>
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Width"
-                                                     To="400"
-                                                     Duration="0:0:0.3">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Height"
-                                                     To="125"
-                                                     Duration="0:0:0.3">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <DoubleAnimation Storyboard.TargetName="TranslateTransform"
-                                                     Storyboard.TargetProperty="X"
-                                                     To="20"
-                                                     Duration="0:0:0.3">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                            <ThicknessAnimation Storyboard.TargetProperty="Margin"
-                                                        To="0,30,0,30"
-                                                        Duration="0:0:0.3">
-                                                <ThicknessAnimation.EasingFunction>
-                                                    <QuadraticEase EasingMode="EaseOut"/>
-                                                </ThicknessAnimation.EasingFunction>
-                                            </ThicknessAnimation>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Width"
-                                                     To="150"
-                                                     Duration="0:0:0.2"/>
-                                            <DoubleAnimation Storyboard.TargetName="ContentViewbox"
-                                                     Storyboard.TargetProperty="Height"
-                                                     To="50"
-                                                     Duration="0:0:0.2"/>
-                                            <DoubleAnimation Storyboard.TargetName="TranslateTransform"
-                                                     Storyboard.TargetProperty="X"
-                                                     To="0"
-                                                     Duration="0:0:0.2"/>
-                                            <ThicknessAnimation Storyboard.TargetProperty="Margin"
-                                                        To="0,8,0,8"
-                                                        Duration="0:0:0.2"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
-
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter Property="Opacity" Value="0.8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="SubButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#ECE8E1"/>
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="18"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" Padding="10,5">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Foreground" Value="#FF4655"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -207,18 +30,129 @@
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
                     <GradientStop Color="#0F1923" Offset="0.0"/>
-                    <GradientStop Color="#CC0F1923" Offset="0.3"/>
+                    <GradientStop Color="#CC0F1923" Offset="0.15"/>
                     <GradientStop Color="Transparent" Offset="1.0"/>
                 </LinearGradientBrush>
             </Grid.Background>
         </Grid>
 
         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0">
-            <RadioButton Content="PLAY" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" VerticalAlignment="Center"/>
-            <RadioButton Content="HISTORY" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
-            <RadioButton Content="SOCIAL" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
-            <RadioButton Content="SETTINGS" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
-            <RadioButton Content="QUIT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton Content="CHƠI" Style="{StaticResource ValorantMenuMainItem}"  GroupName="Menu" VerticalAlignment="Center" Checked="RadioButton_Checked" />
+            <RadioButton Content="LỊCH SỬ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton Content="BẠN BÈ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
         </StackPanel>
+        <Grid>
+            
+            <!-- Main Content Grid -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="350"/>
+                </Grid.ColumnDefinitions>
+
+               
+
+                <!-- Right Side - Player Info & Content -->
+                <StackPanel Grid.Column="1" Margin="20,40,40,40">
+
+                    <!-- Player Profile Card -->
+                    <Border  CornerRadius="10" Padding="20" Margin="0,0,0,20" Height="623">
+                        <Border.Background>
+                            <ImageBrush ImageSource="/Assets/t1.jpg" Stretch="UniformToFill" Opacity="0.4"/>
+                        </Border.Background>
+                        <Border.Effect>
+                            <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.6"/>
+                        </Border.Effect>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Avatar & Name Section -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Avatar with Glow -->
+                                <Border Grid.Column="0" Width="80" Height="80" CornerRadius="40" 
+                                BorderBrush="#FF4655" BorderThickness="3" Margin="0,0,15,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#FF4655" BlurRadius="15" ShadowDepth="0" Opacity="0.8"/>
+                                    </Border.Effect>
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="/Assets/T1_6sao.jpg" Stretch="UniformToFill"/>
+                                    </Border.Background>
+                                </Border>
+
+                                <!-- Name & Info -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="PLAYER" FontSize="24" FontWeight="Bold" 
+                                       Foreground="#FFFFFF" FontFamily="Segoe UI Black"/>
+                                    <TextBlock Text="#VN001" FontSize="14" Foreground="#8B8B8B" Margin="0,2,0,5"/>
+
+                                    <!-- Level Badge - Hiển tại chưa sử dụng
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Background="#FF4655" CornerRadius="3" Padding="8,3">
+                                            <TextBlock Text="Level 127" FontSize="11" FontWeight="Bold" 
+                                               Foreground="White" FontFamily="Segoe UI Black"/>
+                                        </Border>
+                                    </StackPanel>
+                                    -->
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- XP Progress Bar - Hiên tại chưa sử dụng
+                            <Grid Grid.Row="1" Margin="0,20,0,0">
+                                <Border Height="8" Background="#0F0F1E" CornerRadius="4"/>
+                                <Border Height="8" CornerRadius="4" HorizontalAlignment="Left" Width="240">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#FF4655" Offset="0"/>
+                                            <GradientStop Color="#FD6585" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#FF4655" BlurRadius="10" ShadowDepth="0" Opacity="0.6"/>
+                                    </Border.Effect>
+                                </Border>
+                            </Grid>
+                            -->
+
+                            <!-- Stats -->
+                            <Grid Grid.Row="2" Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="68%" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
+                                    <TextBlock Text="Win Rate" FontSize="11" Foreground="#8B8B8B"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="324" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
+                                    <TextBlock Text="Matches" FontSize="11" Foreground="#8B8B8B"/>
+                                </StackPanel>
+
+                                
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    
+
+                    
+                </StackPanel>
+            </Grid>
+        </Grid>
     </Grid>
+    
 </Window>

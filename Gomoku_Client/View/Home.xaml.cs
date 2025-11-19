@@ -50,5 +50,10 @@ namespace Gomoku_Client
         MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
       }
     }
-  }
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            
+        }
+    }
 }

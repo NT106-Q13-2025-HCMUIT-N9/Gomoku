@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Gomoku_Client.View
 {
     /// <summary>
-    /// Interaction logic for BasePage.xaml
+    /// Interaction logic for TemplatePage.xaml
     /// </summary>
-    public partial class BasePage : Page
+    public partial class TemplatePage : UserControl
     {
-        public BasePage()
+        public TemplatePage()
         {
             InitializeComponent();
         }

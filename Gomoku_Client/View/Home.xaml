@@ -36,7 +36,8 @@
             </Grid.Background>
         </Grid>
 
-        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0">
+        <StackPanel x:Name="StackPanelMenu"
+            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0">
             <RadioButton Content="CHƠI" Style="{StaticResource ValorantMenuMainItem}"  GroupName="Menu" VerticalAlignment="Center" Checked="RadioButton_Checked" />
             <RadioButton Content="LỊCH SỬ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
             <RadioButton Content="BẠN BÈ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
@@ -142,17 +143,15 @@
                                     <TextBlock Text="Matches" FontSize="11" Foreground="#8B8B8B"/>
                                 </StackPanel>
 
-                                
+
                             </Grid>
                         </Grid>
                     </Border>
-
-                    
-
-                    
                 </StackPanel>
             </Grid>
         </Grid>
+        <Frame x:Name="MainFrame"
+               NavigationUIVisibility="Hidden"/>
     </Grid>
     
 </Window>

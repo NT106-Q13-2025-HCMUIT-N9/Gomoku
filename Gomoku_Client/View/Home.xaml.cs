@@ -1,5 +1,6 @@
 ﻿using Firebase.Auth;
 using Gomoku_Client.Model;
+using Gomoku_Client.View;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,7 +54,7 @@ namespace Gomoku_Client
 
         private void RadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            
+            // MainFrame.Navigate(new Lobby()); -> Chuyển frame, load trang Lobby
         }
     }
 }

@@ -5,10 +5,19 @@
     <Compile Update="View\ForgotPassword.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\FriendManager.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\History.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\Home.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\Lobby.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="View\Setting.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Update="View\SignUp.xaml.cs">

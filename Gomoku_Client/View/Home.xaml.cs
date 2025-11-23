@@ -52,9 +52,19 @@ namespace Gomoku_Client
       }
     }
 
-        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        private void PlayButton_Checked(object sender, RoutedEventArgs e)
         {
-            // MainFrame.Navigate(new Lobby()); -> Chuyển frame, load trang Lobby
+            // 1. Tải trang Lobby vào Frame
+            MainFrame.Navigate(new Lobby(this));
+
+            // 2. Ẩn Menu Chính
+            StackPanelMenu.Visibility = Visibility.Collapsed;
+
+            // 3. Hiển thị Frame nội dung
+            MainFrame.Visibility = Visibility.Visible;
+
+            // 4. Đặt lại trạng thái RadioButton
+            ((RadioButton)sender).IsChecked = false;
         }
     }
 }

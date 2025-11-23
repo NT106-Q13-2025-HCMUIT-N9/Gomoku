@@ -8,10 +8,10 @@
     <Compile Update="View\Home.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="View\SignUp.xaml.cs">
+    <Compile Update="View\Lobby.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Update="View\TemplatePage.xaml.cs">
+    <Compile Update="View\SignUp.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

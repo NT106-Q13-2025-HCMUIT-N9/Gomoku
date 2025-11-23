@@ -17,6 +17,8 @@
                 <ResourceDictionary Source="Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+        
+        
     </Window.Resources>
 
     <Grid>
@@ -38,7 +40,7 @@
 
         <StackPanel x:Name="StackPanelMenu"
             HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0">
-            <RadioButton Content="CHƠI" Style="{StaticResource ValorantMenuMainItem}"  GroupName="Menu" VerticalAlignment="Center" Checked="RadioButton_Checked" />
+            <RadioButton x:Name="PlayButton" Content="CHƠI" Style="{StaticResource ValorantMenuMainItem}"  GroupName="Menu" VerticalAlignment="Center" Checked="PlayButton_Checked" />
             <RadioButton Content="LỊCH SỬ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
             <RadioButton Content="BẠN BÈ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
             <RadioButton Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
@@ -151,7 +153,8 @@
             </Grid>
         </Grid>
         <Frame x:Name="MainFrame"
-               NavigationUIVisibility="Hidden"/>
+               NavigationUIVisibility="Hidden"
+               Visibility="Collapsed" />
     </Grid>
     
 </Window>

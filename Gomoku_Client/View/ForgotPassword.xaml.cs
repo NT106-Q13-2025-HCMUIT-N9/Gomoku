@@ -36,12 +36,45 @@ namespace Gomoku_Client
             }
         }
 
-        private void Email_LostFocus(object sender, RoutedEventArgs e)
+        private async void Email_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
                 EmailBox.Text = "Email khôi phục";
                 EmailBox.Foreground = Brushes.Gray;
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                GetEmailGrid.Height = 205;
+            }
+
+            //Kiểm tra định dạng email hợp lệ 
+            else if(!Validate.IsValidEmail(EmailBox.Text))
+            {
+                EmailNotFoundText.Text = "Email không hợp lệ";
+                EmailBox.BorderBrush = Brushes.Red;
+                EmailNotFoundText.Visibility = Visibility.Visible;
+                GetEmailGrid.Height = 220;
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+            }
+
+            //Kiểm tra email có tồn tại trong hệ thống không 
+            else
+            {
+                if(!await Validate.IsEmailExists(EmailBox.Text))
+                {
+                    EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                    EmailBox.BorderBrush = Brushes.Red;
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    GetEmailGrid.Height = 220;
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                }
+                else
+                {
+                    EmailBox.Foreground = Brushes.Gray;
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                    EmailNotFoundText.Visibility = Visibility.Collapsed;
+                    GetEmailGrid.Height = 205;
+                }
             }
         }
 
@@ -91,14 +124,25 @@ namespace Gomoku_Client
 
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
-            try
+            Email_LostFocus(sender, e);
+
+            // Thêm điều kiển kiểm tra email hợp lệ và tồn tại trong hệ thống ở đây
+            if (!Validate.IsValidEmail(EmailBox.Text) || !await Validate.IsEmailExists(EmailBox.Text))
             {
-                await UserAction.SendResetAsync(EmailBox.Text);
-                MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
-            catch (AuthException auth_ex)
+
+            else
             {
-                MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try
+                {
+                    await UserAction.SendResetAsync(EmailBox.Text);
+                    MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (AuthException auth_ex)
+                {
+                    MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

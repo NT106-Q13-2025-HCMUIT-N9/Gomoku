@@ -11,6 +11,8 @@
   <ItemGroup>
     <None Remove="Assets\Gomoku.ico" />
     <None Remove="Assets\Login_Background.png" />
+    <None Remove="Assets\t1.jpg" />
+    <None Remove="Assets\T1_6sao.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +24,8 @@
   <ItemGroup>
     <Resource Include="Assets\Gomoku.ico" />
     <Resource Include="Assets\Login_Background.png" />
+    <Resource Include="Assets\t1.jpg" />
+    <Resource Include="Assets\T1_6sao.jpg" />
   </ItemGroup>
 
 </Project>

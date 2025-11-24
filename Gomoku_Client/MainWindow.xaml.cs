@@ -17,25 +17,25 @@ using System.Windows.Shapes;
 
 namespace Gomoku_Client
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+  /// <summary>
+  /// Interaction logic for MainWindow.xaml
+  /// </summary>
+  public partial class MainWindow : Window
+  {
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+      InitializeComponent();
+    }
 
-        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
-        {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = e.Uri.AbsoluteUri,
-                UseShellExecute = true
-            });
-            e.Handled = true;
-        }
+    private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+      System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+      {
+        FileName = e.Uri.AbsoluteUri,
+        UseShellExecute = true
+      });
+      e.Handled = true;
+    }
 
         bool failedLogin = false;
         private void EmailBox_GotFocus(object sender, RoutedEventArgs e)
@@ -110,55 +110,91 @@ namespace Gomoku_Client
             }
         }
 
-        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+    private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+    {
+      if (PasswordBox.Password.Length > 0)
+        PasswordPlaceholder.Visibility = Visibility.Collapsed;
+      else
+        PasswordPlaceholder.Visibility = Visibility.Visible;
+    }
+
+    private void SignUpButton_Click(object sender, RoutedEventArgs e)
+    {
+      SignUpUserInterface SignUp = new SignUpUserInterface();
+      // Sao chép vị trí và kích thước
+      SignUp.Left = this.Left;
+      SignUp.Top = this.Top;
+      SignUp.Width = this.Width;
+      SignUp.Height = this.Height;
+      SignUp.WindowState = this.WindowState;
+
+      // 1. Ẩn Window hiện tại ngay lập tức
+      this.Hide();
+
+      // 2. Hiển thị Window mới
+      SignUp.Show();
+
+      // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
+      this.Close();
+    }
+
+    private void Hyperlink_Click(object sender, RoutedEventArgs e)
+    {
+      ForgotPasswordUI ForgotUI = new ForgotPasswordUI();
+      // Sao chép vị trí và kích thước
+      ForgotUI.Left = this.Left;
+      ForgotUI.Top = this.Top;
+      ForgotUI.Width = this.Width;
+      ForgotUI.Height = this.Height;
+      ForgotUI.WindowState = this.WindowState;
+
+      // 1. Ẩn Window hiện tại ngay lập tức
+      this.Hide();
+
+      // 2. Hiển thị Window mới
+      ForgotUI.Show();
+
+      // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
+      this.Close();
+    }
+
+    private async void LoginButton_Click(object sender, RoutedEventArgs e)
+    {
+      string password = PasswordBox.Password;
+      string email = EmailBox.Text;
+      try
+      {
+        if (string.IsNullOrEmpty(email))
         {
-            if (PasswordBox.Password.Length > 0)
-                PasswordPlaceholder.Visibility = Visibility.Collapsed;
-            else
-                PasswordPlaceholder.Visibility = Visibility.Visible;
+          MessageBox.Show($"Lỗi: Vui lòng nhập một email", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+          return;
         }
 
-        private void SignUpButton_Click(object sender, RoutedEventArgs e)
+        if (string.IsNullOrEmpty(password))
         {
-            SignUpUserInterface SignUp = new SignUpUserInterface();
-            // Sao chép vị trí và kích thước
-            SignUp.Left = this.Left;
-            SignUp.Top = this.Top;
-            SignUp.Width = this.Width;
-            SignUp.Height = this.Height;
-            SignUp.WindowState = this.WindowState;
-
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
-
-            // 2. Hiển thị Window mới
-            SignUp.Show();
-
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+          MessageBox.Show($"Lỗi: Vui lòng nhập mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+          return;
         }
 
-        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+
+        MainGameUI mainGame = new MainGameUI();
+        mainGame.Left = this.Left;
+        mainGame.Top = this.Top;
+        mainGame.Width = this.Width;
+        mainGame.Height = this.Height;
+        mainGame.WindowState = this.WindowState;
+        this.Hide();
+        mainGame.Show();
+        this.Close();
+      }
+      catch (FirebaseAuthException)
+      {
+        try
         {
-            ForgotPasswordUI ForgotUI = new ForgotPasswordUI();
-            // Sao chép vị trí và kích thước
-            ForgotUI.Left = this.Left;
-            ForgotUI.Top = this.Top;
-            ForgotUI.Width = this.Width;
-            ForgotUI.Height = this.Height;
-            ForgotUI.WindowState = this.WindowState;
-
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
-
-            // 2. Hiển thị Window mới
-            ForgotUI.Show();
-
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+          await UserAction.LoginEmailtAsync(email, password);
         }
-
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        catch (AuthException auth_ex)
         {
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
@@ -287,5 +323,7 @@ namespace Gomoku_Client
             else
                 PasswordPlaceholder.Visibility = Visibility.Visible;
         }
+      }
     }
+  }
 }

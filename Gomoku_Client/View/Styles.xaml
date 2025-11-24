@@ -80,6 +80,14 @@
         </Setter>
     </Style>
 
+    <!-- Valorant Background Gradient -->
+    <LinearGradientBrush x:Key="ValorantBackground"
+                         StartPoint="0,0"
+                         EndPoint="1,1">
+        <GradientStop Color="#0F1923" Offset="0"/>
+        <GradientStop Color="#152635" Offset="1"/>
+    </LinearGradientBrush>
+
     <!-- Style Button Đỏ (Nguy hiểm) -->
     <Style x:Key="DangerButton" TargetType="Button">
         <Setter Property="Background" Value="#E53935"/>
@@ -134,5 +142,291 @@
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="Padding" Value="8"/>
     </Style>
+    
+    
 
+    <!-- Button trên trang chủ  -->
+    <Style x:Key="ValorantMenuItem" TargetType="RadioButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#ECE8E1"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="40"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Margin" Value="0,8,0,8"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid Background="Transparent">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                            <Rectangle x:Name="Bullet" Width="8" Height="8" 
+                                   Fill="{TemplateBinding Foreground}" 
+                                   RenderTransformOrigin="0.5,0.5" 
+                                   Margin="0,0,20,0" 
+                                   VerticalAlignment="Center">
+                                <Rectangle.RenderTransform>
+                                    <RotateTransform Angle="45"/>
+                                </Rectangle.RenderTransform>
+                            </Rectangle>
+
+                            <ContentPresenter x:Name="ContentText"
+                                          HorizontalAlignment="Left" 
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}"
+                                          RecognizesAccessKey="True" 
+                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}">
+                                <ContentPresenter.RenderTransform>
+                                    <TranslateTransform x:Name="TranslateTransform" X="0" Y="0"/>
+                                </ContentPresenter.RenderTransform>
+                            </ContentPresenter>
+
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- TRIGGERS -->
+                    <ControlTemplate.Triggers>
+                        
+                        <!-- Hover animation -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FF1FF6C7"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="TranslateTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="15"
+                                                     Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="TranslateTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="0"
+                                                     Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <!-- Selected Animation 
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter Property="Foreground" Value="#2F6BFF"/>
+                            <Setter TargetName="Bullet" Property="Visibility" Value="Collapsed"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ContentViewbox"
+                                                     Storyboard.TargetProperty="Width"
+                                                     To="400"
+                                                     Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="ContentViewbox"
+                                                     Storyboard.TargetProperty="Height"
+                                                     To="125"
+                                                     Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="TranslateTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="20"
+                                                     Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <ThicknessAnimation Storyboard.TargetProperty="Margin"
+                                                        To="0,30,0,30"
+                                                        Duration="0:0:0.3">
+                                            <ThicknessAnimation.EasingFunction>
+                                                <QuadraticEase EasingMode="EaseOut"/>
+                                            </ThicknessAnimation.EasingFunction>
+                                        </ThicknessAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ContentViewbox"
+                                                     Storyboard.TargetProperty="Width"
+                                                     To="150"
+                                                     Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="ContentViewbox"
+                                                     Storyboard.TargetProperty="Height"
+                                                     To="50"
+                                                     Duration="0:0:0.2"/>
+                                        <DoubleAnimation Storyboard.TargetName="TranslateTransform"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="0"
+                                                     Duration="0:0:0.2"/>
+                                        <ThicknessAnimation Storyboard.TargetProperty="Margin"
+                                                        To="0,8,0,8"
+                                                        Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        -->
+                        
+                        
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter Property="Opacity" Value="0.8"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Style riêng cho button "CHƠI" trên trang chủ, kế thừa từ ValorantMenuItem -->
+    <Style x:Key="ValorantMenuMainItem" TargetType="RadioButton" 
+       BasedOn="{StaticResource ValorantMenuItem}">
+        <Setter Property="Foreground" Value="#FF4655"/>
+        <Setter Property="FontSize" Value="80"/>
+    </Style>
+
+    <!-- Style cho nút Back trên thanh điều hướng -->
+    <Style x:Key="BackButton" TargetType="RadioButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="FontFamily" Value="Segoe UI Black"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="20,10"/>
+        <Setter Property="Margin" Value="10,0,0,0"/>
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" >
+
+                            <!-- Arrow Icon (Valorant-like) -->
+                            <Path x:Name="ArrowIcon"
+                              Data="M 12 0 L 0 12 L 12 24 L 16 20 L 8 12 L 16 4 Z"
+                              Fill="{TemplateBinding Foreground}"
+                              Width="20" Height="18"
+                              Stretch="Uniform"
+                              Margin="0,3,5,0"
+                              RenderTransformOrigin="0.5,0.5">
+                                <Path.RenderTransform>
+                                    <TranslateTransform x:Name="IconTranslate" X="0" Y="0"/>
+                                </Path.RenderTransform>
+                            </Path>
+
+                            <!-- TEXT -->
+                            <ContentPresenter x:Name="ContentText"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"
+                                          Content="{TemplateBinding Content}"
+                                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}">
+                                <ContentPresenter.RenderTransform>
+                                    <TranslateTransform x:Name="TextTranslate" X="0" Y="0"/>
+                                </ContentPresenter.RenderTransform>
+                            </ContentPresenter>
+
+                        </StackPanel>
+
+                    
+
+                    <!-- TRIGGERS -->
+                    <ControlTemplate.Triggers>
+
+                        <!-- HOVER -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ArrowIcon" Property="Fill" Value="#FF1FF6C7"/>
+                            <Setter Property="Foreground" Value="#FF1FF6C7"/>
+
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+
+                                        <DoubleAnimation Storyboard.TargetName="TextTranslate"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="10"
+                                                     Duration="0:0:0.15"/>
+
+                                        <DoubleAnimation Storyboard.TargetName="IconTranslate"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="-5"
+                                                     Duration="0:0:0.15"/>
+
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+
+                                        <DoubleAnimation Storyboard.TargetName="TextTranslate"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="0"
+                                                     Duration="0:0:0.15"/>
+
+                                        <DoubleAnimation Storyboard.TargetName="IconTranslate"
+                                                     Storyboard.TargetProperty="X"
+                                                     To="0"
+                                                     Duration="0:0:0.15"/>
+
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+
+                        <!-- Khi chưa được chọn thì nhạt nhẹ  -->
+                        <Trigger Property="IsChecked" Value="False">
+                            <Setter Property="Opacity" Value="0.85"/>
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SubButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#ECE8E1"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" Padding="10,5">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FF4655"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

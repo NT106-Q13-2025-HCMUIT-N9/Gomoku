@@ -89,7 +89,8 @@
         </Style>
 
     </Window.Resources>
-
+    
+    
     <Grid Width="1280">
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Login_Background.png" 

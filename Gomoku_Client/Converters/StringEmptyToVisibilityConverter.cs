@@ -14,7 +14,7 @@ namespace Gomoku_Client.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             // Logic: Nếu string rỗng/null, hiện (Visible), ngược lại ẩn (Collapsed)
-            string str = value as string;
+            string? str = value as string;
             return string.IsNullOrEmpty(str) ? Visibility.Visible : Visibility.Collapsed;
         }
 

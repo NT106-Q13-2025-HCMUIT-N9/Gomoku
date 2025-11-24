@@ -13,11 +13,13 @@ namespace Gomoku_Client
     /// <summary>
     /// Interaction logic for SignUpUserInterface.xaml
     /// </summary>
-    public partial class SignUpUserInterface : Window
+    public partial class SignUpUserInterface : Page
     {
-        public SignUpUserInterface()
+        private MainWindow _mainWindow;
+        public SignUpUserInterface(MainWindow mainWindow)
         {
             InitializeComponent();
+            _mainWindow = mainWindow;
         }
 
         private void UsernameBox_GotFocus(object sender, RoutedEventArgs e)
@@ -158,22 +160,13 @@ namespace Gomoku_Client
 
         private void GoBack_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow main = new MainWindow();
-            // Sao chép vị trí và kích thước
-            main.Left = this.Left;
-            main.Top = this.Top;
-            main.Width = this.Width;
-            main.Height = this.Height;
-            main.WindowState = this.WindowState;
-
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
-
-            // 2. Hiển thị Window mới
-            main.Show();
-
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+            if (_mainWindow == null)
+            {
+                MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
+            _mainWindow.MainBorder.Visibility = Visibility.Visible;
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
@@ -231,15 +224,8 @@ namespace Gomoku_Client
 
                 MessageBox.Show("Đăng kí thành công. Vui lòng kiểm tra email về thông tin đăng nhập", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                MainWindow main = new MainWindow();
-                main.Left = this.Left;
-                main.Top = this.Top;
-                main.Width = this.Width;
-                main.Height = this.Height;
-                main.WindowState = this.WindowState;
-                this.Hide();
-                main.Show();
-                this.Close();
+                _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
+                _mainWindow.MainBorder.Visibility = Visibility.Visible;
             }
             catch (FirebaseAuthException ex)
             {

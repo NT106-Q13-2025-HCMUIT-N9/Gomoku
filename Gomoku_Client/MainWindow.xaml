@@ -7,7 +7,9 @@
         xmlns:converters="clr-namespace:Gomoku_Client.Converters"
         Icon="\Assets\Gomoku.ico"
         mc:Ignorable="d"
-        Title="Gomoku" Height="720" Width="1280" WindowStyle="SingleBorderWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Background="#F0F0F0" 
+        Title="Gomoku" Height="720" Width="1280" 
+        WindowStyle="None" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Window.Resources>
         <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
@@ -299,5 +301,8 @@
                 </Border>
             </Grid>
         </Border>
+        <Frame x:Name="MainFrame"
+            NavigationUIVisibility="Hidden"
+            Visibility="Collapsed" />
     </Grid>
 </Window>

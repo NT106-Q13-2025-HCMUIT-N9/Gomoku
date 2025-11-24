@@ -60,20 +60,33 @@ namespace Gomoku_Client
             //Kiểm tra email có tồn tại trong hệ thống không 
             else
             {
-                if(!await Validate.IsEmailExists(EmailBox.Text))
+                try
                 {
-                    EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                    if (!await Validate.IsEmailExists(EmailBox.Text))
+                    {
+                        EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                        EmailBox.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        GetEmailGrid.Height = 220;
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                    }
+                    else
+                    {
+                        EmailBox.Foreground = Brushes.Gray;
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        EmailNotFoundText.Visibility = Visibility.Collapsed;
+                        GetEmailGrid.Height = 205;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
                     EmailBox.BorderBrush = Brushes.Red;
                     EmailNotFoundText.Visibility = Visibility.Visible;
                     GetEmailGrid.Height = 220;
                     EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
-                }
-                else
-                {
-                    EmailBox.Foreground = Brushes.Gray;
-                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                    EmailNotFoundText.Visibility = Visibility.Collapsed;
-                    GetEmailGrid.Height = 205;
                 }
             }
         }

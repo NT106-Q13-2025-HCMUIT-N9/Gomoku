@@ -54,23 +54,36 @@ namespace Gomoku_Client
             }
             else
             {
-                if (await Validate.IsUsernamExists(UsernameBox.Text))
+                try
                 {
-                    UsernameMsg.Text = "Username đã tồn tại. Vui lòng chọn một username khác";
+                    if (await Validate.IsUsernamExists(UsernameBox.Text))
+                    {
+                        UsernameMsg.Text = "Username đã tồn tại. Vui lòng chọn một username khác";
+                        UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                        UsernameMsg.Visibility = Visibility.Visible;
+                        if (!isWrongUsername) MainBorder.Height += 15;
+                        isWrongUsername = true;
+                    }
+                    else
+                    {
+                        UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        UsernameMsg.Visibility = Visibility.Collapsed;
+                        if (isWrongUsername == true)
+                        {
+                            MainBorder.Height -= 15;
+                            isWrongUsername = false;
+                        }
+                    }
+                }catch (Exception ex)
+                {
+                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    UsernameMsg.Text = "Xảy ra lỗi không biết rõ";
                     UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Red);
                     UsernameMsg.Visibility = Visibility.Visible;
                     if (!isWrongUsername) MainBorder.Height += 15;
+                    
                     isWrongUsername = true;
-                }
-                else
-                {
-                    UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                    UsernameMsg.Visibility = Visibility.Collapsed;
-                    if (isWrongUsername == true)
-                    {
-                        MainBorder.Height -= 15;
-                        isWrongUsername = false;
-                    }
                 }
             }
         }
@@ -107,25 +120,38 @@ namespace Gomoku_Client
             }
             else
             {
-                CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
-                QuerySnapshot query_result = await user_collection.WhereEqualTo("Email", EmailBox.Text).GetSnapshotAsync();
-                if(query_result.Count != 0)
+                try
                 {
-                    EmailMsg.Text = "Email đã liên kết với một tài khoản khác. Vui lòng nhập email khác";
+                    CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
+                    QuerySnapshot query_result = await user_collection.WhereEqualTo("Email", EmailBox.Text).GetSnapshotAsync();
+                    if (query_result.Count != 0)
+                    {
+                        EmailMsg.Text = "Email đã liên kết với một tài khoản khác. Vui lòng nhập email khác";
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                        EmailMsg.Visibility = Visibility.Visible;
+                        if (!isWrongEmail) MainBorder.Height += 15;
+                        isWrongEmail = true;
+                    }
+                    else
+                    {
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        EmailMsg.Visibility = Visibility.Collapsed;
+                        if (isWrongEmail == true)
+                        {
+                            MainBorder.Height -= 15;
+                            isWrongEmail = false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    EmailMsg.Text = "Xảy ra lỗi không biết rõ";
                     EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
                     EmailMsg.Visibility = Visibility.Visible;
                     if (!isWrongEmail) MainBorder.Height += 15;
                     isWrongEmail = true;
-                }
-                else
-                {
-                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                    EmailMsg.Visibility = Visibility.Collapsed;
-                    if (isWrongEmail == true)
-                    {
-                        MainBorder.Height -= 15;
-                        isWrongEmail = false;
-                    }
                 }
             }
         }

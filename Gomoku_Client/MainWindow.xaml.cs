@@ -85,9 +85,35 @@ namespace Gomoku_Client
             }
             else
             {
-                if(!await Validate.IsEmailExists(EmailBox.Text))
+                try
                 {
-                    EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                    if (!await Validate.IsEmailExists(EmailBox.Text))
+                    {
+                        EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                        EmailBox.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        if (isWrongEmail == false) MainBorder.Height += 15;
+                        // Email không tồn tại → viền đỏ
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+
+                        isWrongEmail = true;
+                    }
+                    else
+                    {
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        EmailNotFoundText.Visibility = Visibility.Collapsed;
+                        if (isWrongEmail == true)
+                        {
+                            MainBorder.Height -= 15;
+                            isWrongEmail = false;
+                        }
+                        return;
+                    }
+                }catch (Exception ex)
+                {
+                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
                     EmailBox.BorderBrush = Brushes.Red;
                     EmailNotFoundText.Visibility = Visibility.Visible;
                     if (isWrongEmail == false) MainBorder.Height += 15;
@@ -96,17 +122,7 @@ namespace Gomoku_Client
 
                     isWrongEmail = true;
                 }
-                else
-                {
-                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                    EmailNotFoundText.Visibility = Visibility.Collapsed;
-                    if (isWrongEmail == true)
-                    {
-                        MainBorder.Height -= 15;
-                        isWrongEmail = false;
-                    }
-                    return;
-                }
+                
             }
         }
 

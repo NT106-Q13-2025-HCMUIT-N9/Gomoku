@@ -19,5 +19,12 @@ namespace Gomoku_Client.ViewModel
             QuerySnapshot query_result = await user_collection.WhereEqualTo("UserName", username).GetSnapshotAsync();
             return query_result.Count != 0;
         }
+
+        public static async Task<bool> IsEmailExists(string email)
+        {
+            CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
+            QuerySnapshot query_result = await user_collection.WhereEqualTo("Email", email).GetSnapshotAsync();
+            return query_result.Count != 0;
+        }
     }
 }

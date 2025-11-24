@@ -37,8 +37,18 @@ namespace Gomoku_Client
             e.Handled = true;
         }
 
+        bool failedLogin = false;
         private void EmailBox_GotFocus(object sender, RoutedEventArgs e)
         {
+            if (failedLogin)
+            {
+                EmailBox.Foreground = Brushes.Gray;
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                MainBorder.Height -= 15;
+                failedLogin = false;
+            }
+
             if (EmailBox.Text == "Email")
             {
                 EmailBox.Text = "";
@@ -47,7 +57,7 @@ namespace Gomoku_Client
         }
 
         bool isWrongEmail = false;
-        private void EmailBox_LostFocus(object sender, RoutedEventArgs e)
+        private async void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
@@ -63,7 +73,7 @@ namespace Gomoku_Client
                 return;
             }
 
-            if (true)
+            if (!Validate.IsValidEmail(EmailBox.Text))
             {
                 EmailNotFoundText.Text = "Email không hợp lệ";
                 EmailBox.BorderBrush = Brushes.Red;
@@ -74,16 +84,30 @@ namespace Gomoku_Client
 
                 isWrongEmail = true;
             }
-            else if (true)
+            else
             {
-                EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
-                EmailBox.BorderBrush = Brushes.Red;
-                EmailNotFoundText.Visibility = Visibility.Visible;
-                if (isWrongEmail == false) MainBorder.Height += 15;
-                // Email không tồn tại → viền đỏ
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                if(!await Validate.IsEmailExists(EmailBox.Text))
+                {
+                    EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                    EmailBox.BorderBrush = Brushes.Red;
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    if (isWrongEmail == false) MainBorder.Height += 15;
+                    // Email không tồn tại → viền đỏ
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
 
-                isWrongEmail = true;
+                    isWrongEmail = true;
+                }
+                else
+                {
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                    EmailNotFoundText.Visibility = Visibility.Collapsed;
+                    if (isWrongEmail == true)
+                    {
+                        MainBorder.Height -= 15;
+                        isWrongEmail = false;
+                    }
+                    return;
+                }
             }
         }
 
@@ -141,15 +165,10 @@ namespace Gomoku_Client
             string email = EmailBox.Text;
             try
             {
-                if (string.IsNullOrEmpty(email))
-                {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập một email", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                EmailBox_LostFocus(sender, e);
 
-                if (string.IsNullOrEmpty(password))
+                if(isWrongEmail || string.IsNullOrEmpty(password))
                 {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
@@ -173,7 +192,17 @@ namespace Gomoku_Client
                 }
                 catch (AuthException auth_ex)
                 {
-                    MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    if(auth_ex.Message == "INVALID_LOGIN_CREDENTIALS")
+                    {
+                        EmailNotFoundText.Text = "Email hoặc mật khẩu không chính xác";
+                        EmailBox.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        if (isWrongEmail == false) MainBorder.Height += 15;
+                        // Email không tồn tại → viền đỏ
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+
+                        failedLogin = true;
+                    }
                 }
             }
         }

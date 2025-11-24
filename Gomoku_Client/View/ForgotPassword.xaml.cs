@@ -36,7 +36,7 @@ namespace Gomoku_Client
             }
         }
 
-        private void Email_LostFocus(object sender, RoutedEventArgs e)
+        private async void Email_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
@@ -48,7 +48,7 @@ namespace Gomoku_Client
             }
 
             //Kiểm tra định dạng email hợp lệ 
-            else if(true)
+            else if(!Validate.IsValidEmail(EmailBox.Text))
             {
                 EmailNotFoundText.Text = "Email không hợp lệ";
                 EmailBox.BorderBrush = Brushes.Red;
@@ -60,11 +60,21 @@ namespace Gomoku_Client
             //Kiểm tra email có tồn tại trong hệ thống không 
             else
             {
-                EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
-                EmailBox.BorderBrush = Brushes.Red;
-                EmailNotFoundText.Visibility = Visibility.Visible;
-                GetEmailGrid.Height = 220;
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                if(!await Validate.IsEmailExists(EmailBox.Text))
+                {
+                    EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                    EmailBox.BorderBrush = Brushes.Red;
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    GetEmailGrid.Height = 220;
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                }
+                else
+                {
+                    EmailBox.Foreground = Brushes.Gray;
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                    EmailNotFoundText.Visibility = Visibility.Collapsed;
+                    GetEmailGrid.Height = 205;
+                }
             }
         }
 
@@ -114,8 +124,10 @@ namespace Gomoku_Client
 
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
+            Email_LostFocus(sender, e);
+
             // Thêm điều kiển kiểm tra email hợp lệ và tồn tại trong hệ thống ở đây
-            if (string.IsNullOrWhiteSpace(EmailBox.Text))
+            if (!Validate.IsValidEmail(EmailBox.Text) || !await Validate.IsEmailExists(EmailBox.Text))
             {
                 return;
             }

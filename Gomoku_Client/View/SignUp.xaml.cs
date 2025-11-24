@@ -64,7 +64,6 @@ namespace Gomoku_Client
                 }
                 else
                 {
-                    UsernameBox.Foreground = Brushes.Gray;
                     UsernameBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
                     UsernameMsg.Visibility = Visibility.Collapsed;
                     if (isWrongUsername == true)
@@ -120,7 +119,6 @@ namespace Gomoku_Client
                 }
                 else
                 {
-                    EmailBox.Foreground = Brushes.Gray;
                     EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
                     EmailMsg.Visibility = Visibility.Collapsed;
                     if (isWrongEmail == true)

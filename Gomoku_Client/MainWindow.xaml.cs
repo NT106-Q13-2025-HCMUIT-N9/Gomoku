@@ -42,7 +42,6 @@ namespace Gomoku_Client
         {
             if (failedLogin)
             {
-                EmailBox.Foreground = Brushes.Gray;
                 EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
                 MainBorder.Height -= 15;
@@ -163,6 +162,15 @@ namespace Gomoku_Client
         {
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
+
+            if (failedLogin)
+            {
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                MainBorder.Height -= 15;
+                failedLogin = false;
+            }
+
             try
             {
                 EmailBox_LostFocus(sender, e);

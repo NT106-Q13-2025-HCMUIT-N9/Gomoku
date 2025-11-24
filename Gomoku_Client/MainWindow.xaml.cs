@@ -1,4 +1,4 @@
-﻿using Firebase.Auth;
+using Firebase.Auth;
 using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;

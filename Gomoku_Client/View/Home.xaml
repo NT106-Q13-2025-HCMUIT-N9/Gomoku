@@ -6,98 +6,155 @@
         xmlns:local="clr-namespace:Gomoku_Client"
         mc:Ignorable="d"
         Icon="\Assets\Gomoku.ico"
-        Title="Gomoku" Height="720" Width="1280" WindowStyle="SingleBorderWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
-
+        Title="Gomoku" Height="720" Width="1280" 
+        WindowStyle="None" 
+        WindowStartupLocation="CenterScreen" 
+        ResizeMode="NoResize"
+        Background="#0F1923">
     <Window.Resources>
-        <Style x:Key="BlueButton" TargetType="Button">
-            <Setter Property="Background" Value="#0078D7"/>
-            <!-- Xanh dương -->
-            <Setter Property="Foreground" Value="White"/>
-            <!-- Chữ trắng -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="BorderBrush" Value="#005A9E"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="22">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#005A9E"/>
-                                <!-- Tối lại khi hover -->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#004578"/>
-                                <!-- Nhấn xuống -->
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="WhiteBlueButton" TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-            <!-- Nền trắng -->
-            <Setter Property="Foreground" Value="#0078D7"/>
-            <!-- Chữ xanh -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="BorderBrush" Value="#0078D7"/>
-            <!-- Viền xanh -->
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="22">
-                            <!-- Bo góc -->
-                            <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                        </Border>
-
-                        <!-- Hiệu ứng hover và nhấn -->
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#E5F1FB"/>
-                                <!-- Xanh nhạt khi hover -->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#CCE4F7"/>
-                                <!-- Đậm hơn khi nhấn -->
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
+        
     </Window.Resources>
 
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Login_Background.png" 
-        Stretch="UniformToFill"
-        Opacity="0.3"/>
+                        Stretch="UniformToFill" 
+                        Opacity="0.4"/>
         </Grid.Background>
-        
-        <Button Style="{StaticResource BlueButton}"
-            Content="Đăng xuất"
-            Width="180" Height="40"
-            Margin="5,0,0,0" Click="SignOut_Click"/>
+
+        <Grid>
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                    <GradientStop Color="#0F1923" Offset="0.0"/>
+                    <GradientStop Color="#CC0F1923" Offset="0.15"/>
+                    <GradientStop Color="Transparent" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+        </Grid>
+
+        <StackPanel x:Name="StackPanelMenu"
+            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0">
+            <RadioButton x:Name="PlayButton" Content="CHƠI" Style="{StaticResource ValorantMenuMainItem}"  GroupName="Menu" VerticalAlignment="Center" Checked="PlayButton_Checked" />
+            <RadioButton Content="LỊCH SỬ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton Content="BẠN BÈ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+        </StackPanel>
+        <Grid>
+            
+            <!-- Main Content Grid -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="350"/>
+                </Grid.ColumnDefinitions>
+
+               
+
+                <!-- Right Side - Player Info & Content -->
+                <StackPanel Grid.Column="1" Margin="20,40,40,40">
+
+                    <!-- Player Profile Card -->
+                    <Border  CornerRadius="10" Padding="20" Margin="0,0,0,20" Height="623">
+                        <Border.Background>
+                            <ImageBrush ImageSource="/Assets/t1.jpg" Stretch="UniformToFill" Opacity="0.4"/>
+                        </Border.Background>
+                        <Border.Effect>
+                            <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.6"/>
+                        </Border.Effect>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Avatar & Name Section -->
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Avatar with Glow -->
+                                <Border Grid.Column="0" Width="80" Height="80" CornerRadius="40" 
+                                BorderBrush="#FF4655" BorderThickness="3" Margin="0,0,15,0">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#FF4655" BlurRadius="15" ShadowDepth="0" Opacity="0.8"/>
+                                    </Border.Effect>
+                                    <Border.Background>
+                                        <ImageBrush ImageSource="/Assets/T1_6sao.jpg" Stretch="UniformToFill"/>
+                                    </Border.Background>
+                                </Border>
+
+                                <!-- Name & Info -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="PLAYER" FontSize="24" FontWeight="Bold" 
+                                       Foreground="#FFFFFF" FontFamily="Segoe UI Black"/>
+                                    <TextBlock Text="#VN001" FontSize="14" Foreground="#8B8B8B" Margin="0,2,0,5"/>
+
+                                    <!-- Level Badge - Hiển tại chưa sử dụng
+                                    <StackPanel Orientation="Horizontal">
+                                        <Border Background="#FF4655" CornerRadius="3" Padding="8,3">
+                                            <TextBlock Text="Level 127" FontSize="11" FontWeight="Bold" 
+                                               Foreground="White" FontFamily="Segoe UI Black"/>
+                                        </Border>
+                                    </StackPanel>
+                                    -->
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- XP Progress Bar - Hiên tại chưa sử dụng
+                            <Grid Grid.Row="1" Margin="0,20,0,0">
+                                <Border Height="8" Background="#0F0F1E" CornerRadius="4"/>
+                                <Border Height="8" CornerRadius="4" HorizontalAlignment="Left" Width="240">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#FF4655" Offset="0"/>
+                                            <GradientStop Color="#FD6585" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#FF4655" BlurRadius="10" ShadowDepth="0" Opacity="0.6"/>
+                                    </Border.Effect>
+                                </Border>
+                            </Grid>
+                            -->
+
+                            <!-- Stats -->
+                            <Grid Grid.Row="2" Margin="0,15,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="68%" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
+                                    <TextBlock Text="Win Rate" FontSize="11" Foreground="#8B8B8B"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="324" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
+                                    <TextBlock Text="Matches" FontSize="11" Foreground="#8B8B8B"/>
+                                </StackPanel>
+
+
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+        <Frame x:Name="MainFrame"
+               NavigationUIVisibility="Hidden"
+               Visibility="Collapsed" />
     </Grid>
+    
 </Window>

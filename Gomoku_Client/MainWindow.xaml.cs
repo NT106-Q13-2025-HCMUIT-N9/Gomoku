@@ -169,6 +169,8 @@ namespace Gomoku_Client
             this.IsEnabled = false;
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
+            LoadingCircle.Visibility = Visibility.Visible;
+            LoginButton.Content = "";
 
             if (failedLogin)
             {
@@ -176,7 +178,7 @@ namespace Gomoku_Client
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
                 MainBorder.Height -= 15;
                 failedLogin = false;
-                
+
             }
 
             try
@@ -186,6 +188,8 @@ namespace Gomoku_Client
                 if(isWrongEmail || string.IsNullOrEmpty(password))
                 {
                     this.IsEnabled = true;
+                    LoginButton.Content = "Đăng nhập";
+                    LoadingCircle.Visibility = Visibility.Collapsed;
                     return;
                 }
 
@@ -220,6 +224,8 @@ namespace Gomoku_Client
                         EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
                         this.IsEnabled = true;
                         failedLogin = true;
+                        LoginButton.Content = "Đăng nhập";
+                        LoadingCircle.Visibility = Visibility.Collapsed;
                     }
                 }
             }

@@ -163,7 +163,7 @@
 
                 <!-- Hai nút -->
                 <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" >
-                    <Button Style="{StaticResource BlueButton}"
+                    <Button x:Name="LoginButton" Style="{StaticResource BlueButton}"
                             Content="Đăng Nhập"
                             Width="180" Height="40"
                             Margin="0,0,0,0" Click="LoginButton_Click"/>
@@ -172,6 +172,39 @@
                             Width="180" Height="40"
                             Margin="5,0,0,0" Click="ExitButton_Click"/>
                 </StackPanel>
+                
+                <!-- Loading Circle-->
+                <Grid Grid.Row="5">
+                    <Grid.Resources>
+                        <!-- Animation quay -->
+                        <Storyboard x:Key="SpinAnimation" RepeatBehavior="Forever">
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                From="0" To="360" Duration="0:0:1"
+                                RepeatBehavior="Forever"/>
+                        </Storyboard>
+                    </Grid.Resources>
+
+                    <!-- Loading Circle -->
+                    <Ellipse x:Name="LoadingCircle"
+                        Width="30"
+                        Height="30"
+                        Stroke="White"
+                        StrokeThickness="4"
+                        StrokeDashArray="10 200"
+                        RenderTransformOrigin="0.5,0.5" 
+                        Margin="75,35,261,5"
+                        Visibility="Collapsed">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                        <Ellipse.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource SpinAnimation}"/>
+                            </EventTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+                </Grid>
 
                 <!-- Email box -->
                 <Border x:Name="EmailBorder"
@@ -301,6 +334,34 @@
                 </Border>
             </Grid>
         </Border>
+
+        <Border x:Name="LoadingBorder" 
+        Background="#F9F9F9"
+        BorderBrush="#0078D7"
+        BorderThickness="2"
+        CornerRadius="22"
+        Padding="20"
+        Width="410"
+        Height="300"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center" 
+        Visibility="Collapsed" Opacity="0.7">
+            <Grid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Đang đăng nhập..."
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="#0078D7"  
+                       FontFamily="Segoe UI"
+                       FontSize="20"         
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
+                    <ProgressBar IsIndeterminate="True" Width="300" Height="20"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        
         <Frame x:Name="MainFrame"
             NavigationUIVisibility="Hidden"
             Visibility="Collapsed" />

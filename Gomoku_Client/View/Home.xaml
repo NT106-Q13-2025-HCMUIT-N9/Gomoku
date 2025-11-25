@@ -41,10 +41,10 @@
         <StackPanel x:Name="StackPanelMenu"
             HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0">
             <RadioButton x:Name="PlayButton" Content="CHƠI" Style="{StaticResource ValorantMenuMainItem}"  GroupName="Menu" VerticalAlignment="Center" Checked="PlayButton_Checked" />
-            <RadioButton Content="LỊCH SỬ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
-            <RadioButton Content="BẠN BÈ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
-            <RadioButton Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
-            <RadioButton Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu"/>
+            <RadioButton x:Name="HistoryButton" Content="LỊCH SỬ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="HistoryButton_Checked"/>
+            <RadioButton x:Name="FriendManagerButton" Content="BẠN BÈ" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="FriendManagerButton_Checked"/>
+            <RadioButton x:Name="SettingButton" Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="SettingButton_Checked"/>
+            <RadioButton x:Name="ExitButton" Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="ExitButton_Checked"/>
         </StackPanel>
         <Grid>
             

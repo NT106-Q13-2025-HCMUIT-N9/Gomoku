@@ -1,0 +1,245 @@
+﻿<Page x:Class="Gomoku_Client.View.History"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Gomoku_Client.View"
+      mc:Ignorable="d" 
+      d:DesignHeight="720" d:DesignWidth="1280"
+      Title="History">
+
+    <Page.Resources>
+        <!-- Kế thừa ResourceDictionary từ TemplatePage -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+
+        <!-- Background gradient Valorant (Được copy từ TemplatePage) -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0F1923" Offset="0"/>
+                <GradientStop Color="#152635" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        
+        <!-- Main Content -->
+        <Grid Margin="100,100,100,50">
+            <!-- Match History Border -->
+            <Border BorderBrush="#FF4655" 
+                    BorderThickness="1.5,1.5,1.5,1.5"
+                    Background="#1A1A2E" CornerRadius="10" Padding="0">
+                <Border.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="40" ShadowDepth="0" Opacity="0.4"/>
+                </Border.Effect>
+                <!-- Match History Table -->
+                <Grid Margin="30" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#0F0F1E" CornerRadius="10,10,10,10" Padding="40,20,40,20">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="160"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="150"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Column="0" Text="KẾT QUẢ" FontSize="14" FontWeight="Bold" 
+                                       Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
+                            <TextBlock Grid.Column="1" Text="ĐỐI THỦ" FontSize="14" FontWeight="Bold" 
+                                       Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
+                            <TextBlock Grid.Column="2" Text="THỜI GIAN" FontSize="14" FontWeight="Bold" 
+                                       Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
+                            <TextBlock Grid.Column="3" Text="THỜI LƯỢNG" FontSize="14" FontWeight="Bold" 
+                                       Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Match List ScrollViewer -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="1">
+                        <StackPanel x:Name="MatchListPanel" Margin="15,10,15,15">
+
+                            <!-- Victory Match Example -->
+                            <Border Background="#0F0F1E" CornerRadius="8" Padding="20,15" Margin="0,0,0,10" 
+                                    BorderBrush="#00D946" BorderThickness="0,0,3,0" Cursor="Hand">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#00D946" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="150"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Result Badge -->
+                                    <Border Grid.Column="0" Background="#00D946" CornerRadius="5" 
+                                            Padding="14,6" HorizontalAlignment="Left">
+                                        <TextBlock Text="THẮNG" FontSize="12" FontWeight="Bold" 
+                                                   Foreground="White" FontFamily="Segoe UI Black"
+                                                   TextAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- Opponent Info -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="35" Height="35" CornerRadius="17.5" 
+                                                BorderBrush="#00D946" BorderThickness="2" Margin="0,0,12,0">
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                                            </Border.Background>
+                                        </Border>
+                                        <TextBlock Text="PlayerName123" FontSize="14" FontWeight="SemiBold" 
+                                                   Foreground="#ECECEC" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <!-- Time -->
+                                    <TextBlock Grid.Column="2" Text="2 giờ trước" FontSize="13" 
+                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
+
+                                    <!-- Duration -->
+                                    <TextBlock Grid.Column="3" Text="15 phút 32 giây" FontSize="13" 
+                                               Foreground="#ECECEC" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Defeat Match Example -->
+                            <Border Background="#0F0F1E" CornerRadius="8" Padding="20,15" Margin="0,0,0,10" 
+                                    BorderBrush="#FF4655" BorderThickness="0,0,3,0" Cursor="Hand">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#FF4655" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="150"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Result Badge -->
+                                    <Border Grid.Column="0" Background="#FF4655" CornerRadius="5" 
+                                            Padding="14,6" HorizontalAlignment="Left">
+                                        <TextBlock Text="THUA" FontSize="12" FontWeight="Bold" 
+                                                   Foreground="White" FontFamily="Segoe UI Black"
+                                                   TextAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- Opponent Info -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="35" Height="35" CornerRadius="17.5" 
+                                                BorderBrush="#FF4655" BorderThickness="2" Margin="0,0,12,0">
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                                            </Border.Background>
+                                        </Border>
+                                        <TextBlock Text="ProGamer999" FontSize="14" FontWeight="SemiBold" 
+                                                   Foreground="#ECECEC" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <!-- Time -->
+                                    <TextBlock Grid.Column="2" Text="5 giờ trước" FontSize="13" 
+                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
+
+                                    <!-- Duration -->
+                                    <TextBlock Grid.Column="3" Text="12 phút 08 giây" FontSize="13" 
+                                               Foreground="#ECECEC" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- Draw Match Example -->
+                            <Border Background="#0F0F1E" CornerRadius="8" Padding="20,15" Margin="0,0,0,10" 
+                                    BorderBrush="#FFD700" BorderThickness="0,0,3,0" Cursor="Hand">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#FFD700" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="140"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="180"/>
+                                        <ColumnDefinition Width="150"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Result Badge -->
+                                    <Border Grid.Column="0" Background="#FFD700" CornerRadius="5" 
+                                            Padding="14,6" HorizontalAlignment="Left">
+                                        <TextBlock Text="HÒA" FontSize="12" FontWeight="Bold" 
+                                                   Foreground="#393534" FontFamily="Segoe UI Black"
+                                                   TextAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+
+                                    <!-- Opponent Info -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="35" Height="35" CornerRadius="17.5" 
+                                                BorderBrush="#FFD700" BorderThickness="2" Margin="0,0,12,0">
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                                            </Border.Background>
+                                        </Border>
+                                        <TextBlock Text="EqualSkill88" FontSize="14" FontWeight="SemiBold" 
+                                                   Foreground="#ECECEC" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <!-- Time -->
+                                    <TextBlock Grid.Column="2" Text="1 ngày trước" FontSize="13" 
+                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
+
+                                    <!-- Duration -->
+                                    <TextBlock Grid.Column="3" Text="20 phút 15 giây" FontSize="13" 
+                                               Foreground="#ECECEC" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- More matches... (duplicate above patterns) -->
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+                
+                
+            </Border>
+        </Grid>
+
+        
+        
+        
+        
+        
+        
+        
+        <!-- Top Navigation Bar (Được copy từ TemplatePage) -->
+        <Border Height="60" VerticalAlignment="Top" Background="Transparent" Panel.ZIndex="1">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.5"/>
+            </Border.Effect>
+
+            <Grid>
+                <RadioButton x:Name="BackButton" 
+                         Content="Quay lại" 
+                         Style="{StaticResource BackButton}" 
+                         Checked="BackButton_Checked"/>
+
+                <!-- Page Title (Đã được đặt cố định) -->
+                <TextBlock Grid.Column="1" 
+                       Text="LỊCH SỬ ĐẤU" 
+                       FontSize="25" 
+                       FontWeight="Bold" 
+                       Foreground="#FFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center"
+                       FontFamily="Segoe UI Black"/>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</Page>

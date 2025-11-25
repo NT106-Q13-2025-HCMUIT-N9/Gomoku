@@ -63,8 +63,46 @@ namespace Gomoku_Client
             // 3. Hiển thị Frame nội dung
             MainFrame.Visibility = Visibility.Visible;
 
-            // 4. Đặt lại trạng thái RadioButton
+            // 4. Đặt lại trạng thái PlayButton
             ((RadioButton)sender).IsChecked = false;
+        }
+
+        private void HistoryButton_Checked(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new History(this));
+
+            StackPanelMenu.Visibility = Visibility.Collapsed;
+
+            MainFrame.Visibility = Visibility.Visible;
+
+            ((RadioButton)sender).IsChecked = false;
+        }
+
+        private void FriendManagerButton_Checked(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new FriendManager(this));
+
+            StackPanelMenu.Visibility = Visibility.Collapsed;
+
+            MainFrame.Visibility = Visibility.Visible;
+
+            ((RadioButton)sender).IsChecked = false;
+        }
+
+        private void SettingButton_Checked(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new Setting(this));
+
+            StackPanelMenu.Visibility = Visibility.Collapsed;
+
+            MainFrame.Visibility = Visibility.Visible;
+
+            ((RadioButton)sender).IsChecked = false;
+        }
+
+        private void ExitButton_Checked(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

@@ -16,17 +16,16 @@ using System.Windows.Shapes;
 namespace Gomoku_Client.View
 {
     /// <summary>
-    /// Interaction logic for Lobby.xaml
+    /// Interaction logic for History.xaml
     /// </summary>
-    public partial class Lobby : Page
+    public partial class History : Page
     {
         // Truyền tham số MainGameUI để có thể quay lại bằng BackButton
         private MainGameUI _mainWindow;
-        public Lobby(MainGameUI mainGameUI)
+        public History(MainGameUI mainGameUI)
         {
             InitializeComponent();
             _mainWindow = mainGameUI;
-
         }
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)

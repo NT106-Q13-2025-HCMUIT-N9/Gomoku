@@ -13,6 +13,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
@@ -26,6 +27,73 @@ namespace Gomoku_Client
     public MainGameUI()
     {
       InitializeComponent();
+    }
+
+    private void AnimateSlideIn()
+    {
+      var slideIn = (Storyboard)this.Resources["SlideInFromRight"];
+      slideIn.Begin(MainFrame);
+    }
+
+    public void ShowMenuWithAnimation()
+    {
+      if (MainFrame.Visibility == Visibility.Visible)
+      {
+        var slideOut = (Storyboard)this.Resources["SlideOutToLeft"];
+        slideOut.Completed += (s, args) =>
+        {
+          MainFrame.Visibility = Visibility.Collapsed;
+          MainFrame.Content = null;
+          StackPanelMenu.Visibility = Visibility.Visible;
+
+          AnimateMenuFadeIn();
+        };
+        slideOut.Begin(MainFrame);
+      }
+      else
+      {
+        StackPanelMenu.Visibility = Visibility.Visible;
+      }
+    }
+
+    private void AnimateMenuFadeIn()
+    {
+      StackPanelMenu.Opacity = 0;
+      var fadeIn = new DoubleAnimation
+      {
+        From = 0,
+        To = 1,
+        Duration = TimeSpan.FromSeconds(0.3),
+        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+      };
+      StackPanelMenu.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+    }
+
+    private void NavigateWithSlideAnimation(Page page, RadioButton sender) { 
+    
+      if (MainFrame.Visibility == Visibility.Visible)
+      {
+        var slideOut = (Storyboard)this.Resources["SlideOutToLeft"];
+        slideOut.Completed += (s, args) =>
+        {
+          MainFrame.Navigate(page);
+          AnimateSlideIn();
+        };
+        slideOut.Begin(MainFrame);
+      }
+      else
+      {
+        // 1. Tải trang Lobby vào Frame
+        MainFrame.Navigate(page);
+        // 2. Ẩn Menu Chính
+        MainFrame.Visibility = Visibility.Visible;
+        // 3. Hiển thị Frame nội dung
+        StackPanelMenu.Visibility = Visibility.Collapsed;
+        // 4. Đặt lại trạng thái PlayButton
+        AnimateSlideIn();
+      }
+
+      sender.IsChecked = false;
     }
 
     private void SignOut_Click(object sender, RoutedEventArgs e)
@@ -52,57 +120,51 @@ namespace Gomoku_Client
       }
     }
 
-        private void PlayButton_Checked(object sender, RoutedEventArgs e)
-        {
-            // 1. Tải trang Lobby vào Frame
-            MainFrame.Navigate(new Lobby(this));
-
-            // 2. Ẩn Menu Chính
-            StackPanelMenu.Visibility = Visibility.Collapsed;
-
-            // 3. Hiển thị Frame nội dung
-            MainFrame.Visibility = Visibility.Visible;
-
-            // 4. Đặt lại trạng thái PlayButton
-            ((RadioButton)sender).IsChecked = false;
-        }
-
-        private void HistoryButton_Checked(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new History(this));
-
-            StackPanelMenu.Visibility = Visibility.Collapsed;
-
-            MainFrame.Visibility = Visibility.Visible;
-
-            ((RadioButton)sender).IsChecked = false;
-        }
-
-        private void FriendManagerButton_Checked(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new FriendManager(this));
-
-            StackPanelMenu.Visibility = Visibility.Collapsed;
-
-            MainFrame.Visibility = Visibility.Visible;
-
-            ((RadioButton)sender).IsChecked = false;
-        }
-
-        private void SettingButton_Checked(object sender, RoutedEventArgs e)
-        {
-            MainFrame.Navigate(new Setting(this));
-
-            StackPanelMenu.Visibility = Visibility.Collapsed;
-
-            MainFrame.Visibility = Visibility.Visible;
-
-            ((RadioButton)sender).IsChecked = false;
-        }
-
-        private void ExitButton_Checked(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+    private void PlayButton_Checked(object sender, RoutedEventArgs e)
+    {
+      NavigateWithSlideAnimation(new Lobby(this), (RadioButton)sender);
     }
+
+    private void HistoryButton_Checked(object sender, RoutedEventArgs e)
+    {
+      NavigateWithSlideAnimation(new History(this), (RadioButton)sender);
+    }
+
+    private void FriendManagerButton_Checked(object sender, RoutedEventArgs e)
+    {
+      NavigateWithSlideAnimation(new FriendManager(this), (RadioButton)sender);
+    }
+
+    private void SettingButton_Checked(object sender, RoutedEventArgs e)
+    {
+      NavigateWithSlideAnimation(new Setting(this), (RadioButton)sender);
+    }
+
+    private void ExitButton_Checked(object sender, RoutedEventArgs e)
+    {
+      QuitConfirmationOverlay.Visibility = Visibility.Visible;
+
+      var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+      var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+      storyboard.Begin(border);
+
+      ExitButton.IsChecked = false;
+    }
+    private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
+    {
+      Application.Current.Shutdown();
+    }
+
+    private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
+    {
+      var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
+      var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+      storyboard.Completed += (s, args) =>
+      {
+        QuitConfirmationOverlay.Visibility = Visibility.Collapsed;
+      };
+
+      storyboard.Begin(border);
+    }
+  }
 }

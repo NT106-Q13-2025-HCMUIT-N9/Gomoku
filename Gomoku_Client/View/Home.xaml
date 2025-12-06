@@ -232,6 +232,7 @@
                 <TranslateTransform X="0" Y="0"/>
             </Frame.RenderTransform>
         </Frame>
+        <!-- quit confirmation overlay -->
         <Grid x:Name="QuitConfirmationOverlay" 
               Visibility="Collapsed" 
               Panel.ZIndex="1000">
@@ -248,7 +249,7 @@
 
                 <!-- popup card -->
                 <Border Background="#1A1F2E" 
-                CornerRadius="16" 
+                CornerRadius="3" 
                 Width="500" 
                 Padding="0"
                 BorderBrush="#FF4655" 
@@ -263,13 +264,14 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-
-                        <!-- header + accent bar -->
+                        <!--
+                         (I FOUND THIS UNNECESSARY LMAO)
+                         header + accent bar
                         <Border Grid.Row="0" 
                         Background="#FF4655" 
-                        CornerRadius="16,16,0,0" 
+                        CornerRadius="4,4,0,0" 
                         Height="6"/>
-
+                        -->
                         <!-- vv BELOW ARE POPUP CONTENT vv -->
                         <StackPanel Grid.Row="1" Margin="40,40,40,30">
                             <!-- icon -->

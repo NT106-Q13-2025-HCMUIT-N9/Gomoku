@@ -27,18 +27,18 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        
+
         <!-- Main Content -->
         <Grid Margin="100,100,100,50">
             <!-- Match History Border -->
             <Border BorderBrush="#FF4655" 
                     BorderThickness="1.5,1.5,1.5,1.5"
-                    Background="#1A1A2E" CornerRadius="10" Padding="0">
+                    Background="#1A1A2E" CornerRadius="2" Padding="0">
                 <Border.Effect>
-                        <DropShadowEffect Color="#FF4655" BlurRadius="40" ShadowDepth="0" Opacity="0.4"/>
+                    <DropShadowEffect Color="#FF4655" BlurRadius="40" ShadowDepth="0" Opacity="0.4"/>
                 </Border.Effect>
                 <!-- Match History Table -->
-                <Grid Margin="30" >
+                <Grid Margin="0" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
@@ -67,14 +67,17 @@
 
                     <!-- Match List ScrollViewer -->
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="1">
-                        <StackPanel x:Name="MatchListPanel" Margin="15,10,15,15">
+                        <StackPanel x:Name="MatchListPanel" Margin="0,0,0,0">
 
                             <!-- Victory Match Example -->
-                            <Border Background="#0F0F1E" CornerRadius="8" Padding="20,15" Margin="0,0,0,10" 
-                                    BorderBrush="#00D946" BorderThickness="0,0,3,0" Cursor="Hand">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#00D946" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
-                                </Border.Effect>
+                            <Border Padding="20,15" Margin="0,0,0,0" 
+                                BorderBrush="#00D946" BorderThickness="0,0,6,0" Cursor="Hand">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#00D946" Offset="0"/>
+                                        <GradientStop Color="#0F0F1E" Offset="0.13"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="140"/>
@@ -83,13 +86,10 @@
                                         <ColumnDefinition Width="150"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Result Badge -->
-                                    <Border Grid.Column="0" Background="#00D946" CornerRadius="5" 
-                                            Padding="14,6" HorizontalAlignment="Left">
-                                        <TextBlock Text="THẮNG" FontSize="12" FontWeight="Bold" 
-                                                   Foreground="White" FontFamily="Segoe UI Black"
-                                                   TextAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
+                                    <!-- Result Text -->
+                                    <TextBlock Grid.Column="0" Text="THẮNG" FontSize="14" FontWeight="Bold" 
+                                               Foreground="White" FontFamily="Segoe UI Black"
+                                               VerticalAlignment="Center"/>
 
                                     <!-- Opponent Info -->
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -114,11 +114,14 @@
                             </Border>
 
                             <!-- Defeat Match Example -->
-                            <Border Background="#0F0F1E" CornerRadius="8" Padding="20,15" Margin="0,0,0,10" 
-                                    BorderBrush="#FF4655" BorderThickness="0,0,3,0" Cursor="Hand">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#FF4655" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
-                                </Border.Effect>
+                            <Border Padding="20,15" Margin="0,0,0,0" 
+                                    BorderBrush="#FF4655" BorderThickness="0,0,6,0" Cursor="Hand">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FF4655" Offset="0"/>
+                                        <GradientStop Color="#0F0F1E" Offset="0.13"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="140"/>
@@ -127,13 +130,10 @@
                                         <ColumnDefinition Width="150"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Result Badge -->
-                                    <Border Grid.Column="0" Background="#FF4655" CornerRadius="5" 
-                                            Padding="14,6" HorizontalAlignment="Left">
-                                        <TextBlock Text="THUA" FontSize="12" FontWeight="Bold" 
-                                                   Foreground="White" FontFamily="Segoe UI Black"
-                                                   TextAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
+                                    <!-- Result Text -->
+                                    <TextBlock Grid.Column="0" Text="THUA" FontSize="14" FontWeight="Bold" 
+                                               Foreground="White" FontFamily="Segoe UI Black"
+                                               VerticalAlignment="Center"/>
 
                                     <!-- Opponent Info -->
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -158,11 +158,14 @@
                             </Border>
 
                             <!-- Draw Match Example -->
-                            <Border Background="#0F0F1E" CornerRadius="8" Padding="20,15" Margin="0,0,0,10" 
-                                    BorderBrush="#FFD700" BorderThickness="0,0,3,0" Cursor="Hand">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="#FFD700" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
-                                </Border.Effect>
+                            <Border Padding="20,15" Margin="0,0,0,0" 
+                                    BorderBrush="#FFD700" BorderThickness="0,0,6,0" Cursor="Hand">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                        <GradientStop Color="#FFD700" Offset="0"/>
+                                        <GradientStop Color="#0F0F1E" Offset="0.13"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="140"/>
@@ -171,13 +174,10 @@
                                         <ColumnDefinition Width="150"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <!-- Result Badge -->
-                                    <Border Grid.Column="0" Background="#FFD700" CornerRadius="5" 
-                                            Padding="14,6" HorizontalAlignment="Left">
-                                        <TextBlock Text="HÒA" FontSize="12" FontWeight="Bold" 
-                                                   Foreground="#393534" FontFamily="Segoe UI Black"
-                                                   TextAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
+                                    <!-- Result Text -->
+                                    <TextBlock Grid.Column="0" Text="HÒA" FontSize="14" FontWeight="Bold" 
+                                               Foreground="White" FontFamily="Segoe UI Black"
+                                               VerticalAlignment="Center"/>
 
                                     <!-- Opponent Info -->
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -200,24 +200,12 @@
                                                Foreground="#ECECEC" VerticalAlignment="Center"/>
                                 </Grid>
                             </Border>
-
-                            <!-- More matches... (duplicate above patterns) -->
-
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
-                
-                
             </Border>
         </Grid>
 
-        
-        
-        
-        
-        
-        
-        
         <!-- Top Navigation Bar (Được copy từ TemplatePage) -->
         <Border Height="60" VerticalAlignment="Top" Background="Transparent" Panel.ZIndex="1">
             <Border.Effect>

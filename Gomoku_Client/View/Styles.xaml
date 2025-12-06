@@ -442,7 +442,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="ButtonBorder" 
                         Background="{TemplateBinding Background}" 
-                        CornerRadius="10"
+                        CornerRadius="2"
                         BorderBrush="#3A3E49" 
                         BorderThickness="1.5">
                         <ContentPresenter HorizontalAlignment="Center" 
@@ -483,7 +483,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="ButtonBorder" 
                         Background="{TemplateBinding Background}" 
-                        CornerRadius="10">
+                        CornerRadius="2">
                         <Border.Effect>
                             <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
                         </Border.Effect>

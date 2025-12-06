@@ -8,6 +8,9 @@
     <Compile Update="View\FriendManager.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\GamePlay.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\History.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

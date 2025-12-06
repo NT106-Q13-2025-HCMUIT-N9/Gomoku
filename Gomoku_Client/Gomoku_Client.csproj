@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\api.env" />
+    <None Remove="Assets\firebase_key.json" />
     <None Remove="Assets\Gomoku.ico" />
     <None Remove="Assets\Login_Background.png" />
     <None Remove="Assets\t1.jpg" />
@@ -22,6 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\api.env" />
+    <Resource Include="Assets\firebase_key.json" />
     <Resource Include="Assets\Gomoku.ico" />
     <Resource Include="Assets\Login_Background.png" />
     <Resource Include="Assets\t1.jpg" />

@@ -143,8 +143,6 @@
         <Setter Property="Padding" Value="8"/>
     </Style>
     
-    
-
     <!-- Button trên trang chủ  -->
     <Style x:Key="ValorantMenuItem" TargetType="RadioButton">
         <Setter Property="Background" Value="Transparent"/>
@@ -522,4 +520,8 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
+    
+    
+    
 </ResourceDictionary>

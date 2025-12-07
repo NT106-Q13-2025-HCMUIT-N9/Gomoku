@@ -14,14 +14,35 @@ using System.Windows.Shapes;
 
 namespace Gomoku_Client.View
 {
-    /// <summary>
-    /// Interaction logic for GamePlay.xaml
-    /// </summary>
-    public partial class GamePlay : Window
+  /// <summary>
+  /// Interaction logic for GamePlay.xaml
+  /// </summary>
+  public partial class GamePlay : Window
+  {
+    public GamePlay()
     {
-        public GamePlay()
-        {
-            InitializeComponent();
-        }
+      InitializeComponent();
     }
+
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+    private void BoardCanvas_MouseLeftButtonDown(object sender, RoutedEventArgs e)
+    {
+
+    }
+    private void ChatInput_KeyDown(object sender, RoutedEventArgs e)
+    {
+
+    }
+    private void SendMessage_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+    private void SurrenderButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+  }
 }

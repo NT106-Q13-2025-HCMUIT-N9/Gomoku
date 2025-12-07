@@ -19,8 +19,23 @@ namespace Server
                 ServerUtils.SendMessage(player1.Client, $"[INNIT];{clock1};{clock2};X");
                 ServerUtils.SendMessage(player2.Client, $"[INNIT];{clock1};{clock2};O");
 
-                Thread clock_thread = new Thread(() => matchHandle.StartClock());
+                Thread clock_thread = new Thread(() => {
+                    matchHandle.StartClock();
+                });
                 clock_thread.Start();
+
+                Thread player1_thread = new Thread(() => {
+                    matchHandle.Handle_Player1();
+                });
+                player1_thread.Start();
+
+                Thread player2_thread = new Thread(() => {
+                    matchHandle.Handle_Player2();
+                });
+                player2_thread.Start();
+
+                player1_thread.Join();
+                player2_thread.Join();
                 clock_thread.Join();
             }
             catch (Exception ex)

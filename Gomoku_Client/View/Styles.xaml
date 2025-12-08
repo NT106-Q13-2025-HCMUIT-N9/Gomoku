@@ -10,7 +10,43 @@
     <!-- CONVERTER (Từ file SignUp) -->
     <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
 
-    <!-- CÁC STYLE BUTTON -->
+    <!-- Style cho Friend Card -->
+    <Style x:Key="FriendCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="#1A1A2E"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="15"/>
+        <Setter Property="Margin" Value="0,0,0,12"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.4"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Hiệu ứng viền sáng khi hover cho tất cả Button -->
+    <Style TargetType="Button">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+
+        <Style.Triggers>
+            <!-- Khi hover -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderThickness" Value="2"/>
+
+                <!-- Viền sáng theo màu nền của nút -->
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect BlurRadius="20"
+                          ShadowDepth="0"
+                          Opacity="1"
+                          Color="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Background.Color}"/>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+
+
+        </Style.Triggers>
+    </Style>
 
     <!-- Style Button Xanh (Chính) -->
     <Style x:Key="BlueButton" TargetType="Button">
@@ -521,6 +557,57 @@
         </Setter>
     </Style>
 
+    <!-- ======================================= -->
+    <!-- Fade In + Fade Out reusable storyboard -->
+    <!-- ======================================= -->
+
+    <!-- Fade In -->
+    <Storyboard x:Key="PopupFadeIn">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                     From="0" To="1" Duration="0:0:0.3">
+            <DoubleAnimation.EasingFunction>
+                <QuadraticEase EasingMode="EaseOut"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+
+        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                     From="0.8" To="1" Duration="0:0:0.3">
+            <DoubleAnimation.EasingFunction>
+                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+
+        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                     From="0.8" To="1" Duration="0:0:0.3">
+            <DoubleAnimation.EasingFunction>
+                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+    </Storyboard>
+
+    <!-- Fade Out -->
+    <Storyboard x:Key="PopupFadeOut">
+        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                     From="1" To="0" Duration="0:0:0.25">
+            <DoubleAnimation.EasingFunction>
+                <QuadraticEase EasingMode="EaseIn"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+
+        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                     From="1" To="0.8" Duration="0:0:0.25">
+            <DoubleAnimation.EasingFunction>
+                <QuadraticEase EasingMode="EaseIn"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+
+        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                     From="1" To="0.8" Duration="0:0:0.25">
+            <DoubleAnimation.EasingFunction>
+                <QuadraticEase EasingMode="EaseIn"/>
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
+    </Storyboard>
 
 
 

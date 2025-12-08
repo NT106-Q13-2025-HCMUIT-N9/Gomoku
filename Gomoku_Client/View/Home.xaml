@@ -119,6 +119,8 @@
             <RadioButton x:Name="SettingButton" Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="SettingButton_Checked"/>
             <RadioButton x:Name="ExitButton" Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="ExitButton_Checked"/>
         </StackPanel>
+        
+        
         <Grid>
 
             <!-- Main Content Grid -->
@@ -171,7 +173,6 @@
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="PLAYER" FontSize="24" FontWeight="Bold" 
                                        Foreground="#FFFFFF" FontFamily="Segoe UI Black"/>
-                                    <TextBlock Text="#VN001" FontSize="14" Foreground="#8B8B8B" Margin="0,2,0,5"/>
 
                                     <!-- Level Badge - Hiển tại chưa sử dụng
                                     <StackPanel Orientation="Horizontal">
@@ -225,6 +226,8 @@
                 </StackPanel>
             </Grid>
         </Grid>
+        
+        
         <Frame x:Name="MainFrame"
                NavigationUIVisibility="Hidden"
                Visibility="Collapsed">
@@ -232,6 +235,9 @@
                 <TranslateTransform X="0" Y="0"/>
             </Frame.RenderTransform>
         </Frame>
+        
+        
+        
         <!-- quit confirmation overlay -->
         <Grid x:Name="QuitConfirmationOverlay" 
               Visibility="Collapsed" 
@@ -342,6 +348,10 @@
                 </Border>
             </Border>
         </Grid>
+        
+        
+        
+        
     </Grid>
 
 </Window>

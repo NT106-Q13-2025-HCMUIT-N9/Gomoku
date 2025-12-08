@@ -14,12 +14,52 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Style cho Friend Card -->
+            <Style x:Key="FriendCardStyle" TargetType="Border">
+                <Setter Property="Background" Value="#1A1A2E"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Padding" Value="15"/>
+                <Setter Property="Margin" Value="0,0,0,12"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.4"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Hiệu ứng viền sáng khi hover cho tất cả Button -->
+            <Style TargetType="Button">
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+
+                <Style.Triggers>
+                    <!-- Khi hover -->
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="BorderThickness" Value="2"/>
+
+                        <!-- Viền sáng theo màu nền của nút -->
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <DropShadowEffect BlurRadius="20"
+                                      ShadowDepth="0"
+                                      Opacity="1"
+                                      Color="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Background.Color}"/>
+                            </Setter.Value>
+                        </Setter>
+                    </Trigger>
+
+
+                </Style.Triggers>
+            </Style>
+
+
+
         </ResourceDictionary>
     </Page.Resources>
 
     <Grid>
-
-        <!-- Background gradient Valorant (Được copy từ TemplatePage) -->
+        <!-- Background gradient Valorant -->
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#0F1923" Offset="0"/>
@@ -27,42 +67,306 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        <!-- Vùng Nội dung Riêng của Lobby -->
-        <Grid Margin="0,60,0,0">
+        <!-- Vùng Nội dung Riêng của Friend Manager -->
+        <Grid Margin="30,80,30,30">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="171*"/>
-                <ColumnDefinition Width="149*"/>
+                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <!-- Đặt các control riêng của trang Lobby tại đây -->
-            <TextBlock Text="GIAO DIỆN CHÍNH CỦA QUẢN LÝ BẠN BÈ"
-                   Foreground="#FFFFFF"
-                   FontSize="48"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Center" Grid.ColumnSpan="2" Margin="264,0,0,0"/>
-        </Grid>
 
-        <!-- Top Navigation Bar (Được copy từ TemplatePage) -->
+            <!-- Left Panel - Add Friend & Friend Requests -->
+            <StackPanel Grid.Column="0" Margin="0,0,15,0">
+
+                <!-- Add Friend Section -->
+                <Border Background="#1A1A2E" CornerRadius="12" Padding="25" Margin="0,0,0,20">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="25" ShadowDepth="0" Opacity="0.4"/>
+                    </Border.Effect>
+
+                    <StackPanel>
+                        <TextBlock Text="THÊM BẠN BÈ" FontSize="16" FontWeight="Bold" 
+                                   Foreground="#FF4655" Margin="0,0,0,15" FontFamily="Segoe UI Black"/>
+
+                        <TextBlock Text="Nhập tên người chơi" FontSize="12" 
+                                   Foreground="#8B8B8B" Margin="0,0,0,10"/>
+
+                        <!-- Input Box -->
+                        <Grid Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="FriendUsernameInput" Grid.Column="0" Height="45" 
+                                     Background="#0F0F1E" BorderBrush="#FF4655" BorderThickness="2" 
+                                     Foreground="White" FontSize="14" 
+                                     Padding="15,0" VerticalContentAlignment="Center"
+                                     MaxLength="50">
+                                <TextBox.Resources>
+                                    <Style TargetType="Border">
+                                        <Setter Property="CornerRadius" Value="8,0,0,8"/>
+                                    </Style>
+                                </TextBox.Resources>
+                            </TextBox>
+
+                            <Button x:Name="btn_SendRequest" Grid.Column="1" Width="45" Height="45" Background="#FF4655" 
+                                    BorderThickness="0" Cursor="Hand"
+                                    Click="SendFriendRequest_Click">
+                                <Button.Effect>
+                                    <DropShadowEffect Color="#FF4655" BlurRadius="15" ShadowDepth="0" Opacity="0.6"/>
+                                </Button.Effect>
+                                <Path Data="M2,21 L23,12 L2,3 L2,10 L17,12 L2,14 Z" 
+                                      Fill="White" Width="20" Height="20" Stretch="Uniform"/>
+                            </Button>
+                        </Grid>
+
+                        <!-- Info Text -->
+                        <TextBlock Text="💡 Bạn có thể gửi lời mời kết bạn bằng tên người chơi" 
+                                   FontSize="11" Foreground="#8B8B8B" TextWrapping="Wrap"
+                                   LineHeight="16"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Friend Requests Section -->
+                <Border Background="#1A1A2E" CornerRadius="12" Padding="20" Height="403">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Grid Grid.Row="0" Margin="0,0,0,15">
+                            <TextBlock Text="LỜI MỜI KẾT BẠN" FontSize="14" FontWeight="Bold" 
+                                       Foreground="#FFD700" FontFamily="Segoe UI Black"/>
+                        </Grid>
+
+                        <!-- Request List -->
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="320">
+                            <StackPanel x:Name="FriendRequestsPanel">
+
+                                <!-- Friend Request Card Example -->
+                                <Border Style="{StaticResource FriendCardStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Avatar -->
+                                        <Border Grid.Column="0" Width="45" Height="45" CornerRadius="22.5" 
+                                                BorderBrush="#FFD700" BorderThickness="2" Margin="0,0,12,0">
+                                            <Border.Background>
+                                                <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                                            </Border.Background>
+                                        </Border>
+
+                                        <!-- Name & Time -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="PlayerName123" FontSize="14" 
+                                                       FontWeight="SemiBold" Foreground="#ECECEC"/>
+                                        </StackPanel>
+
+                                        <!-- Action Buttons -->
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Button x:Name="btn_Accept" Width="35" Height="35" Background="#00D946" 
+                                                    BorderThickness="0" Cursor="Hand"
+                                                    Margin="0,0,5,0" ToolTip="Chấp nhận">
+                                                <Path Data="M5,12 L10,17 L20,7" Stroke="White" 
+                                                      StrokeThickness="2.5" Width="16" Height="16" Stretch="Uniform"/>
+                                            </Button>
+                                            <Button x:Name="btn_Refuse" Width="35" Height="35" Background="#FF4655" 
+                                                    BorderThickness="0" Cursor="Hand"
+                                                    ToolTip="Từ chối">
+                                                <Path Data="M6,6 L18,18 M18,6 L6,18" Stroke="White" 
+                                                      StrokeThickness="2.5" Width="16" Height="16" Stretch="Uniform"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- Right Panel - Friends List -->
+            <Border Grid.Column="1" Background="#1A1A2E" CornerRadius="12" Padding="0" Margin="15,0,0,0">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
+                </Border.Effect>
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <Border Grid.Row="0" Background="#0F0F1E" CornerRadius="12,12,0,0" Padding="25,18">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="DANH SÁCH BẠN BÈ" FontSize="16" FontWeight="Bold" 
+                                           Foreground="#FFFFFF" FontFamily="Segoe UI Black" 
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <TextBlock x:Name="TotalFriendsCount" Text="24 bạn bè" FontSize="12" 
+                                       Foreground="#8B8B8B" HorizontalAlignment="Right" 
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Friends List -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
+                        <StackPanel x:Name="FriendsListPanel">
+
+                            <!-- Friend Card -->
+                            <Border Style="{StaticResource FriendCardStyle}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Avatar -->
+                                    <Border Grid.Column="0" Width="50" Height="50" CornerRadius="25"
+                                            BorderBrush="#8B8B8B" BorderThickness="2"
+                                            Margin="0,0,15,0">
+                                        <Border.Background>
+                                            <ImageBrush ImageSource="/Assets/Gomoku.ico"/>
+                                        </Border.Background>
+                                    </Border>
+
+                                    <!-- Name -->
+                                    <TextBlock Grid.Column="1" Text="BestFriend2024" 
+                                               VerticalAlignment="Center"
+                                               FontSize="15" FontWeight="Bold" 
+                                               Foreground="#ECECEC"/>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+
+                                        <!-- Thách đấu -->
+
+                                        <Button x:Name="btn_Challenge"
+                                                Width="50"
+                                                Height="50"
+                                                Background="#FF4655"
+                                                BorderBrush="#FF4655"
+                                                BorderThickness="2"
+                                                Cursor="Hand"
+                                                Margin="0,0,20,0">
+
+                                            <Button.ToolTip>
+                                                <ToolTip Content="Thách đấu"/>
+                                            </Button.ToolTip>
+
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Grid>
+                                                        <!-- Viền tròn -->
+                                                        <Ellipse Fill="{TemplateBinding Background}"
+                                                                 Stroke="{TemplateBinding BorderBrush}"
+                                                                 StrokeThickness="{TemplateBinding BorderThickness}"/>
+
+                                                        <!-- Icon -->
+                                                        <Image Source="/Assets/Riot_Games_Logo.png"
+                                                               Width="50"
+                                                               Height="50"
+                                                               Stretch="Fill"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </ControlTemplate>
+                                            </Button.Template>
+
+                                        </Button>
+
+
+                                        <!-- Xóa bạn -->
+                                        <Button x:Name="btn_Unfriend"
+                                                Width="50"
+                                                Height="50"
+                                                Background="#FF4655"
+                                                BorderBrush="#FF4655"
+                                                BorderThickness="2"
+                                                Cursor="Hand"
+                                                ToolTip="Xóa bạn">
+
+                                            <Button.Template>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Grid>
+                                                        <!-- Viền tròn -->
+                                                        <Ellipse Fill="{TemplateBinding Background}"
+                                                                 Stroke="{TemplateBinding BorderBrush}"
+                                                                 StrokeThickness="{TemplateBinding BorderThickness}"/>
+
+                                                        <!-- Icon -->
+                                                        <Image Source="/Assets/delete-friend.png"
+                                                               Width="50"
+                                                               Height="50"
+                                                               Stretch="Fill"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </ControlTemplate>
+                                            </Button.Template>
+
+                                        </Button>
+
+                                    </StackPanel>
+
+                                </Grid>
+                            </Border>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+
+        </Grid>
+        
+        
+
+        <!-- Top Navigation Bar -->
         <Border Height="60" VerticalAlignment="Top" Background="Transparent" Panel.ZIndex="1">
             <Border.Effect>
                 <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.5"/>
             </Border.Effect>
-
             <Grid>
                 <RadioButton x:Name="BackButton" 
-                         Content="Quay lại" 
-                         Style="{StaticResource BackButton}" 
-                         Checked="BackButton_Checked"/>
-
-                <!-- Page Title (Đã được đặt cố định) -->
+                             Content="Quay lại" 
+                             Style="{StaticResource BackButton}" 
+                             Checked="BackButton_Checked"/>
+                <!-- Page Title -->
                 <TextBlock Grid.Column="1" 
-                       Text="BẠN BÈ" 
-                       FontSize="25" 
-                       FontWeight="Bold" 
-                       Foreground="#FFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center"
-                       FontFamily="Segoe UI Black"/>
-
+                           Text="BẠN BÈ" 
+                           FontSize="25" 
+                           FontWeight="Bold" 
+                           Foreground="#FFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center"
+                           FontFamily="Segoe UI Black"/>
             </Grid>
         </Border>
-
+        
+      
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     </Grid>
 </Page>

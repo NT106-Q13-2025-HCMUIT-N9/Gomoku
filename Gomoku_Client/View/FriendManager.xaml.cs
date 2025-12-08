@@ -36,5 +36,16 @@ namespace Gomoku_Client.View
       }
       _mainWindow.ShowMenuWithAnimation();
     }
+
+    private void SendFriendRequest_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+
+
+
+
+
   }
 }

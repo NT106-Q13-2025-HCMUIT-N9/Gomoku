@@ -24,6 +24,40 @@ namespace Gomoku_Server
 
         char[,] table = new char[15, 15];
 
+        public int prev_mark_at_dir(int start_row, int start_col, int delta_row, int delta_col, char player)
+        {
+            int count = 0;
+            int col = start_col + delta_col;
+            int row = start_row + delta_row;
+            while (col >= 0 && row >= 0)
+            {
+                if (table[row, col] != player)
+                {
+                    break;
+                }
+
+                count += 1;
+                col += delta_col;
+                row += delta_row;
+            }
+
+            return count;
+        }
+
+        public bool CheckWin(int start_row, int start_col, char player)
+        {
+            int top_left = prev_mark_at_dir(start_row, start_col, -1, -1, player);
+            int top_mid = prev_mark_at_dir(start_row, start_col, -1, 0, player);
+            int top_right = prev_mark_at_dir(start_row, start_col, -1, 1, player);
+            int mid_left = prev_mark_at_dir(start_row, start_col, 0, -1, player);
+            int mid_right = prev_mark_at_dir(start_row, start_col, 0, 1, player);
+            int bot_left = prev_mark_at_dir(start_row, start_col, 1, -1, player);
+            int bot_mid = prev_mark_at_dir(start_row, start_col, 1, 0, player);
+            int bot_right = prev_mark_at_dir(start_row, start_col, 1, 1, player);
+
+            return (top_left + bot_right + 1 >= 5) || (top_mid + bot_mid + 1 >= 5) || (top_right + bot_left + 1 >= 5) || (mid_left + mid_right + 1 >= 5);
+        }
+
         public void StartClock()
         {
             try
@@ -115,6 +149,12 @@ namespace Gomoku_Server
                                         player2.Client.Send(Encoding.ASCII.GetBytes($"[MOVE1];{row};{col}"));
                                     }
                                 }
+
+                                if (CheckWin(row, col, 'X'))
+                                {
+                                    player1.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
+                                    player2.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
+                                }
                             }
                         }
                     }
@@ -164,6 +204,12 @@ namespace Gomoku_Server
                                         player1.Client.Send(Encoding.ASCII.GetBytes($"[MOVE2];{row};{col}"));
                                         player2.Client.Send(Encoding.ASCII.GetBytes($"[MOVE2];{row};{col}"));
                                     }
+                                }
+
+                                if (CheckWin(row, col, 'O'))
+                                {
+                                    player1.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
+                                    player2.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
                                 }
                             }
                         }

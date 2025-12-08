@@ -22,6 +22,8 @@ namespace Gomoku_Server
         int clock2;
         object turn_lock = new object();
 
+        char[,] table = new char[15, 15];
+
         public void StartClock()
         {
             try
@@ -29,23 +31,26 @@ namespace Gomoku_Server
                 DateTime lastTick = DateTime.Now;
                 while (ServerUtils.StillConnected(player1.Client) && ServerUtils.StillConnected(player2.Client))
                 {
-                    if ((DateTime.Now - lastTick).TotalSeconds >= 1)
+                    lock (turn_lock)
                     {
-                        lastTick = DateTime.Now;
+                        if ((DateTime.Now - lastTick).TotalSeconds >= 1)
+                        {
+                            lastTick = DateTime.Now;
 
-                        if (current_turn == PlayerTurn.player1)
-                        {
-                            string message = $"[TIME1];{clock1}";
-                            ServerUtils.SendMessage(player1.Client, message);
-                            ServerUtils.SendMessage(player2.Client, message);
-                            clock1--;
-                        }
-                        else if (current_turn == PlayerTurn.player2)
-                        {
-                            string message = $"[TIME2];{clock2}";
-                            ServerUtils.SendMessage(player1.Client, message);
-                            ServerUtils.SendMessage(player2.Client, message);
-                            clock2--;
+                            if (current_turn == PlayerTurn.player1)
+                            {
+                                string message = $"[TIME1];{clock1}";
+                                ServerUtils.SendMessage(player1.Client, message);
+                                ServerUtils.SendMessage(player2.Client, message);
+                                clock1--;
+                            }
+                            else if (current_turn == PlayerTurn.player2)
+                            {
+                                string message = $"[TIME2];{clock2}";
+                                ServerUtils.SendMessage(player1.Client, message);
+                                ServerUtils.SendMessage(player2.Client, message);
+                                clock2--;
+                            }
                         }
                     }
                 }
@@ -89,9 +94,29 @@ namespace Gomoku_Server
                     string message_str = Encoding.UTF8.GetString(buffer, 0, byte_read);
                     string[] parameter = message_str.Split(';');
 
-                    if (parameter[0] == "[SWITCH]" && current_turn == PlayerTurn.player1)
-                    {
-                        SwitchPlayer();
+                    lock (turn_lock) {
+                        if(current_turn == PlayerTurn.player1)
+                        {
+                            if (parameter[0] == "[SWITCH]")
+                            {
+                                SwitchPlayer();
+                            }
+                            else if (parameter[0] == "[MOVE]")
+                            {
+                                int row = int.Parse(parameter[1]);
+                                int col = int.Parse(parameter[2]);
+
+                                lock (table)
+                                {
+                                    if (table[row, col] == '\0')
+                                    {
+                                        table[row, col] = 'X';
+                                        player1.Client.Send(Encoding.ASCII.GetBytes($"[MOVE1];{row};{col}"));
+                                        player2.Client.Send(Encoding.ASCII.GetBytes($"[MOVE1];{row};{col}"));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -118,9 +143,30 @@ namespace Gomoku_Server
                     string message_str = Encoding.UTF8.GetString(buffer, 0, byte_read);
                     string[] parameter = message_str.Split(';');
 
-                    if (parameter[0] == "[SWITCH]" && current_turn == PlayerTurn.player2)
+                    lock (turn_lock)
                     {
-                        SwitchPlayer();
+                        if(current_turn == PlayerTurn.player2)
+                        {
+                            if (parameter[0] == "[SWITCH]")
+                            {
+                                SwitchPlayer();
+                            }
+                            else if (parameter[0] == "[MOVE]")
+                            {
+                                int row = int.Parse(parameter[1]);
+                                int col = int.Parse(parameter[2]);
+
+                                lock (table)
+                                {
+                                    if (table[row, col] == '\0')
+                                    {
+                                        table[row, col] = 'O';
+                                        player1.Client.Send(Encoding.ASCII.GetBytes($"[MOVE2];{row};{col}"));
+                                        player2.Client.Send(Encoding.ASCII.GetBytes($"[MOVE2];{row};{col}"));
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

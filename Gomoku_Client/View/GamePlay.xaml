@@ -6,10 +6,17 @@
         xmlns:local="clr-namespace:Gomoku_Client.View"
         mc:Ignorable="d"
         Title="Gomoku | Match In Progress" Height="720" Width="1280"
-        FontFamily="Segoe UI" WindowStyle="None" ResizeMode="NoResize">
+        FontFamily="Segoe UI" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <!-- ********************************** TÀI NGUYÊN STYLE CHUNG ********************************** -->
     <Window.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        
+        
         <!-- Style cơ sở cho các Border của Panel (góc bo tròn, nền tối, đổ bóng sâu) -->
         <Style x:Key="PanelBaseStyle" TargetType="Border">
             <Setter Property="Background" Value="#1A1A2E"/>
@@ -49,6 +56,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        </ResourceDictionary>
     </Window.Resources>
 
     <Grid>
@@ -202,7 +210,9 @@
                         </Border>
 
                         <!-- Grid Canvas for Board -->
-                        <Canvas x:Name="BoardCanvas" Width="700" Height="700" 
+                        <Canvas x:Name="BoardCanvas" 
+                                Width="700" 
+                                Height="700" 
                                 Background="Transparent" MouseLeftButtonDown="BoardCanvas_MouseLeftButtonDown"/>
                     </Grid>
                 </Viewbox>

@@ -22,8 +22,7 @@ namespace Gomoku_Client.View
     {
         // Constants Variables
         private const int boardSize = 15;
-        private const int cellSize = 40;
-        private const double stoneRadius = 16;
+        private const double cellSize = 46.5;
 
         // Game state
         private int[,] board;
@@ -49,7 +48,7 @@ namespace Gomoku_Client.View
             SetupTimers();
             UpdateGameStatus();
         }
-
+        
         private void BoardCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (isGameOver) return;
@@ -68,7 +67,6 @@ namespace Gomoku_Client.View
             // Kiểm tra ô đã có quân chưa
             if (board[row, col] != 0)
             {
-                MessageBox.Show("Ô này đã có quân cờ!");
                 return;
             }
 
@@ -102,7 +100,7 @@ namespace Gomoku_Client.View
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show(
-                "Bạn có chắc chắn muốn thoát? Trận đấu sẽ bị hủy.",
+                "Bạn có chắc chắn muốn thoát? Bạn sẽ bị xử thua.",
                 "Xác nhận thoát",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Warning
@@ -292,43 +290,29 @@ namespace Gomoku_Client.View
 
         private void UpdatePlayer1TimerDisplay()
         {
-            // Nếu bạn đã thêm x:Name="Player1TimerText" trong XAML:
             Player1TimerText.Text = player1TimeLeft.ToString(@"mm\:ss");
-
-            // Nếu chưa có, có thể tìm element bằng cách này:
-            var player1TimerText = FindTimerTextBlock(true);
-            if (player1TimerText != null)
+            // Đổi màu cảnh báo khi còn < 30 giây
+            if (player1TimeLeft.TotalSeconds <= 30)
             {
-                player1TimerText.Text = player1TimeLeft.ToString(@"mm\:ss");
-
-                // Đổi màu cảnh báo khi còn < 30 giây
-                if (player1TimeLeft.TotalSeconds <= 30)
-                {
-                    player1TimerText.Foreground = new SolidColorBrush(Colors.Red);
-                }
-                else
-                {
-                    player1TimerText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00D946"));
-                }
+                Player1TimerText.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            else
+            {
+                Player1TimerText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#00D946"));
             }
         }
 
         private void UpdatePlayer2TimerDisplay()
         {
-            var player2TimerText = FindTimerTextBlock(false);
-            if (player2TimerText != null)
+            Player2TimerText.Text = player2TimeLeft.ToString(@"mm\:ss");
+            // Đổi màu cảnh báo khi còn < 30 giây
+            if (player2TimeLeft.TotalSeconds <= 30)
             {
-                player2TimerText.Text = player2TimeLeft.ToString(@"mm\:ss");
-
-                // Đổi màu cảnh báo khi còn < 30 giây
-                if (player2TimeLeft.TotalSeconds <= 30)
-                {
-                    player2TimerText.Foreground = new SolidColorBrush(Colors.Red);
-                }
-                else
-                {
-                    player2TimerText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#ECECEC"));
-                }
+                Player2TimerText.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            else
+            {
+                Player2TimerText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#ECECEC"));
             }
         }
 
@@ -339,7 +323,6 @@ namespace Gomoku_Client.View
 
             foreach (var tb in textBlocks)
             {
-                // Tìm bằng FontFamily Consolas (như trong XAML của bạn)
                 if (tb.FontFamily.Source == "Consolas" && tb.FontSize == 30)
                 {
                     // Kiểm tra màu để phân biệt Player 1 và Player 2
@@ -382,14 +365,11 @@ namespace Gomoku_Client.View
 
         private void PlaceStone(int row, int col)
         {
-            // Cập nhật mảng board
             board[row, col] = isPlayerTurn ? 1 : 2;
             moveCount++;
 
-            // Vẽ quân cờ lên canvas
             DrawStone(row, col, isPlayerTurn);
 
-            // Kiểm tra thắng
             if (CheckWin(row, col))
             {
                 string winner = isPlayerTurn ? player1Name : player2Name;
@@ -397,14 +377,12 @@ namespace Gomoku_Client.View
                 return;
             }
 
-            // Kiểm tra hòa (bàn cờ đầy)
             if (moveCount >= boardSize * boardSize)
             {
                 GameOver(null, "Hòa! Bàn cờ đã đầy!");
                 return;
             }
 
-            // Chuyển lượt
             SwitchTurn();
         }
 
@@ -430,7 +408,6 @@ namespace Gomoku_Client.View
         {
             isPlayerTurn = !isPlayerTurn;
 
-            // Dừng timer hiện tại và bắt đầu timer của người kế tiếp
             if (isPlayerTurn)
             {
                 player2Timer.Stop();
@@ -464,7 +441,7 @@ namespace Gomoku_Client.View
 
         private bool CheckDirection(int row, int col, int dRow, int dCol, int player)
         {
-            int count = 1; // Đếm quân hiện tại
+            int count = 1; 
 
             // Đếm về phía trước
             count += CountStones(row, col, dRow, dCol, player);
@@ -498,7 +475,7 @@ namespace Gomoku_Client.View
             player2Timer.Stop();
 
             MessageBoxResult result = MessageBox.Show(
-                message + "\n\nBạn có muốn chơi lại?",
+                message + "\n\nThoát về màn hình chính?",
                 "Kết thúc trận đấu",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Information
@@ -508,11 +485,7 @@ namespace Gomoku_Client.View
             {
                 this.Close();
             }
-            else
-            {
-                // Quay về màn hình chính hoặc đóng cửa sổ
-                this.Close();
-            }
+            
         }
 
         public void ReceiveMove(int row, int col)
@@ -552,11 +525,5 @@ namespace Gomoku_Client.View
                 GameOver(true, $"{player1Name} thắng do {player2Name} hết thời gian!");
             }
         }
-
-
-
-
-
-
     }
 }

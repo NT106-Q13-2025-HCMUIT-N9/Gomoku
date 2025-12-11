@@ -410,31 +410,20 @@ namespace Gomoku_Client.View
 
         private void DrawStone(int row, int col, bool isBlack)
         {
-            Ellipse stone = new Ellipse
-            {
-                Width = stoneRadius * 2,
-                Height = stoneRadius * 2,
-                Fill = isBlack ? Brushes.Black : Brushes.White,
-                Stroke = isBlack ? Brushes.White : Brushes.Black,
-                StrokeThickness = 1
-            };
+            Ellipse stone = new Ellipse();
 
-            // Hiệu ứng đổ bóng
-            stone.Effect = new System.Windows.Media.Effects.DropShadowEffect
-            {
-                Color = Colors.Black,
-                BlurRadius = 5,
-                ShadowDepth = 3,
-                Opacity = 0.5
-            };
+            if (isBlack)
+                stone.Style = (Style)FindResource("BlackStone");
+            else
+                stone.Style = (Style)FindResource("WhiteStone");
 
-            // FIX: Tọa độ đúng
-            double x = cellSize / 2.0 + col * cellSize - stoneRadius;
-            double y = cellSize / 2.0 + row * cellSize - stoneRadius;
+            double x = cellSize / 2.0 + col * cellSize - stone.Width / 2;
+            double y = cellSize / 2.0 + row * cellSize - stone.Height / 2;
 
             Canvas.SetLeft(stone, x);
             Canvas.SetTop(stone, y);
-            BoardCanvas.Children.Add(stone);    
+
+            BoardCanvas.Children.Add(stone);
         }
 
         private void SwitchTurn()

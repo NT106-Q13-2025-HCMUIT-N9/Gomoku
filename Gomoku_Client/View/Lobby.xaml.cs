@@ -26,8 +26,8 @@ namespace Gomoku_Client.View
     {
       InitializeComponent();
       _mainWindow = mainGameUI;
-
-    }
+            new GamePlay().Show();
+        }
 
     private void BackButton_Checked(object sender, RoutedEventArgs e)
     {

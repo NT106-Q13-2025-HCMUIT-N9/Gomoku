@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Gomoku_Client.View"
+      xmlns:converters="clr-namespace:Gomoku_Client.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="Setting">
@@ -14,6 +15,163 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <converters:SliderValueToWidthConverter x:Key="SliderValueToWidthConverter"/>
+
+            <Style x:Key="ModernSlider" TargetType="Slider">
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Slider">
+                            <Grid>
+                                <!-- background -->
+                                <Border Height="40" 
+                                        Background="#1A1A1A"
+                                        BorderBrush="#2A2A2A"
+                                        BorderThickness="2"/>
+
+                                <!-- filled slider -->
+                                <Border x:Name="FilledTrack"
+                                        Height="40"
+                                        Background="#FF4655"
+                                        HorizontalAlignment="Left">
+                                    <Border.Width>
+                                        <MultiBinding Converter="{StaticResource SliderValueToWidthConverter}">
+                                            <Binding Path="Value" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                            <Binding Path="Minimum" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                            <Binding Path="Maximum" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                            <Binding Path="ActualWidth" RelativeSource="{RelativeSource TemplatedParent}"/>
+                                        </MultiBinding>
+                                    </Border.Width>
+                                </Border>
+
+                                <!-- pergentage -->
+                                <TextBlock Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:0}%}"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontFamily="Segoe UI Black"
+                                           FontStyle="Italic"
+                                           IsHitTestVisible="False"/>
+
+                                <!-- interaction track (invisible) -->
+                                <Track x:Name="PART_Track">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Command="Slider.DecreaseLarge" Opacity="0"/>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Command="Slider.IncreaseLarge" Opacity="0"/>
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Width="40" Height="40" Opacity="0" Cursor="Hand"/>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <!-- increase decrease button -->
+            <Style x:Key="SliderAdjustButton" TargetType="Button">
+                <Setter Property="Width" Value="40"/>
+                <Setter Property="Height" Value="40"/>
+                <Setter Property="Background" Value="#1A1A1A"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="BorderBrush" Value="#2A2A2A"/>
+                <Setter Property="BorderThickness" Value="2"/>
+                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Opacity" Value="0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter HorizontalAlignment="Center" 
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Background" Value="#FF4655"/>
+                        <Setter Property="BorderBrush" Value="#FF4655"/>
+                    </Trigger>
+                    <Trigger Property="IsPressed" Value="True">
+                        <Setter Property="Background" Value="#A32E38"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <!-- setting row container -->
+            <Style x:Key="SettingRow" TargetType="Border">
+                <Setter Property="Background" Value="#0A0A0A"/>
+                <Setter Property="BorderBrush" Value="#1A1A1A"/>
+                <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                <Setter Property="Padding" Value="30,15"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+            </Style>
+            <!-- option -->
+            <Style x:Key="OptionButton" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="#606060"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="Padding" Value="20,8"/>
+                <Setter Property="Margin" Value="0,0,0,0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="BorderThickness" Value="0,0,0,3"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="{TemplateBinding Padding}">
+                                <TextBlock Text="{TemplateBinding Content}"
+                                           FontSize="{TemplateBinding FontSize}"
+                                           FontWeight="{TemplateBinding FontWeight}"
+                                           FontStyle="{TemplateBinding FontStyle}"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <Trigger Property="Tag" Value="Selected">
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="BorderBrush" Value="#FF4655"/>
+                    </Trigger>
+                    <Trigger Property="IsMouseOver" Value="True">
+                        <Setter Property="Foreground" Value="#CCCCCC"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+            <!--- section header -->
+            <Style x:Key="SectionHeader" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Margin" Value="30,30,0,15"/>
+                <Setter Property="FontFamily" Value="Segoe UI Black"/>
+            </Style>
+            <!--- section label -->
+            <Style x:Key="SettingLabel" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="FontStyle" Value="Italic"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="FontFamily" Value="Segoe UI Black"/>
+            </Style>
         </ResourceDictionary>
     </Page.Resources>
 
@@ -26,16 +184,6 @@
                 <GradientStop Color="#152635" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
-
-        <!-- Vùng Nội dung Riêng của Lobby -->
-        <Grid Margin="0,60,0,0">
-            <!-- Đặt các control riêng của trang Lobby tại đây -->
-            <TextBlock Text="GIAO DIỆN CHÍNH CỦA CÀI ĐẶT"
-                   Foreground="#FFFFFF"
-                   FontSize="48"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
-        </Grid>
 
         <!-- Top Navigation Bar (Được copy từ TemplatePage) -->
         <Border Height="60" VerticalAlignment="Top" Background="Transparent" Panel.ZIndex="1">
@@ -59,6 +207,277 @@
 
             </Grid>
         </Border>
+        <!-- Left Side Menu -->
+        <Border Width="320"
+                HorizontalAlignment="Left"
+                Background="#0D0D0D"
+                BorderBrush="#1A1A1A"
+                BorderThickness="0,0,2,0">
+            <StackPanel Margin="0,100,0,0">
+                <TextBlock Text="CÀI ĐẶT CHUNG"
+                           FontSize="28"
+                           FontWeight="Black"
+                           FontStyle="Italic"
+                           Foreground="White"
+                           Margin="30,0,0,0"
+                           FontFamily="Segoe UI Black"/>
+            </StackPanel>
+        </Border>
 
+        <!-- main area -->
+        <ScrollViewer Margin="320,60,0,0" 
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+
+                <!-- sound section -->
+                <TextBlock Text="SOUND SETTINGS" Style="{StaticResource SectionHeader}"/>
+
+                <!-- general volume -->
+                <Border Style="{StaticResource SettingRow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="ÂM LƯỢNG TỔNG" 
+                                   Style="{StaticResource SettingLabel}"
+                                   Grid.Column="0"/>
+
+                        <Grid Grid.Column="1" x:Name="GeneralSliderContainer">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="400"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="GeneralDecBtn"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SliderAdjustButton}"
+                                    Content="−"
+                                    Margin="0,0,5,0"
+                                    Click="DecreaseVolume_Click"
+                                    Tag="GeneralVolumeSlider"/>
+
+                            <Slider x:Name="GeneralVolumeSlider"
+                                    Grid.Column="2"
+                                    Style="{StaticResource ModernSlider}"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    Value="20"/>
+
+                            <Button x:Name="GeneralIncBtn"
+                                    Grid.Column="3"
+                                    Style="{StaticResource SliderAdjustButton}"
+                                    Content="+"
+                                    Margin="5,0,0,0"
+                                    Click="IncreaseVolume_Click"
+                                    Tag="GeneralVolumeSlider"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- background music volume -->
+                <Border Style="{StaticResource SettingRow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="NHẠC NỀN" 
+                                   Style="{StaticResource SettingLabel}"
+                                   Grid.Column="0"/>
+
+                        <Grid Grid.Column="1" x:Name="BackgroundVolumeSliderContainer">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="400"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="BackgroundVolumeDecBtn"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SliderAdjustButton}"
+                                    Content="−"
+                                    Margin="0,0,5,0"
+                                    Click="DecreaseVolume_Click"
+                                    Tag="BackgroundVolumeSlider"/>
+
+                            <Slider x:Name="BackgroundVolumeSlider"
+                                    Grid.Column="2"
+                                    Style="{StaticResource ModernSlider}"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    Value="100"/>
+
+                            <Button x:Name="BackgroundVolumeIncBtn"
+                                    Grid.Column="3"
+                                    Style="{StaticResource SliderAdjustButton}"
+                                    Content="+"
+                                    Margin="5,0,0,0"
+                                    Click="IncreaseVolume_Click"
+                                    Tag="BackgroundVolumeSlider"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- SFX volume -->
+                <Border Style="{StaticResource SettingRow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="SFX" 
+                                   Style="{StaticResource SettingLabel}"
+                                   Grid.Column="0"/>
+
+                        <Grid Grid.Column="1" x:Name="SfxSliderContainer">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="400"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="SfxDecBtn"
+                                    Grid.Column="1"
+                                    Style="{StaticResource SliderAdjustButton}"
+                                    Content="−"
+                                    Margin="0,0,5,0"
+                                    Click="DecreaseVolume_Click"
+                                    Tag="SfxVolumeSlider"/>
+
+                            <Slider x:Name="SfxVolumeSlider"
+                                    Grid.Column="2"
+                                    Style="{StaticResource ModernSlider}"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    Value="100"/>
+
+                            <Button x:Name="SfxIncBtn"
+                                    Grid.Column="3"
+                                    Style="{StaticResource SliderAdjustButton}"
+                                    Content="+"
+                                    Margin="5,0,0,0"
+                                    Click="IncreaseVolume_Click"
+                                    Tag="SfxVolumeSlider"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- display section -->
+                <TextBlock Text="DISPLAY SETTINGS" Style="{StaticResource SectionHeader}"/>
+
+                <!-- che do cu khoai tay =)) -->
+                <Border Style="{StaticResource SettingRow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="POTATO MODE" 
+                                   Style="{StaticResource SettingLabel}"
+                                   Grid.Column="0"/>
+
+                        <StackPanel Grid.Column="1" 
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <Button Content="OFF" 
+                                    Style="{StaticResource OptionButton}"
+                                    Tag="Selected"/>
+                            <Button Content="ON" 
+                                    Style="{StaticResource OptionButton}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- quality -->
+                <Border Style="{StaticResource SettingRow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="CHẤT LƯỢNG HÌNH ẢNH" 
+                                   Style="{StaticResource SettingLabel}"
+                                   Grid.Column="0"/>
+
+                        <StackPanel Grid.Column="1" 
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <Button Content="THẤP" 
+                                    Style="{StaticResource OptionButton}"
+                                    Tag="Selected"/>
+                            <Button Content="TRUNG BÌNH" 
+                                    Style="{StaticResource OptionButton}"/>
+                            <Button Content="CAO" 
+                                    Style="{StaticResource OptionButton}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- icon -->
+                <Border Style="{StaticResource SettingRow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="ICON QUÂN CỜ" 
+                                   Style="{StaticResource SettingLabel}"
+                                   Grid.Column="0"/>
+
+                        <StackPanel Grid.Column="1" 
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <Button Content="ĐEN TRẮNG" 
+                                    Style="{StaticResource OptionButton}"
+                                    Tag="Selected"/>
+                            <Button Content=" X  /  O " 
+                                    Style="{StaticResource OptionButton}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- dummy -->
+                <Border Style="{StaticResource SettingRow}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="dummy" 
+                                   Style="{StaticResource SettingLabel}"
+                                   Grid.Column="0"/>
+
+                        <StackPanel Grid.Column="1" 
+                                    Orientation="Horizontal"
+                                    HorizontalAlignment="Right">
+                            <Button Content="bat" 
+                                    Style="{StaticResource OptionButton}"
+                                    Tag="Selected"/>
+                            <Button Content="tat" 
+                                    Style="{StaticResource OptionButton}"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- bottom spacing -->
+                <Border Height="50"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>

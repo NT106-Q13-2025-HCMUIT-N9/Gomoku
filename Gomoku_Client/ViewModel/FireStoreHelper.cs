@@ -28,5 +28,35 @@ namespace Gomoku_Client.ViewModel
             DocumentReference user_collection = FirebaseInfo.DB.Collection("UserInfo").Document(user_data.Username);
             await user_collection.SetAsync(user_data);
         }
+
+        public static async Task<UserDataModel?> GetUserInfo(string username)
+        {
+            DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
+            DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
+            if (doc_snap.Exists)
+            {
+                UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
+                return user_data;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static async Task<UserStatsModel?> GetUserStats(string username)
+        {
+            DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(username);
+            DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
+            if (doc_snap.Exists)
+            {
+                UserStatsModel user_stats = doc_snap.ConvertTo<UserStatsModel>();
+                return user_stats;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

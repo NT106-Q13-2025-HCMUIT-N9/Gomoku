@@ -10,7 +10,8 @@
         WindowStyle="None" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize"
-        Background="#0F1923">
+        Background="#0F1923"
+        Loaded="Window_Loaded">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -171,7 +172,7 @@
 
                                 <!-- Name & Info -->
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="PLAYER" FontSize="24" FontWeight="Bold" 
+                                    <TextBlock x:Name="tb_PlayerName" Text="PLAYER" FontSize="24" FontWeight="Bold" 
                                        Foreground="#FFFFFF" FontFamily="Segoe UI Black"/>
 
                                     <!-- Level Badge - Hiển tại chưa sử dụng
@@ -210,12 +211,12 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0">
-                                    <TextBlock Text="68%" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
+                                    <TextBlock x:Name="lb_winrate" Text="68%" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
                                     <TextBlock Text="Win Rate" FontSize="11" Foreground="#8B8B8B"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="324" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
+                                    <TextBlock x:Name="lb_matches" Text="324" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
                                     <TextBlock Text="Matches" FontSize="11" Foreground="#8B8B8B"/>
                                 </StackPanel>
 

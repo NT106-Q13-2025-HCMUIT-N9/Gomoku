@@ -185,6 +185,16 @@ namespace Gomoku_Client
                 PasswordConfirmPlaceholder.Visibility = Visibility.Visible;
         }
 
+        private void UsernameBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            char inputChar = e.Text[0];
+
+            if (!(char.IsLetterOrDigit(inputChar)))
+            {
+                e.Handled = true;
+            }
+        }
+
         private async void DangKi_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -214,13 +224,13 @@ namespace Gomoku_Client
                 var temp = await FirebaseInfo.AuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
                 await UserAction.SendVeriAsync(await temp.User.GetIdTokenAsync());
 
-                CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
                 UserDataModel doc = new UserDataModel
                 {
                     Username = username,
                     Email = email
                 };
-                await user_collection.AddAsync(doc);
+
+                await FireStoreHelper.AddUser(doc);
 
                 MessageBox.Show("Đăng kí thành công. Vui lòng kiểm tra email về thông tin đăng nhập", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 

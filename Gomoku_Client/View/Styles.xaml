@@ -610,6 +610,55 @@
     </Storyboard>
 
 
+    <!-- Black stone -->
+    <Style x:Key="BlackStone" TargetType="Ellipse">
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Fill">
+            <Setter.Value>
+                <RadialGradientBrush GradientOrigin="0.3,0.3" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                    <GradientStop Color="#FF555555" Offset="0" />
+                    <GradientStop Color="Black" Offset="0.9" />
+                </RadialGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="Black" Direction="320" ShadowDepth="2" Opacity="0.5" BlurRadius="3"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <!-- White stone -->
+    <Style x:Key="WhiteStone" TargetType="Ellipse">
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Fill">
+            <Setter.Value>
+                <RadialGradientBrush GradientOrigin="0.3,0.3" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                    <GradientStop Color="White" Offset="0.1" />
+                    <GradientStop Color="#FFDDDDDD" Offset="1" />
+                </RadialGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="Black" Direction="320" ShadowDepth="2" Opacity="0.3" BlurRadius="3"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 </ResourceDictionary>

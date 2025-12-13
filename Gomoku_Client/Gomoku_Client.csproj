@@ -10,6 +10,17 @@
 
   <ItemGroup>
     <None Remove="Assets\AI_Background.gif" />
+    <Compile Remove="Helpers\**" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="Helpers\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Helpers\**" />
+    <None Remove="Services\**" />
+    <Page Remove="Helpers\**" />
+    <Page Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Assets\api.env" />
     <None Remove="Assets\delete-friend.png" />
     <None Remove="Assets\firebase_key.json" />
@@ -41,6 +52,11 @@
     <Resource Include="Assets\ServerBrowser_Background.gif" />
     <Resource Include="Assets\t1.jpg" />
     <Resource Include="Assets\T1_6sao.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\Images\" />
+    <Folder Include="Assets\Sounds\" />
   </ItemGroup>
 
 </Project>

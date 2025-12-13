@@ -215,6 +215,7 @@ namespace Gomoku_Client
                 await UserAction.SendVeriAsync(await temp.User.GetIdTokenAsync());
 
                 CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
+                CollectionReference user_stat_collection = FirebaseInfo.DB.Collection("UserStats");
                 UserDataModel doc = new UserDataModel
                 {
                     Username = username,

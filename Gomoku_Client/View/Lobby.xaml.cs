@@ -38,5 +38,21 @@ namespace Gomoku_Client.View
       }
       _mainWindow.ShowMenuWithAnimation();
     }
+    private void MatchMakingButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+    private void AIButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+    private void ServerBrowserButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+    private void RankedButton_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
   }
 }

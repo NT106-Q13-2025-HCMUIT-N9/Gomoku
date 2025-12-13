@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Gomoku_Client.View"
+      xmlns:gif="clr-namespace:XamlAnimatedGif;assembly=XamlAnimatedGif"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="Lobby">
@@ -14,6 +15,78 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Style cho các nút lớn trong Lobby -->
+            <Style x:Key="LobbyModeButton" TargetType="Button">
+                <Setter Property="Background" Value="#1A1A2E"/>
+                <Setter Property="Foreground" Value="#ECECEC"/>
+                <Setter Property="FontFamily" Value="Segoe UI Black"/>
+                <Setter Property="FontSize" Value="32"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="BorderThickness" Value="3"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    Padding="30">
+                                <Border.Effect>
+                                    <DropShadowEffect x:Name="shadow" 
+                                                      Color="{Binding BorderBrush.Color, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                      BlurRadius="20" 
+                                                      ShadowDepth="0" 
+                                                      Opacity="0.6"/>
+                                </Border.Effect>
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="shadow"
+                                                                 Storyboard.TargetProperty="BlurRadius"
+                                                                 To="30"
+                                                                 Duration="0:0:0.2"/>
+                                                <DoubleAnimation Storyboard.TargetName="shadow"
+                                                                 Storyboard.TargetProperty="Opacity"
+                                                                 To="0.9"
+                                                                 Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+                                    <Trigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="shadow"
+                                                                 Storyboard.TargetProperty="BlurRadius"
+                                                                 To="20"
+                                                                 Duration="0:0:0.2"/>
+                                                <DoubleAnimation Storyboard.TargetName="shadow"
+                                                                 Storyboard.TargetProperty="Opacity"
+                                                                 To="0.6"
+                                                                 Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.ExitActions>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="RenderTransform">
+                                        <Setter.Value>
+                                            <ScaleTransform ScaleX="0.95" ScaleY="0.95"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter TargetName="border" Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Page.Resources>
 
@@ -29,15 +102,317 @@
 
         <!-- Vùng Nội dung Riêng của Lobby -->
         <Grid Margin="0,60,0,0">
-            <!-- Đặt các control riêng của trang Lobby tại đây -->
-            <TextBlock Text="GIAO DIỆN CHÍNH CỦA SẢNH CHỜ"
-                       Foreground="#FFFFFF"
-                       FontSize="48"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"/>
+            <Grid Margin="34,29,34,34">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="8"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- matchmaking button (top left) -->
+                <Button x:Name="MatchMakingButton" 
+                        Grid.Row="0" Grid.Column="0"
+                        Style="{StaticResource LobbyModeButton}"
+                        BorderBrush="#ffffff"
+                        Content="TÌM TRẬN"
+                        FontSize="60"
+                        Click="MatchMakingButton_Click"/>
+
+                <!-- AI button (top right) -->
+                <Grid Grid.Row="0" Grid.Column="2" ClipToBounds="True">
+                    <Button x:Name="AIButton" 
+                            Style="{StaticResource LobbyModeButton}"
+                            BorderBrush="#5c5c5c"
+                            Click="AIButton_Click"
+                            FontSize="60"
+                            IsEnabled="False">
+                        <Grid ClipToBounds="False">
+                            <!-- animated background -->
+                            <Image x:Name="AnimatedBackground"
+                                   gif:AnimationBehavior.SourceUri="/Assets/AI_Background.gif"
+                                   gif:AnimationBehavior.RepeatBehavior="Forever"
+                                   gif:AnimationBehavior.AutoStart="True"
+                                   Stretch="UniformToFill"
+                                   Panel.ZIndex="0"
+                                   Margin="-30"
+                                   RenderOptions.BitmapScalingMode="LowQuality"
+                                   RenderOptions.CachingHint="Cache"/>
+
+                            <!-- Button Text -->
+                            <TextBlock Text="THÁCH ĐẤU AI" 
+                                       FontFamily="Segoe UI Black"
+                                       FontSize="60"
+                                       FontWeight="Bold"
+                                       Foreground="#ECECEC"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Panel.ZIndex="2"/>
+
+                            <!-- under development banner (inside button) -->
+                            <Border Height="60"
+                                    VerticalAlignment="Center"
+                                    RenderTransformOrigin="0.5,0.5"
+                                    Panel.ZIndex="10"
+                                    Margin="-110,0,-101,0"
+                                    ClipToBounds="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0" SpreadMethod="Repeat" MappingMode="Absolute">
+                                        <LinearGradientBrush.GradientStops>
+                                            <GradientStop Color="#FFD700" Offset="0"/>
+                                            <GradientStop Color="#FFD700" Offset="0.5"/>
+                                            <GradientStop Color="#000000" Offset="0.5"/>
+                                            <GradientStop Color="#000000" Offset="1"/>
+                                        </LinearGradientBrush.GradientStops>
+                                        <LinearGradientBrush.Transform>
+                                            <TransformGroup>
+                                                <SkewTransform AngleX="-30"/>
+                                                <ScaleTransform ScaleX="0.05"/>
+                                            </TransformGroup>
+                                        </LinearGradientBrush.Transform>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.RenderTransform>
+                                    <RotateTransform Angle="-15"/>
+                                </Border.RenderTransform>
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="5" Opacity="0.8"/>
+                                </Border.Effect>
+
+                                <!-- black border -->
+                                <Grid>
+                                    <Rectangle Fill="#000000" Height="2" VerticalAlignment="Top"/>
+                                    <Rectangle Fill="#000000" Height="2" VerticalAlignment="Bottom"/>
+
+                                    <!-- canvas (this make the text move, pls dont change if not needed) -->
+                                    <Canvas ClipToBounds="True">
+                                        <Canvas x:Name="ScrollingTextContainer" Canvas.Top="12">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform x:Name="ScrollTransform" X="0"/>
+                                            </Canvas.RenderTransform>
+                                            <Canvas.Triggers>
+                                                <EventTrigger RoutedEvent="Canvas.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetName="ScrollTransform"
+                                                                             Storyboard.TargetProperty="X"
+                                                                             From="0"
+                                                                             To="-600"
+                                                                             Duration="0:0:10"
+                                                                             RepeatBehavior="Forever"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Canvas.Triggers>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                       FontFamily="Segoe UI Black"
+                                                       FontSize="24"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="#000000"
+                                                       Canvas.Left="0">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                       FontFamily="Segoe UI Black"
+                                                       FontSize="24"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="#000000"
+                                                       Canvas.Left="600">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                       FontFamily="Segoe UI Black"
+                                                       FontSize="24"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="#000000"
+                                                       Canvas.Left="1200">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+                                        </Canvas>
+                                    </Canvas>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Button>
+                </Grid>
+
+                <!-- server browser (bottom left) -->
+                <Grid Grid.Row="2" Grid.Column="0" ClipToBounds="True">
+                    <Button x:Name="ServerBrowserButton" 
+                            Style="{StaticResource LobbyModeButton}"
+                            Background="White"
+                            BorderBrush="#FFD700"
+                            Click="ServerBrowserButton_Click"
+                            FontSize="60">
+                        <Grid ClipToBounds="False">
+                            <!-- animated background -->
+                            <Image x:Name="AnimatedBackgroundServerBrowser"
+                                   gif:AnimationBehavior.SourceUri="/Assets/ServerBrowser_Background.gif"
+                                   gif:AnimationBehavior.RepeatBehavior="Forever"
+                                   gif:AnimationBehavior.AutoStart="True"
+                                   Stretch="UniformToFill"
+                                   Panel.ZIndex="0"
+                                   Margin="-30"
+                                   Opacity="0.55"
+                                   RenderOptions.BitmapScalingMode="LowQuality"
+                                   RenderOptions.CachingHint="Cache"/>
+                            <!-- Button Text -->
+                            <TextBlock Text="TÌM PHÒNG" 
+                                       FontFamily="Segoe UI Black"
+                                       FontSize="60"
+                                       FontWeight="Bold"
+                                       Foreground="#ECECEC"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Panel.ZIndex="2"/>
+                        </Grid>
+                    </Button>
+                </Grid>
+
+                <!-- ranked button (bottom right) -->
+                <Grid Grid.Row="2" Grid.Column="2" ClipToBounds="True">
+                    <Button x:Name="RankedButton" 
+                            Style="{StaticResource LobbyModeButton}"
+                            BorderBrush="#5c5c5c"
+                            Click="RankedButton_Click"
+                            FontSize="60"
+                            IsEnabled="False">
+                        <Grid ClipToBounds="False">
+                            <!-- animated background -->
+                            <Image x:Name="AnimatedBackgroundRanked"
+                                   gif:AnimationBehavior.SourceUri="/Assets/AI_Background.gif"
+                                   gif:AnimationBehavior.RepeatBehavior="Forever"
+                                   gif:AnimationBehavior.AutoStart="True"
+                                   Stretch="UniformToFill"
+                                   Panel.ZIndex="0"
+                                   Margin="-30"
+                                   RenderOptions.BitmapScalingMode="LowQuality"
+                                   RenderOptions.CachingHint="Cache"/>
+
+                            <!-- Button Text -->
+                            <TextBlock Text="XẾP HẠNG" 
+                                       FontFamily="Segoe UI Black"
+                                       FontSize="60"
+                                       FontWeight="Bold"
+                                       Foreground="#b3b3b3"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Panel.ZIndex="2"/>
+
+                            <!-- under development banner (inside button) -->
+                            <Border Height="60"
+                                    VerticalAlignment="Center"
+                                    RenderTransformOrigin="0.5,0.5"
+                                    Panel.ZIndex="10"
+                                    Margin="-183,0,-175,0"
+                                    ClipToBounds="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0" SpreadMethod="Repeat" MappingMode="Absolute">
+                                        <LinearGradientBrush.GradientStops>
+                                            <GradientStop Color="#FFD700" Offset="0"/>
+                                            <GradientStop Color="#FFD700" Offset="0.5"/>
+                                            <GradientStop Color="#000000" Offset="0.5"/>
+                                            <GradientStop Color="#000000" Offset="1"/>
+                                        </LinearGradientBrush.GradientStops>
+                                        <LinearGradientBrush.Transform>
+                                            <TransformGroup>
+                                                <SkewTransform AngleX="-30"/>
+                                                <ScaleTransform ScaleX="0.05"/>
+                                            </TransformGroup>
+                                        </LinearGradientBrush.Transform>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.RenderTransform>
+                                    <RotateTransform Angle="25"/>
+                                </Border.RenderTransform>
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="5" Opacity="0.8"/>
+                                </Border.Effect>
+
+                                <!-- black border -->
+                                <Grid>
+                                    <Rectangle Fill="#000000" Height="2" VerticalAlignment="Top"/>
+                                    <Rectangle Fill="#000000" Height="2" VerticalAlignment="Bottom"/>
+
+                                    <!-- canvas (this make the text move, pls dont change if not needed) -->
+                                    <Canvas ClipToBounds="True">
+                                        <Canvas x:Name="ScrollingTextContainerRanked" Canvas.Top="12">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform x:Name="ScrollTransformRanked" X="0"/>
+                                            </Canvas.RenderTransform>
+                                            <Canvas.Triggers>
+                                                <EventTrigger RoutedEvent="Canvas.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetName="ScrollTransformRanked"
+                                                                             Storyboard.TargetProperty="X"
+                                                                             From="0"
+                                                                             To="-600"
+                                                                             Duration="0:0:10"
+                                                                             RepeatBehavior="Forever"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Canvas.Triggers>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                       FontFamily="Segoe UI Black"
+                                                       FontSize="24"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="#000000"
+                                                       Canvas.Left="0">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                       FontFamily="Segoe UI Black"
+                                                       FontSize="24"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="#000000"
+                                                       Canvas.Left="600">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                       FontFamily="Segoe UI Black"
+                                                       FontSize="24"
+                                                       FontWeight="ExtraBold"
+                                                       Foreground="#000000"
+                                                       Canvas.Left="1200">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+                                        </Canvas>
+                                    </Canvas>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Button>
+                </Grid>
+
+            </Grid>
         </Grid>
 
-        <!-- Top Navigation Bar (Được copy từ TemplatePage) -->
+        <!-- navigation bar -->
         <Border Height="60" VerticalAlignment="Top" Background="Transparent" Panel.ZIndex="1">
             <Border.Effect>
                 <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.5"/>
@@ -49,9 +424,9 @@
                              Style="{StaticResource BackButton}" 
                              Checked="BackButton_Checked"/>
 
-                <!-- Page Title (Đã được đặt cố định) -->
+                <!-- page title -->
                 <TextBlock Grid.Column="1" 
-                           Text="SẢNH CHỜ" 
+                           Text="CHỌN CHẾ ĐỘ CHƠI" 
                            FontSize="25" 
                            FontWeight="Bold" 
                            Foreground="#FFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center"

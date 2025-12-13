@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -36,5 +37,54 @@ namespace Gomoku_Client.View
       }
       _mainWindow.ShowMenuWithAnimation();
     }
-  }
+
+    private void SendFriendRequest_Click(object sender, RoutedEventArgs e)
+    {
+        // Send friend request
+    }
+ 
+        
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            var border = (Border)((Grid)UnfriendConfirmationOverlay).Children[0];
+            Storyboard fadeOut = (Storyboard)FindResource("PopupFadeOut");
+            fadeOut.Begin(border);
+            fadeOut.Completed += (s, args) =>
+            {
+                UnfriendConfirmationOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            fadeOut.Begin(border);
+        }
+
+        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Send unfriend request to server
+        }
+
+        private void AcceptButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Accept friend request
+        }
+
+        private void RefuseButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Refuse friend request
+        }
+
+        private void ChallengeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void UnfriendButton_Click(object sender, RoutedEventArgs e)
+        {
+            UnfriendConfirmationOverlay.Visibility = Visibility.Visible;
+            var border = (Border)((Grid)UnfriendConfirmationOverlay).Children[0];
+            Storyboard fadeIn = (Storyboard)FindResource("PopupFadeIn");
+            fadeIn.Begin(border);
+        }
+
+
+}
 }

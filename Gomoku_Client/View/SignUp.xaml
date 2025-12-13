@@ -151,7 +151,9 @@
                      FontStyle="Normal"
                      Text="Tên người dùng"
                      GotFocus="UsernameBox_GotFocus"
-                     LostFocus="UsernameBox_LostFocus"/>
+                     LostFocus="UsernameBox_LostFocus"
+                     MaxLength="15"
+                     PreviewTextInput="UsernameBox_PreviewTextInput"/>
                 </Border>
 
                 <!-- Thông báo tên trùng -->

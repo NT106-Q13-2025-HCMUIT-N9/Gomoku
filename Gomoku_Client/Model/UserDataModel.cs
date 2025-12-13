@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Gomoku_Client.Model
 {
     [FirestoreData]
-    class UserStatsModel
+    public class UserStatsModel
     {
         [FirestoreProperty]
         public string UserHandle { get; set; }
@@ -27,7 +27,7 @@ namespace Gomoku_Client.Model
     }
 
     [FirestoreData]
-    class UserDataModel
+    public class UserDataModel
     {
         [FirestoreProperty]
         public string Username { get; set; }
@@ -36,9 +36,6 @@ namespace Gomoku_Client.Model
         public string Email { get; set; }
 
         [FirestoreProperty]
-        public string UserHandle { get; set; }
-
-        [FirestoreProperty]
-        DocumentReference UserStats { get; set; }
+        public DocumentReference UserStats { get; set; }
     }
 }

@@ -42,7 +42,9 @@ namespace Gomoku_Client
         {
             if (failedLogin)
             {
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailBox.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                );
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
                 MainBorder.Height -= 15;
                 failedLogin = false;
@@ -51,7 +53,7 @@ namespace Gomoku_Client
             if (EmailBox.Text == "Email")
             {
                 EmailBox.Text = "";
-                EmailBox.Foreground = Brushes.Black;
+                EmailBox.Foreground = Brushes.White;
             }
         }
 
@@ -62,7 +64,9 @@ namespace Gomoku_Client
             {
                 EmailBox.Text = "Email";
                 EmailBox.Foreground = Brushes.Gray;
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                );
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
                 if(isWrongEmail == true)
                 {
@@ -75,11 +79,15 @@ namespace Gomoku_Client
             if (!Validate.IsValidEmail(EmailBox.Text))
             {
                 EmailNotFoundText.Text = "Email không hợp lệ";
-                EmailBox.BorderBrush = Brushes.Red;
+                EmailBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#FF4655")
+                );
                 EmailNotFoundText.Visibility = Visibility.Visible;
                 if(isWrongEmail == false) MainBorder.Height += 15;
                 // Email không tồn tại → viền đỏ
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                EmailBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#FF4655")
+                );
 
                 isWrongEmail = true;
             }
@@ -90,17 +98,21 @@ namespace Gomoku_Client
                     if (!await Validate.IsEmailExists(EmailBox.Text))
                     {
                         EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
-                        EmailBox.BorderBrush = Brushes.Red;
+                        EmailBorder.BorderBrush = Brushes.Red;
                         EmailNotFoundText.Visibility = Visibility.Visible;
                         if (isWrongEmail == false) MainBorder.Height += 15;
                         // Email không tồn tại → viền đỏ
-                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#FF4655")
+                        );
 
                         isWrongEmail = true;
                     }
                     else
                     {
-                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                        );
                         EmailNotFoundText.Visibility = Visibility.Collapsed;
                         if (isWrongEmail == true)
                         {
@@ -118,7 +130,9 @@ namespace Gomoku_Client
                     EmailNotFoundText.Visibility = Visibility.Visible;
                     if (isWrongEmail == false) MainBorder.Height += 15;
                     // Email không tồn tại → viền đỏ
-                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
 
                     isWrongEmail = true;
                 }
@@ -164,13 +178,33 @@ namespace Gomoku_Client
             //this.Close();
         }
 
+        private void buttonDisable()
+        {
+            LoginButton.IsHitTestVisible = false;
+            ExitButton.IsHitTestVisible = false;
+            TogglePasswordBtn.IsHitTestVisible = false;
+            ForgotPasswordText.IsHitTestVisible = false;
+            SignUpText.IsHitTestVisible = false;
+        }
+
+        private void buttonEnable()
+        {
+            LoginButton.IsHitTestVisible = true;
+            ExitButton.IsHitTestVisible = true;
+            TogglePasswordBtn.IsHitTestVisible = true;
+            ForgotPasswordText.IsHitTestVisible = true;
+            SignUpText.IsHitTestVisible = true;
+        }
+
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
+            buttonDisable();
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
             LoadingCircle.Visibility = Visibility.Visible;
             LoginButton.Content = "";
+
+            await Task.Delay(10);
 
             if (failedLogin)
             {
@@ -187,7 +221,7 @@ namespace Gomoku_Client
 
                 if(isWrongEmail || string.IsNullOrEmpty(password))
                 {
-                    this.IsEnabled = true;
+                    buttonEnable();
                     LoginButton.Content = "Đăng nhập";
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     return;
@@ -221,8 +255,10 @@ namespace Gomoku_Client
                         EmailNotFoundText.Visibility = Visibility.Visible;
                         if (isWrongEmail == false) MainBorder.Height += 15;
                         // Email không tồn tại → viền đỏ
-                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
-                        this.IsEnabled = true;
+                        EmailBox.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#FF4655")
+                        );
+                        buttonEnable();
                         failedLogin = true;
                         LoginButton.Content = "Đăng nhập";
                         LoadingCircle.Visibility = Visibility.Collapsed;

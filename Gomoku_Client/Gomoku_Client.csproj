@@ -9,25 +9,36 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\AI_Background.gif" />
     <None Remove="Assets\api.env" />
+    <None Remove="Assets\delete-friend.png" />
     <None Remove="Assets\firebase_key.json" />
     <None Remove="Assets\Gomoku.ico" />
     <None Remove="Assets\Login_Background.png" />
+    <None Remove="Assets\ServerBrowser_Background.gif" />
     <None Remove="Assets\t1.jpg" />
     <None Remove="Assets\T1_6sao.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\delete-friend.png" />
+    <Resource Include="Assets\Riot_Games_Logo.png" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
     <PackageReference Include="Google.Cloud.Firestore" Version="3.12.0" />
+    <PackageReference Include="XamlAnimatedGif" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\AI_Background.gif" />
     <Resource Include="Assets\api.env" />
     <Resource Include="Assets\firebase_key.json" />
     <Resource Include="Assets\Gomoku.ico" />
     <Resource Include="Assets\Login_Background.png" />
+    <Resource Include="Assets\ServerBrowser_Background.gif" />
     <Resource Include="Assets\t1.jpg" />
     <Resource Include="Assets\T1_6sao.jpg" />
   </ItemGroup>

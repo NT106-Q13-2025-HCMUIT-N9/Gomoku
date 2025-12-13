@@ -23,5 +23,42 @@ namespace Gomoku_Client.View
         {
             InitializeComponent();
         }
+
+        private void BoardCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void SendMessage_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SurrenderButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ChatInput_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                SendMessage_Click(sender, e);
+
+                e.Handled = true;
+            }
+
+            if ( e.Key == Key.Escape)
+            {
+                tb_Message.Clear();
+                e.Handled = true;
+            }
+
+        }
     }
 }

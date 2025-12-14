@@ -20,13 +20,12 @@
     </Window.Resources>
     
     
-    <Grid Width="1280"
-          Background="#101418">
-        <!--<Grid.Background>
+    <Grid Width="1280">
+        <Grid.Background>
             <ImageBrush ImageSource="/Assets/Login_Background.png" 
                         Stretch="UniformToFill"
-                        Opacity="0.3"/>
-        </Grid.Background>-->
+                        Opacity="1"/>
+        </Grid.Background>
 
         <Border x:Name="MainBorder" 
                 Background="#0F0F0F"
@@ -37,7 +36,8 @@
                 Width="410"
                 Height="290"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Center">
+                VerticalAlignment="Center"
+                Margin="0,0,0,50">
             <Grid x:Name="EmailBorder1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -182,7 +182,9 @@
                              FontStyle="Normal"
                              Text="Email"
                              GotFocus="EmailBox_GotFocus"
-                             LostFocus="EmailBox_LostFocus">
+                             LostFocus="EmailBox_LostFocus"
+                             KeyDown="EmailBox_KeyDown"
+                             PreviewKeyDown="EmailBox_PreviewKeyDown">
                         </TextBox>
                         <TextBlock x:Name="EmailError"
                            Foreground="#FF4655"
@@ -208,8 +210,8 @@
 
                 <!-- Thông báo sai Password -->
                 <TextBlock x:Name="WrongPassText" 
-                   Text="Mật khẩu không được dưới 6 ký tự"
-                   Grid.Row="2"
+                   Text="Mật khẩu không được để trống"
+                   Grid.Row="4"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
                    Foreground="#FF4655"  
@@ -248,6 +250,7 @@
                             PreviewKeyDown="PasswordBox_PreviewKeyDown"
                             PasswordChanged="PasswordBox_PasswordChanged" 
                             LostFocus="PasswordBox_LostFocus"
+                            GotFocus="PasswordBox_GotFocus"
                             Grid.ColumnSpan="2"/>
                         
                         <TextBlock x:Name="PasswordPlaceholder"
@@ -275,6 +278,7 @@
                              Visibility="Collapsed"
                              PreviewKeyDown="PasswordVisible_PreviewKeyDown"
                              TextChanged="PasswordVisible_TextChanged"
+                             GotFocus="PasswordVisible_GotFocus"
                              Grid.ColumnSpan="2"/>
 
                         <Button x:Name="TogglePasswordBtn"

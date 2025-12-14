@@ -198,17 +198,16 @@ namespace Gomoku_Client
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            buttonDisable();
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
-            LoadingCircle.Visibility = Visibility.Visible;
-            LoginButton.Content = "";
-
-            await Task.Delay(10);
+            buttonDisable();
+            
 
             if (failedLogin)
             {
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                );
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
                 MainBorder.Height -= 15;
                 failedLogin = false;
@@ -219,13 +218,29 @@ namespace Gomoku_Client
             {
                 EmailBox_LostFocus(sender, e);
 
-                if(isWrongEmail || string.IsNullOrEmpty(password))
+                if (string.IsNullOrEmpty(password))
+                {
+                    PasswordBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+                    WrongPassText.Visibility = Visibility.Visible;
+                    if (isWrongPassword == false) MainBorder.Height += 15;
+                    buttonEnable();
+                    LoginButton.Content = "Đăng nhập";
+                    LoadingCircle.Visibility = Visibility.Collapsed;
+                    isWrongPassword = true;
+                }
+
+                if (isWrongEmail || string.IsNullOrEmpty(password))
                 {
                     buttonEnable();
                     LoginButton.Content = "Đăng nhập";
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     return;
                 }
+
+                LoadingCircle.Visibility = Visibility.Visible;
+                LoginButton.Content = "";
 
                 var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
 
@@ -251,7 +266,6 @@ namespace Gomoku_Client
                     if(auth_ex.Message == "INVALID_LOGIN_CREDENTIALS")
                     {
                         EmailNotFoundText.Text = "Email hoặc mật khẩu không chính xác";
-                        EmailBox.BorderBrush = Brushes.Red;
                         EmailNotFoundText.Visibility = Visibility.Visible;
                         if (isWrongEmail == false) MainBorder.Height += 15;
                         // Email không tồn tại → viền đỏ
@@ -323,20 +337,63 @@ namespace Gomoku_Client
             }
         }
 
+        bool isWrongPassword = false;
         private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            
+            if (true)
+            {
+                PasswordBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                );
+                WrongPassText.Visibility = Visibility.Collapsed;
+                if (isWrongPassword == true)
+                {
+                    MainBorder.Height -= 15;
+                    isWrongPassword = false;
+                }
+            }
+
+            if(string.IsNullOrEmpty(PasswordBox.Password))
+            {
+                PasswordPlaceholder.Visibility = Visibility.Visible;
+            }
         }
 
         private void PasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
         {
             PasswordBox.Password = PasswordVisible.Text;
-            if (PasswordBox.Password.Length > 0)
-                PasswordPlaceholder.Visibility = Visibility.Collapsed;
-            else
-                PasswordPlaceholder.Visibility = Visibility.Visible;
         }
 
-        
+        private void EmailBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Down || e.Key == Key.Enter)
+            {
+                PasswordBox.Focus();
+            }
+        }
+
+        private void EmailBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if(PasswordPlaceholder.Visibility == Visibility.Visible)
+            {
+                PasswordPlaceholder.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void PasswordVisible_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (PasswordPlaceholder.Visibility == Visibility.Visible)
+            {
+                PasswordPlaceholder.Visibility = Visibility.Collapsed;
+            }
+        }
     }
 }

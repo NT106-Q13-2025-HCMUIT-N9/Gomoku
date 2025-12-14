@@ -10,97 +10,24 @@
         Background="#F0F0F0" 
         Height="720" Width="1280" >
     <Page.Resources>
-        <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
-        <Style x:Key="BlueButton" TargetType="Button">
-            <Setter Property="Background" Value="#0078D7"/>
-            <!-- Xanh dương -->
-            <Setter Property="Foreground" Value="White"/>
-            <!-- Chữ trắng -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="BorderBrush" Value="#005A9E"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                             BorderBrush="{TemplateBinding BorderBrush}"
-                             BorderThickness="{TemplateBinding BorderThickness}"
-                             CornerRadius="22">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#005A9E"/>
-                                <!-- Tối lại khi hover -->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#004578"/>
-                                <!-- Nhấn xuống -->
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="WhiteBlueButton" TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-            <!-- Nền trắng -->
-            <Setter Property="Foreground" Value="#0078D7"/>
-            <!-- Chữ xanh -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="BorderBrush" Value="#0078D7"/>
-            <!-- Viền xanh -->
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                             BorderBrush="{TemplateBinding BorderBrush}"
-                             BorderThickness="{TemplateBinding BorderThickness}"
-                             CornerRadius="22">
-                            <!-- Bo góc -->
-                            <ContentPresenter HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"/>
-                        </Border>
-
-                        <!-- Hiệu ứng hover và nhấn -->
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#E5F1FB"/>
-                                <!-- Xanh nhạt khi hover -->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#CCE4F7"/>
-                                <!-- Đậm hơn khi nhấn -->
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Page.Resources>
 
     <Grid Width="1280" Height="720">
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Login_Background.png" 
                 Stretch="UniformToFill"
-                Opacity="0.3"/>
+                Opacity="1"/>
         </Grid.Background>
         
-        <Border x:Name="MainBorder" Background="#F9F9F9"
-             BorderBrush="#0078D7"
+        <Border x:Name="MainBorder" Background="Black"
+             BorderBrush="#FF4655"
              BorderThickness="2"
-             CornerRadius="22"
+             CornerRadius="0"
              Padding="20"
              Width="410"
              Height="380"
@@ -126,7 +53,7 @@
                  Grid.Row="0"
                  HorizontalAlignment="Center"
                  VerticalAlignment="Center"
-                 Foreground="#0078D7"  
+                 Foreground="#FF4655"  
                  FontFamily="Segoe UI"
                  FontSize="24"         
                  FontWeight="Bold"
@@ -134,12 +61,13 @@
 
                 <!-- Textbox Username-->
                 <Border x:Name="UsernameBorder" Grid.Row="1"
-                 Background="#F3F3F3"
-                 CornerRadius="8"
-                 BorderBrush="#CCCCCC"
-                 BorderThickness="1"
+                 Background="#121212"
+                CornerRadius="0"
+                BorderBrush="#2A2A2A"
+                 BorderThickness="2"
                  Padding="2">
                     <TextBox x:Name="UsernameBox"
+                     CaretBrush="White"
                      Height="36"
                      FontSize="14"
                      Padding="10,7"
@@ -153,7 +81,8 @@
                      GotFocus="UsernameBox_GotFocus"
                      LostFocus="UsernameBox_LostFocus"
                      MaxLength="15"
-                     PreviewTextInput="UsernameBox_PreviewTextInput"/>
+                     PreviewTextInput="UsernameBox_PreviewTextInput"
+                     PreviewKeyDown="UsernameBox_PreviewKeyDown"/>
                 </Border>
 
                 <!-- Thông báo tên trùng -->
@@ -162,7 +91,7 @@
                    Grid.Row="2"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
-                   Foreground="Red"  
+                   Foreground="#FF4655"  
                    FontFamily="Segoe UI"
                    FontSize="12"         
                    FontWeight="Bold"
@@ -171,14 +100,15 @@
 
                 <!-- Textbox Email-->
                 <Border x:Name="EmailBorder" Grid.Row="3"
-                     Background="#F3F3F3"
-                     CornerRadius="8"
-                     BorderBrush="#CCCCCC"
-                     BorderThickness="1"
+                     Background="#121212"
+                    CornerRadius="0"
+                    BorderBrush="#2A2A2A"
+                     BorderThickness="2"
                      Padding="2"
                      Margin="0,15,0,0">
                     <TextBox x:Name="EmailBox"
                      Height="36"
+                     CaretBrush="White"
                      FontSize="14"
                      Padding="10,7"
                      Background="Transparent"
@@ -189,7 +119,8 @@
                      FontStyle="Normal"
                      Text="Email"
                      GotFocus="EmailBox_GotFocus"
-                     LostFocus="EmailBox_LostFocus"/>
+                     LostFocus="EmailBox_LostFocus"
+                     PreviewKeyDown="EmailBox_PreviewKeyDown"/>
                 </Border>
 
                 <!-- Thông báo Email trùng -->
@@ -198,7 +129,7 @@
                    Grid.Row="4"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
-                   Foreground="Red"  
+                   Foreground="#FF4655"  
                    FontFamily="Segoe UI"
                    FontSize="12"         
                    FontWeight="Bold"
@@ -207,10 +138,10 @@
 
                 <!-- PasswordBox -->
                 <Border x:Name="PasswordBorder" Grid.Row="5"
-                 Background="#F3F3F3"
-                 CornerRadius="8"
-                 BorderBrush="#CCCCCC"
-                 BorderThickness="1"
+                 Background="#121212"
+                CornerRadius="0"
+                BorderBrush="#2A2A2A"
+                BorderThickness="2"
                  Padding="2"
                  Margin="0,15,0,0">
                     <Grid>
@@ -219,18 +150,20 @@
                             <ColumnDefinition Width="35"/>
                         </Grid.ColumnDefinitions>
                         <PasswordBox x:Name="PasswordBox"
+                            CaretBrush="White"
                             Height="36"
                             FontSize="14"
                             Padding="10,7"
                             Background="Transparent"
                             BorderThickness="0"
-                            Foreground="Black"
+                            Foreground="White"
                             FontFamily="Segoe UI"
                             FontWeight="SemiBold"
                             FontStyle="Normal"
                             PasswordChanged="PasswordBox_PasswordChanged"
                             LostFocus="PasswordBox_LostFocus"
-                            PreviewKeyDown="PasswordBox_PreviewKeyDown"/>
+                            PreviewKeyDown="PasswordBox_PreviewKeyDown"
+                            GotFocus="PasswordBox_GotFocus"/>
                         
                         <TextBlock x:Name="PasswordPlaceholder"
                             Text="Mật khẩu"
@@ -244,23 +177,26 @@
                             Visibility="{Binding ElementName=PasswordBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
 
                         <TextBox x:Name="PasswordVisible"
+                             CaretBrush="White"
                              Height="36"
                              FontSize="14"
                              Padding="10,7"
                              Background="Transparent"
                              BorderThickness="0"
-                             Foreground="Black"
+                             Foreground="White"
                              FontFamily="Segoe UI"
                              FontWeight="SemiBold"
                              Visibility="Collapsed"
                              PreviewKeyDown="PasswordVisible_PreviewKeyDown"
                              TextChanged="PasswordVisible_TextChanged"
                              Grid.ColumnSpan="2"
-                             LostFocus="PasswordVisible_LostFocus"/>
+                             LostFocus="PasswordVisible_LostFocus"
+                             GotFocus="PasswordVisible_GotFocus"/>
 
                         <Button x:Name="TogglePasswordBtn"
                             Grid.Column="1"
                             Content="👁"
+                            Foreground="#FF4655"
                             Background="Transparent"
                             BorderThickness="0"
                             Width="30"
@@ -277,7 +213,7 @@
                    Grid.Row="6"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
-                   Foreground="Red"  
+                   Foreground="#FF4655"  
                    FontFamily="Segoe UI"
                    FontSize="12"         
                    FontWeight="Bold"
@@ -286,10 +222,10 @@
 
                 <!-- Password Confirm Box -->
                 <Border x:Name="PasswordConfirmBorder" Grid.Row="7"
-                    Background="#F3F3F3"
-                    CornerRadius="8"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
+                    Background="#121212"
+                    CornerRadius="0"
+                    BorderBrush="#2A2A2A"
+                    BorderThickness="2"
                     Padding="2"
                     Margin="0,15,0,0">
                     <Grid>
@@ -298,18 +234,20 @@
                             <ColumnDefinition Width="35"/>
                         </Grid.ColumnDefinitions>
                         <PasswordBox x:Name="PasswordConfirmBox"
+                            CaretBrush="White"
                             Height="36"
                             FontSize="14"
                             Padding="10,7"
                             Background="Transparent"
                             BorderThickness="0"
-                            Foreground="Black"
+                            Foreground="White"
                             FontFamily="Segoe UI"
                             FontWeight="SemiBold"
                             FontStyle="Normal"
                             PasswordChanged="PasswordConfirmBox_PasswordChanged"
                             LostFocus="PasswordConfirmBox_LostFocus"
-                            PreviewKeyDown="PasswordConfirmBox_PreviewKeyDown"/>
+                            PreviewKeyDown="PasswordConfirmBox_PreviewKeyDown"
+                            GotFocus="PasswordConfirmBox_GotFocus"/>
                         
                         <TextBlock x:Name="PasswordConfirmPlaceholder"
                             Text="Xác nhận mật khẩu"
@@ -323,23 +261,26 @@
                             Visibility="{Binding ElementName=PasswordConfirmBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
 
                         <TextBox x:Name="PasswordConfirmVisible"
+                             CaretBrush="White"
                              Height="36"
                              FontSize="14"
                              Padding="10,7"
                              Background="Transparent"
                              BorderThickness="0"
-                             Foreground="Black"
+                             Foreground="White"
                              FontFamily="Segoe UI"
                              FontWeight="SemiBold"
                              Visibility="Collapsed"
                              PreviewKeyDown="PasswordConfirmVisible_PreviewKeyDown"
                              TextChanged="PasswordConfirmVisible_TextChanged"
                              Grid.ColumnSpan="2"
-                             LostFocus="PasswordConfirmVisible_LostFocus"/>
+                             LostFocus="PasswordConfirmVisible_LostFocus"
+                             GotFocus="PasswordConfirmVisible_GotFocus"/>
 
                         <Button x:Name="TogglePasswordConfirmBtn"
                             Grid.Column="1"
                             Content="👁"
+                            Foreground="#FF4655"
                             Background="Transparent"
                             BorderThickness="0"
                             Width="30"
@@ -356,7 +297,7 @@
                    Grid.Row="8"
                    HorizontalAlignment="Left"
                    VerticalAlignment="Bottom"
-                   Foreground="Red"  
+                   Foreground="#FF4655"  
                    FontFamily="Segoe UI"
                    FontSize="12"         
                    FontWeight="Bold"
@@ -365,15 +306,35 @@
                 
                 <!-- Hai nút -->
                 <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0" >
-                    <Button Style="{StaticResource WhiteBlueButton}"
+                    <Button 
                      Content="Quay lại"
-                     Width="180" Height="40"
+                     Width="170"
+                    Height="40"
+                    Background="White"
+                    Foreground="#FF4655"
+                    FontFamily="Segoe UI"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Padding="10,5"
+                    BorderBrush="White"
+                    BorderThickness="0"
+                    Cursor="Hand" 
                      Margin="0,0,0,0" Click="GoBack_Click"/>
 
-                    <Button Style="{StaticResource BlueButton}"
-                     Content="Đăng Ký Mới"
-                     Width="180" Height="40"
-                     Margin="5,0,0,0" Click="DangKi_Click"/>
+                    <Button 
+                       Content="Đăng Ký Mới"
+                       Width="170"
+                       Height="40"
+                       Background="#FF4655"
+                       Foreground="White"
+                       FontFamily="Segoe UI"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Padding="10,5"
+                       BorderBrush="#FF4655"
+                       BorderThickness="0"
+                       Cursor="Hand" 
+                     Margin="15,0,0,0" Click="DangKi_Click"/>
                 </StackPanel>
             </Grid>
         </Border>

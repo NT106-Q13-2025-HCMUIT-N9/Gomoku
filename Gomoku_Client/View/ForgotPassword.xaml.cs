@@ -82,7 +82,6 @@ namespace Gomoku_Client
                     }
                     else
                     {
-                        EmailBox.Foreground = Brushes.Gray;
                         EmailBorder.BorderBrush = new SolidColorBrush(
                     (Color)ColorConverter.ConvertFromString("#2A2A2A")
                 );
@@ -126,37 +125,46 @@ namespace Gomoku_Client
 
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
+            LoadingCircle.Visibility = Visibility.Visible;
+            buttonDisable();
+            SendOTPButton.Content = "";
+
             Email_LostFocus(sender, e);
 
             // Thêm điều kiển kiểm tra email hợp lệ và tồn tại trong hệ thống ở đây
             if (!Validate.IsValidEmail(EmailBox.Text) || !await Validate.IsEmailExists(EmailBox.Text))
             {
+                //Loaded
+                LoadingCircle.Visibility = Visibility.Collapsed;
+                buttonEnable();
+                SendOTPButton.Content = "Gửi mã xác thực";
                 return;
             }
 
             else
             {
                 //Loading
-                LoadingCircle.Visibility = Visibility.Visible;
-                buttonDisable();
-                SendOTPButton.Content = "";
+                
                 try
                 { 
                     await UserAction.SendResetAsync(EmailBox.Text);
                     //MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    //Hiển thị overlay xác nhận
+                    ConfirmationOverlay.Visibility = Visibility.Visible;
+
+                    var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+                    var border = (Border)((Grid)ConfirmationOverlay).Children[0];
+                    storyboard.Begin(border);
+
+                    
 
                     //Loaded
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     buttonEnable();
                     SendOTPButton.Content = "Gửi mã xác thực";
 
-                    //Hiển thị overlay xác nhận
-                    var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
-                    var border = (Border)((Grid)ConfirmationOverlay).Children[0];
-                    storyboard.Completed += (s, args) =>
-                    {
-                        ConfirmationOverlay.Visibility = Visibility.Collapsed;
-                    };
+                    
 
                     storyboard.Begin(border);
                 }

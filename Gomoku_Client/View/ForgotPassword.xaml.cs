@@ -20,11 +20,13 @@ namespace Gomoku_Client
     /// <summary>
     /// Interaction logic for ForgotPasswordUI.xaml
     /// </summary>
-    public partial class ForgotPasswordUI : Window
+    public partial class ForgotPasswordUI : Page
     {
-        public ForgotPasswordUI()
+        private MainWindow _mainWindow;
+        public ForgotPasswordUI(MainWindow mainWindow)
         {
             InitializeComponent();
+            _mainWindow = mainWindow;
         }
 
         private void Email_GotFocus(object sender, RoutedEventArgs e)
@@ -36,33 +38,65 @@ namespace Gomoku_Client
             }
         }
 
-        private void Email_LostFocus(object sender, RoutedEventArgs e)
+        private async void Email_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
                 EmailBox.Text = "Email khôi phục";
                 EmailBox.Foreground = Brushes.Gray;
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                GetEmailGrid.Height = 205;
+            }
+
+            //Kiểm tra định dạng email hợp lệ 
+            else if(!Validate.IsValidEmail(EmailBox.Text))
+            {
+                EmailNotFoundText.Text = "Email không hợp lệ";
+                EmailBox.BorderBrush = Brushes.Red;
+                EmailNotFoundText.Visibility = Visibility.Visible;
+                GetEmailGrid.Height = 220;
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+            }
+
+            //Kiểm tra email có tồn tại trong hệ thống không 
+            else
+            {
+                try
+                {
+                    if (!await Validate.IsEmailExists(EmailBox.Text))
+                    {
+                        EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                        EmailBox.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        GetEmailGrid.Height = 220;
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                    }
+                    else
+                    {
+                        EmailBox.Foreground = Brushes.Gray;
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        EmailNotFoundText.Visibility = Visibility.Collapsed;
+                        GetEmailGrid.Height = 205;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
+                    EmailBox.BorderBrush = Brushes.Red;
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    GetEmailGrid.Height = 220;
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                }
             }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow main = new MainWindow();
-            // Sao chép vị trí và kích thước
-            main.Left = this.Left;
-            main.Top = this.Top;
-            main.Width = this.Width;
-            main.Height = this.Height;
-            main.WindowState = this.WindowState;
-
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
-
-            // 2. Hiển thị Window mới
-            main.Show();
-
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+            _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
+            _mainWindow.MainBorder.Visibility = Visibility.Visible;
         }
 
         private void OTPBox_GotFocus(object sender, RoutedEventArgs e)
@@ -91,14 +125,25 @@ namespace Gomoku_Client
 
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
-            try
+            Email_LostFocus(sender, e);
+
+            // Thêm điều kiển kiểm tra email hợp lệ và tồn tại trong hệ thống ở đây
+            if (!Validate.IsValidEmail(EmailBox.Text) || !await Validate.IsEmailExists(EmailBox.Text))
             {
-                await UserAction.SendResetAsync(EmailBox.Text);
-                MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
-            catch (AuthException auth_ex)
+
+            else
             {
-                MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                try
+                {
+                    await UserAction.SendResetAsync(EmailBox.Text);
+                    MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (AuthException auth_ex)
+                {
+                    MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -110,22 +155,13 @@ namespace Gomoku_Client
 
         private void Set_Password_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow main = new MainWindow();
-            // Sao chép vị trí và kích thước
-            main.Left = this.Left;
-            main.Top = this.Top;
-            main.Width = this.Width;
-            main.Height = this.Height;
-            main.WindowState = this.WindowState;
-
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
-
-            // 2. Hiển thị Window mới
-            main.Show();
-
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+            if (_mainWindow == null)
+            {
+                MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
+            _mainWindow.MainBorder.Visibility = Visibility.Visible;
         }
 
         private void Back_From_SetPasswordGrid_Click(object sender, RoutedEventArgs e)

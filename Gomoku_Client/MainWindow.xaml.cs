@@ -1,4 +1,4 @@
-﻿using Firebase.Auth;
+using Firebase.Auth;
 using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
@@ -37,8 +37,17 @@ namespace Gomoku_Client
             e.Handled = true;
         }
 
+        bool failedLogin = false;
         private void EmailBox_GotFocus(object sender, RoutedEventArgs e)
         {
+            if (failedLogin)
+            {
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                MainBorder.Height -= 15;
+                failedLogin = false;
+            }
+
             if (EmailBox.Text == "Email")
             {
                 EmailBox.Text = "";
@@ -46,12 +55,74 @@ namespace Gomoku_Client
             }
         }
 
-        private void EmailBox_LostFocus(object sender, RoutedEventArgs e)
+        bool isWrongEmail = false;
+        private async void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
-                EmailBox.Text = "Tên người dùng";
+                EmailBox.Text = "Email";
                 EmailBox.Foreground = Brushes.Gray;
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                if(isWrongEmail == true)
+                {
+                    MainBorder.Height -= 15;
+                    isWrongEmail = false;
+                }
+                return;
+            }
+
+            if (!Validate.IsValidEmail(EmailBox.Text))
+            {
+                EmailNotFoundText.Text = "Email không hợp lệ";
+                EmailBox.BorderBrush = Brushes.Red;
+                EmailNotFoundText.Visibility = Visibility.Visible;
+                if(isWrongEmail == false) MainBorder.Height += 15;
+                // Email không tồn tại → viền đỏ
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+
+                isWrongEmail = true;
+            }
+            else
+            {
+                try
+                {
+                    if (!await Validate.IsEmailExists(EmailBox.Text))
+                    {
+                        EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                        EmailBox.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        if (isWrongEmail == false) MainBorder.Height += 15;
+                        // Email không tồn tại → viền đỏ
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+
+                        isWrongEmail = true;
+                    }
+                    else
+                    {
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        EmailNotFoundText.Visibility = Visibility.Collapsed;
+                        if (isWrongEmail == true)
+                        {
+                            MainBorder.Height -= 15;
+                            isWrongEmail = false;
+                        }
+                        return;
+                    }
+                }catch (Exception ex)
+                {
+                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
+                    EmailBox.BorderBrush = Brushes.Red;
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    if (isWrongEmail == false) MainBorder.Height += 15;
+                    // Email không tồn tại → viền đỏ
+                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+
+                    isWrongEmail = true;
+                }
+                
             }
         }
 
@@ -63,61 +134,62 @@ namespace Gomoku_Client
                 PasswordPlaceholder.Visibility = Visibility.Visible;
         }
 
-        private void SignUpButton_Click(object sender, RoutedEventArgs e)
-        {
-            SignUpUserInterface SignUp = new SignUpUserInterface();
-            // Sao chép vị trí và kích thước
-            SignUp.Left = this.Left;
-            SignUp.Top = this.Top;
-            SignUp.Width = this.Width;
-            SignUp.Height = this.Height;
-            SignUp.WindowState = this.WindowState;
-
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
-
-            // 2. Hiển thị Window mới
-            SignUp.Show();
-
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
-        }
+        
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
-            ForgotPasswordUI ForgotUI = new ForgotPasswordUI();
-            // Sao chép vị trí và kích thước
-            ForgotUI.Left = this.Left;
-            ForgotUI.Top = this.Top;
-            ForgotUI.Width = this.Width;
-            ForgotUI.Height = this.Height;
-            ForgotUI.WindowState = this.WindowState;
+            MainFrame.Navigate(new ForgotPasswordUI(this));
 
-            // 1. Ẩn Window hiện tại ngay lập tức
-            this.Hide();
+            MainBorder.Visibility = Visibility.Collapsed;
 
-            // 2. Hiển thị Window mới
-            ForgotUI.Show();
+            MainFrame.Visibility = Visibility.Visible;
 
-            // 3. Đóng Window cũ sau khi Window mới đã được hiển thị
-            this.Close();
+
+
+            //ForgotPasswordUI ForgotUI = new ForgotPasswordUI();
+            //// Sao chép vị trí và kích thước
+            //ForgotUI.Left = this.Left;
+            //ForgotUI.Top = this.Top;
+            //ForgotUI.Width = this.Width;
+            //ForgotUI.Height = this.Height;
+            //ForgotUI.WindowState = this.WindowState;
+
+            //// 1. Ẩn Window hiện tại ngay lập tức
+            //this.Hide();
+
+            //// 2. Hiển thị Window mới
+            //ForgotUI.Show();
+
+            //// 3. Đóng Window cũ sau khi Window mới đã được hiển thị
+            //this.Close();
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            this.IsEnabled = false;
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
+            LoadingCircle.Visibility = Visibility.Visible;
+            LoginButton.Content = "";
+
+            if (failedLogin)
+            {
+                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                EmailNotFoundText.Visibility = Visibility.Collapsed;
+                MainBorder.Height -= 15;
+                failedLogin = false;
+
+            }
+
             try
             {
-                if (string.IsNullOrEmpty(email))
-                {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập một email", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                EmailBox_LostFocus(sender, e);
 
-                if (string.IsNullOrEmpty(password))
+                if(isWrongEmail || string.IsNullOrEmpty(password))
                 {
-                    MessageBox.Show($"Lỗi: Vui lòng nhập mật khẩu", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    this.IsEnabled = true;
+                    LoginButton.Content = "Đăng nhập";
+                    LoadingCircle.Visibility = Visibility.Collapsed;
                     return;
                 }
 
@@ -129,6 +201,7 @@ namespace Gomoku_Client
                 mainGame.Width = this.Width;
                 mainGame.Height = this.Height;
                 mainGame.WindowState = this.WindowState;
+                
                 this.Hide();
                 mainGame.Show();
                 this.Close();
@@ -141,8 +214,93 @@ namespace Gomoku_Client
                 }
                 catch (AuthException auth_ex)
                 {
-                    MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }            }
+                    if(auth_ex.Message == "INVALID_LOGIN_CREDENTIALS")
+                    {
+                        EmailNotFoundText.Text = "Email hoặc mật khẩu không chính xác";
+                        EmailBox.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        if (isWrongEmail == false) MainBorder.Height += 15;
+                        // Email không tồn tại → viền đỏ
+                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                        this.IsEnabled = true;
+                        failedLogin = true;
+                        LoginButton.Content = "Đăng nhập";
+                        LoadingCircle.Visibility = Visibility.Collapsed;
+                    }
+                }
+            }
         }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void SignUp_Click(object sender, RoutedEventArgs e)
+        {
+
+            MainFrame.Navigate(new SignUpUserInterface(this));
+
+            MainBorder.Visibility = Visibility.Collapsed;
+
+            MainFrame.Visibility = Visibility.Visible;
+        }
+
+        private bool isShowing = false;
+        private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isShowing)
+            {
+                // Hiện mật khẩu
+                PasswordVisible.Text = PasswordBox.Password;
+                PasswordVisible.Visibility = Visibility.Visible;
+                PasswordBox.Visibility = Visibility.Collapsed;
+
+                TogglePasswordBtn.Content = "🙈";
+            }
+            else
+            {
+                // Ẩn mật khẩu
+                PasswordBox.Password = PasswordVisible.Text;
+                PasswordBox.Visibility = Visibility.Visible;
+                PasswordVisible.Visibility = Visibility.Collapsed;
+
+                TogglePasswordBtn.Content = "👁";
+            }
+
+            isShowing = !isShowing;
+        }
+
+        private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true; // chặn phím Space
+            }
+        }
+
+        private void PasswordVisible_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void PasswordBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void PasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            PasswordBox.Password = PasswordVisible.Text;
+            if (PasswordBox.Password.Length > 0)
+                PasswordPlaceholder.Visibility = Visibility.Collapsed;
+            else
+                PasswordPlaceholder.Visibility = Visibility.Visible;
+        }
+
+        
     }
 }

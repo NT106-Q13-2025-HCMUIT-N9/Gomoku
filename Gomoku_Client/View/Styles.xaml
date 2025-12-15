@@ -23,98 +23,55 @@
         </Setter>
     </Style>
 
+    
     <!-- Hiệu ứng viền sáng khi hover cho tất cả Button -->
     <Style TargetType="Button">
+        <!-- Chặn hoàn toàn style mặc định -->
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
 
-        <Style.Triggers>
-            <!-- Khi hover -->
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderThickness" Value="2"/>
-
-                <!-- Viền sáng theo màu nền của nút -->
-                <Setter Property="Effect">
-                    <Setter.Value>
-                        <DropShadowEffect BlurRadius="20"
-                          ShadowDepth="0"
-                          Opacity="1"
-                          Color="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Background.Color}"/>
-                    </Setter.Value>
-                </Setter>
-            </Trigger>
-
-
-        </Style.Triggers>
-    </Style>
-
-    <!-- Style Button Xanh (Chính) -->
-    <Style x:Key="BlueButton" TargetType="Button">
-        <Setter Property="Background" Value="#0078D7"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="FontFamily" Value="Segoe UI"/>
-        <Setter Property="FontSize" Value="16"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Padding" Value="10,5"/>
-        <Setter Property="BorderBrush" Value="#005A9E"/>
-        <Setter Property="BorderThickness" Value="2"/>
-        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="22">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
+                    <Border x:Name="Root"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                        <ContentPresenter
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
                     </Border>
+
+                    <!-- TRIGGERS -->
                     <ControlTemplate.Triggers>
+
+                        <!-- Hover: glow theo màu nút -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#005A9E"/>
+                            <Setter TargetName="Root" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect
+                                    BlurRadius="20"
+                                    ShadowDepth="0"
+                                    Opacity="1"
+                                    Color="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background.Color}"/>
+                                </Setter.Value>
+                            </Setter>
                         </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#004578"/>
+
+                        <!-- Disabled: KHÔNG glow trắng -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Root" Property="Opacity" Value="0.5"/>
+                            <Setter TargetName="Root" Property="Effect" Value="{x:Null}"/>
                         </Trigger>
+
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
 
-    <!-- Style Button Trắng (Phụ) -->
-    <Style x:Key="WhiteBlueButton" TargetType="Button">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="Foreground" Value="#0078D7"/>
-        <Setter Property="FontFamily" Value="Segoe UI"/>
-        <Setter Property="FontSize" Value="16"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="BorderBrush" Value="#0078D7"/>
-        <Setter Property="BorderThickness" Value="2"/>
-        <Setter Property="Cursor" Value="Hand"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="22">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#E5F1FB"/>
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter Property="Background" Value="#CCE4F7"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
     <!-- Valorant Background Gradient -->
     <LinearGradientBrush x:Key="ValorantBackground"

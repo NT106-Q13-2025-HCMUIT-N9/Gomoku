@@ -34,29 +34,35 @@ namespace Gomoku_Client
             if (EmailBox.Text == "Email khôi phục")
             {
                 EmailBox.Text = "";
-                EmailBox.Foreground = Brushes.Black;
+                EmailBox.Foreground = Brushes.White;
             }
         }
 
         private async void Email_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(EmailBox.Text))
+            if(string.IsNullOrWhiteSpace(EmailBox.Text) && textChanged == true)
             {
+                EmailNotFoundText.Text = "Email không hợp lệ";
                 EmailBox.Text = "Email khôi phục";
                 EmailBox.Foreground = Brushes.Gray;
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                EmailNotFoundText.Visibility = Visibility.Collapsed;
-                GetEmailGrid.Height = 205;
+                EmailNotFoundText.Visibility = Visibility.Visible;
+                GetEmailGrid.Height = 220;
+                EmailBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#FF4655")
+                );
+                return;
             }
 
             //Kiểm tra định dạng email hợp lệ 
-            else if(!Validate.IsValidEmail(EmailBox.Text))
+            else if (!Validate.IsValidEmail(EmailBox.Text))
             {
                 EmailNotFoundText.Text = "Email không hợp lệ";
-                EmailBox.BorderBrush = Brushes.Red;
                 EmailNotFoundText.Visibility = Visibility.Visible;
                 GetEmailGrid.Height = 220;
-                EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                EmailBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#FF4655")
+                );
+                return;
             }
 
             //Kiểm tra email có tồn tại trong hệ thống không 
@@ -67,15 +73,18 @@ namespace Gomoku_Client
                     if (!await Validate.IsEmailExists(EmailBox.Text))
                     {
                         EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
-                        EmailBox.BorderBrush = Brushes.Red;
                         EmailNotFoundText.Visibility = Visibility.Visible;
                         GetEmailGrid.Height = 220;
-                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#FF4655")
+                        );
                     }
                     else
                     {
                         EmailBox.Foreground = Brushes.Gray;
-                        EmailBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                    (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                );
                         EmailNotFoundText.Visibility = Visibility.Collapsed;
                         GetEmailGrid.Height = 205;
                     }
@@ -85,10 +94,11 @@ namespace Gomoku_Client
                     MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
-                    EmailBox.BorderBrush = Brushes.Red;
                     EmailNotFoundText.Visibility = Visibility.Visible;
                     GetEmailGrid.Height = 220;
-                    EmailBorder.BorderBrush = new SolidColorBrush(Colors.Red);
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
                 }
             }
         }
@@ -97,30 +107,6 @@ namespace Gomoku_Client
         {
             _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
             _mainWindow.MainBorder.Visibility = Visibility.Visible;
-        }
-
-        private void OTPBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (OTPBox.Text == "Mã OTP")
-            {
-                OTPBox.Text = "";
-                OTPBox.Foreground = Brushes.Black;
-            }
-        }
-
-        private void OTPBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(OTPBox.Text))
-            {
-                OTPBox.Text = "Mã OTP";
-                OTPBox.Foreground = Brushes.Gray;
-            }
-        }
-
-        private void OTPConfirm_Click(object sender, RoutedEventArgs e)
-        {
-            GetOTPGrid.Visibility = Visibility.Collapsed;
-            SetPasswordGrid.Visibility = Visibility.Visible;
         }
 
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
@@ -147,12 +133,6 @@ namespace Gomoku_Client
             }
         }
 
-        private void Back_From_OPTGrid_Click(object sender, RoutedEventArgs e)
-        {
-            GetOTPGrid.Visibility = Visibility.Collapsed;
-            GetEmailGrid.Visibility = Visibility.Visible;
-        }
-
         private void Set_Password_Click(object sender, RoutedEventArgs e)
         {
             if (_mainWindow == null)
@@ -164,26 +144,93 @@ namespace Gomoku_Client
             _mainWindow.MainBorder.Visibility = Visibility.Visible;
         }
 
-        private void Back_From_SetPasswordGrid_Click(object sender, RoutedEventArgs e)
+        private CancellationTokenSource? _emailTypingCts; // CancellationTokenSource để hủy bỏ tác vụ kiểm tra email khi người dùng tiếp tục gõ
+        private bool textChanged = false;
+        private async void EmailBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            SetPasswordGrid.Visibility = Visibility.Collapsed;
-            GetOTPGrid.Visibility = Visibility.Visible;
-        }
+            textChanged = true;
+            if (e.Key == Key.Space) 
+            {
+                e.Handled = true;
+            }
 
-        private void NewPasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            if (NewPasswordBox.Password.Length > 0)
-                NewPasswordPlaceholder.Visibility = Visibility.Collapsed;
-            else
-                NewPasswordPlaceholder.Visibility = Visibility.Visible;
-        }
+            EmailBox.Foreground = Brushes.White;
+            EmailBorder.BorderBrush = new SolidColorBrush(
+                (Color)ColorConverter.ConvertFromString("#2A2A2A")
+            );
+            EmailNotFoundText.Visibility = Visibility.Collapsed;
+            GetEmailGrid.Height = 205;
 
-        private void NewPasswordConfirmBox_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            if (NewPasswordConfirmBox.Password.Length > 0)
-                NewPasswordConfirmPlaceholder.Visibility = Visibility.Collapsed;
-            else
-                NewPasswordConfirmPlaceholder.Visibility = Visibility.Visible;
+            // Hủy delay cũ nếu user vẫn đang gõ
+            _emailTypingCts?.Cancel();
+            _emailTypingCts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(1500, _emailTypingCts.Token);
+                if (string.IsNullOrWhiteSpace(EmailBox.Text))
+                {
+                    EmailNotFoundText.Text = "Email không hợp lệ";
+                    EmailBox.Foreground = Brushes.Gray;
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    GetEmailGrid.Height = 220;
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+                    return;
+                }
+
+                else if (!Validate.IsValidEmail(EmailBox.Text))
+                {
+                    EmailNotFoundText.Text = "Email không hợp lệ";
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    GetEmailGrid.Height = 220;
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+                    return;
+                }
+
+                else
+                {
+                    try
+                    {
+                        if (!await Validate.IsEmailExists(EmailBox.Text))
+                        {
+                            EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                            EmailNotFoundText.Visibility = Visibility.Visible;
+                            GetEmailGrid.Height = 220;
+                            EmailBorder.BorderBrush = new SolidColorBrush(
+                                (Color)ColorConverter.ConvertFromString("#FF4655")
+                            );
+                        }
+                        else
+                        {
+                            EmailBox.Foreground = Brushes.Gray;
+                            EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                    );
+                            EmailNotFoundText.Visibility = Visibility.Collapsed;
+                            GetEmailGrid.Height = 205;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        GetEmailGrid.Height = 220;
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#FF4655")
+                        );
+                    }
+                }
+            }
+            catch (TaskCanceledException)
+            {
+
+            }
         }
     }
 }

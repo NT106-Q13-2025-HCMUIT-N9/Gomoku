@@ -187,7 +187,7 @@ namespace Gomoku_Client
                 }
                 this.Visibility = Visibility.Visible;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 MessageBox.Show("Failed to load user data.");
                 this.Close();

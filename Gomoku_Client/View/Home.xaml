@@ -97,7 +97,7 @@
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+            <ImageBrush ImageSource="/Assets/Main.png" 
                         Stretch="UniformToFill" 
                         Opacity="0.4"/>
         </Grid.Background>

@@ -62,9 +62,9 @@ namespace Gomoku_Client
             {
                 try
                 {
-                    if (await Validate.IsUsernamExists(UsernameBox.Text))
+                    if (!await Validate.IsUsernamExists(UsernameBox.Text))
                     {
-                        UsernameMsg.Text = "Username đã tồn tại. Vui lòng chọn một username khác";
+                        UsernameMsg.Text = "Username đã tồn tại";
                         UsernameBorder.BorderBrush = new SolidColorBrush(
                             (Color)ColorConverter.ConvertFromString("#FF4655")
                         );
@@ -142,7 +142,7 @@ namespace Gomoku_Client
                     QuerySnapshot query_result = await user_collection.WhereEqualTo("Email", EmailBox.Text).GetSnapshotAsync();
                     if (query_result.Count != 0)
                     {
-                        EmailMsg.Text = "Email đã liên kết với một tài khoản khác. Vui lòng nhập email khác";
+                        EmailMsg.Text = "Email đã liên kết với một tài khoản khác";
                         EmailBorder.BorderBrush = new SolidColorBrush(
                             (Color)ColorConverter.ConvertFromString("#FF4655")
                         );

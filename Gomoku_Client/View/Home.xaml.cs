@@ -189,6 +189,7 @@ namespace Gomoku_Client
             }
             catch (Exception)
             {
+                Exception a = ex;
                 MessageBox.Show("Failed to load user data.");
                 this.Close();
             }

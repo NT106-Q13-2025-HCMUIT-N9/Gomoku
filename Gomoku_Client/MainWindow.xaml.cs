@@ -11,6 +11,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -283,7 +284,11 @@ namespace Gomoku_Client
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            QuitConfirmationOverlay.Visibility = Visibility.Visible;
+
+            var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
         }
 
         private void SignUp_Click(object sender, RoutedEventArgs e)
@@ -394,6 +399,23 @@ namespace Gomoku_Client
             {
                 PasswordPlaceholder.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
+        {
+            var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
+            {
+                QuitConfirmationOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            storyboard.Begin(border);
+        }
+
+        private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
     }
 }

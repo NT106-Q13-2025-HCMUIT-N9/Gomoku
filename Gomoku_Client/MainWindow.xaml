@@ -7,151 +7,274 @@
         xmlns:converters="clr-namespace:Gomoku_Client.Converters"
         Icon="\Assets\Gomoku.ico"
         mc:Ignorable="d"
-        Title="Gomoku" Height="800" Width="1600">
+        Background="#F0F0F0" 
+        Title="Gomoku" Height="720" Width="1280" 
+        WindowStyle="None" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
 
     <Window.Resources>
-        <converters:StringEmptyToVisibilityConverter x:Key="StringEmptyToVisibilityConverter"/>
-        <Style x:Key="BlueButton" TargetType="Button">
-            <Setter Property="Background" Value="#0078D7"/>
-            <!-- Xanh dương -->
-            <Setter Property="Foreground" Value="White"/>
-            <!-- Chữ trắng -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="BorderBrush" Value="#005A9E"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="22">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#005A9E"/>
-                                <!-- Tối lại khi hover -->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#004578"/>
-                                <!-- Nhấn xuống -->
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="WhiteBlueButton" TargetType="Button">
-            <Setter Property="Background" Value="White"/>
-            <!-- Nền trắng -->
-            <Setter Property="Foreground" Value="#0078D7"/>
-            <!-- Chữ xanh -->
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="10,6"/>
-            <Setter Property="BorderBrush" Value="#0078D7"/>
-            <!-- Viền xanh -->
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="22">
-                            <!-- Bo góc -->
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                        </Border>
-
-                        <!-- Hiệu ứng hover và nhấn -->
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#E5F1FB"/>
-                                <!-- Xanh nhạt khi hover -->
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#CCE4F7"/>
-                                <!-- Đậm hơn khi nhấn -->
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="View/Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Background="#F0F0F0" >
-        <Border Background="#F9F9F9"
-                BorderBrush="#0078D7"
+
+    <Grid Width="1280">
+        <Grid.Background>
+            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+                        Stretch="UniformToFill"
+                        Opacity="1"/>
+        </Grid.Background>
+
+        <!-- Quit Confirmation Overlay -->
+        <Grid x:Name="QuitConfirmationOverlay" 
+              Visibility="Collapsed" 
+              Panel.ZIndex="1000">
+            <Grid.Background>
+                <SolidColorBrush Color="#000000" Opacity="0.7"/>
+            </Grid.Background>
+
+            <Border HorizontalAlignment="Center" 
+                VerticalAlignment="Center"
+                RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Border.RenderTransform>
+
+                <!-- popup card -->
+                <Border Background="Black" 
+                    CornerRadius="3" 
+                    Width="500" 
+                    Padding="0"
+                    BorderBrush="#FF4655" 
+                    BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="40" ShadowDepth="0" Opacity="0.6"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- vv BELOW ARE POPUP CONTENT vv -->
+                        <StackPanel Grid.Row="1" Margin="40,40,40,30">
+                            <!-- icon -->
+                            <Border Width="80" Height="80" 
+                                CornerRadius="40" 
+                                Background="#2A2E39"
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,20">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+                                </Border.Effect>
+                                <Viewbox Width="45" Height="45" 
+                                     HorizontalAlignment="Center" 
+                                     VerticalAlignment="Center">
+                                    <Canvas Width="24" Height="24">
+                                        <!-- Door frame -->
+                                        <Path Fill="#FF4655" 
+                                            Data="M10.09,15.59L11.5,17L16.5,12L11.5,7L10.09,8.41L12.67,11H3V13H12.67L10.09,15.59M19,3H5C3.89,3 3,3.9 3,5V9H5V5H19V19H5V15H3V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.9 20.1,3 19,3Z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+
+                            <!-- title -->
+                            <TextBlock Text="XÁC NHẬN THOÁT" 
+                                       FontSize="32" 
+                                       FontWeight="Bold" 
+                                       FontFamily="Segoe UI"
+                                       Foreground="White" 
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,15"/>
+
+                            <!-- message -->
+                            <TextBlock Text="Bạn có chắc chắn muốn thoát khỏi trò chơi không?" 
+                                       FontSize="16" 
+                                       Foreground="#B0B0B0" 
+                                       TextWrapping="Wrap"
+                                       HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       LineHeight="24"/>
+                        </StackPanel>
+
+                        <!-- action -->
+                        <Grid Grid.Row="2" 
+                             Margin="40,0,40,40">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- cancel -->
+                            <Button Grid.Column="0"
+                                    x:Name="CancelQuitButton"
+                                    Content="HỦY BỎ" 
+                                    Height="54"
+                                    Click="CancelQuitButton_Click"
+                                    Style="{StaticResource CancelButton}"/>
+
+                            <!-- confirm -->
+                            <Button Grid.Column="2"
+                                    x:Name="ConfirmQuitButton"
+                                    Content="THOÁT NGAY" 
+                                    Height="54"
+                                    Click="ConfirmQuitButton_Click"
+                                    Style="{StaticResource ConfirmButton}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Border>
+        </Grid>
+
+        <Border x:Name="MainBorder" 
+                Background="#0F0F0F"
+                BorderBrush="#FF4655"
                 BorderThickness="2"
-                CornerRadius="22"
+                CornerRadius="0"
                 Padding="20"
                 Width="410"
-                Height="300"
+                Height="290"
                 HorizontalAlignment="Center"
-                VerticalAlignment="Center">
-            <Grid>
+                VerticalAlignment="Center"
+                Margin="0,0,0,50">
+            <Grid x:Name="EmailBorder1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="70"/>
+                    <RowDefinition Height="Auto"/>
 
                 </Grid.RowDefinitions>
 
+                <!-- Label đăng nhập -->
                 <TextBlock Text="Đăng nhập vào Gomoku"
                        Grid.Row="0"
                        HorizontalAlignment="Center"
                        VerticalAlignment="Center"
-                       Foreground="#0078D7"  
+                       Foreground="#FF4655"  
                        FontFamily="Segoe UI"
                        FontSize="24"         
                        FontWeight="Bold"
                        Margin="0,0,0,20"/>
 
-                <TextBlock Grid.Row="4" 
+                <!-- Quên mật khẩu -->
+                <TextBlock Grid.Row="6" 
+                           x:Name="ForgotPasswordText"
                            FontFamily="Segoe UI"
                            FontSize="14"
                            FontWeight="SemiBold" 
-                           HorizontalAlignment="Left" 
-                           Margin="10,12,0,0" 
+                           Foreground="#FF4655"
+                           HorizontalAlignment="Right" 
+                           Margin="0,0,35,0" 
                            Height="20" 
                            VerticalAlignment="Top">
-                    <Hyperlink NavigateUri="https://google.com"
-                               RequestNavigate="Hyperlink_RequestNavigate">
-                        Quên tên đăng nhập hay mật khẩu?
+                    <Hyperlink Click="Hyperlink_Click"
+                               Foreground="#FF4655">
+                        Quên mật khẩu?
                     </Hyperlink>
                 </TextBlock>
 
-                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,30,0,0" >
-                    <Button Style="{StaticResource BlueButton}"
+                <!-- Đăng ký tài khoản -->
+                <TextBlock Grid.Row="6" 
+                   x:Name="SignUpText"
+                   FontFamily="Segoe UI"
+                   FontSize="14"
+                   FontWeight="SemiBold" 
+                   HorizontalAlignment="Left" 
+                   Margin="16,0,0,0" 
+                   Height="20" 
+                   VerticalAlignment="Top">
+                    <Hyperlink Click="SignUp_Click"
+                               Foreground="#FF4655">
+                        Đăng ký tài khoản mới
+                    </Hyperlink>
+                </TextBlock>
+
+                <!-- Hai nút -->
+                <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Height="70" >
+                    <Button x:Name="LoginButton" 
                             Content="Đăng Nhập"
-                            Width="180" Height="40"
-                            Margin="0,0,0,0"/>
-                    <Button Style="{StaticResource WhiteBlueButton}"
-                            Content="Đăng Ký"
-                            Width="180" Height="40"
-                            Margin="5,0,0,0"/>
+                            Width="170"
+                            Height="40"
+                            Background="#FF4655"
+                            Foreground="White"
+                            FontFamily="Segoe UI"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="10,5"
+                            BorderBrush="#FF4655"
+                            BorderThickness="0"
+                            Cursor="Hand" 
+                            Margin="0,0,0,0" Click="LoginButton_Click"/>
+
+                    <Button x:Name="ExitButton" 
+                            Content="Thoát"
+                            Width="170"
+                            Height="40"
+                            Background="White"
+                            Foreground="#FF4655"
+                            FontFamily="Segoe UI"
+                            FontSize="16"
+                            FontWeight="Bold"
+                            Padding="10,5"
+                            BorderBrush="White"
+                            BorderThickness="0"
+                            Cursor="Hand" 
+                            Margin="15,0,0,0" Click="ExitButton_Click"/>
                 </StackPanel>
 
-                <Border Grid.Row="1"
-                        Background="#F3F3F3"
-                        CornerRadius="8"
-                        BorderBrush="#CCCCCC"
-                        BorderThickness="1"
+                <!-- Loading Circle-->
+                <Grid Grid.Row="5">
+                    <Grid.Resources>
+                        <!-- Animation quay -->
+                        <Storyboard x:Key="SpinAnimation" RepeatBehavior="Forever">
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                From="0" To="360" Duration="0:0:1"
+                                RepeatBehavior="Forever"/>
+                        </Storyboard>
+                    </Grid.Resources>
+
+                    <!-- Loading Circle -->
+                    <Ellipse x:Name="LoadingCircle"
+                        Width="30"
+                        Height="30"
+                        Stroke="White"
+                        StrokeThickness="4"
+                        StrokeDashArray="10 200"
+                        RenderTransformOrigin="0.5,0.5" 
+                        Margin="75,5,261,5"
+                        Visibility="Collapsed">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                        <Ellipse.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource SpinAnimation}"/>
+                            </EventTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+                </Grid>
+
+                <!-- Email box -->
+                <Border x:Name="EmailBorder"
+                        Grid.Row="1"
+                        Background="#121212"
+                        CornerRadius="0"
+                        BorderBrush="#2A2A2A"
+                        BorderThickness="2"
                         Padding="2">
-                    <TextBox x:Name="UsernameBox"
+                    <StackPanel>
+                        <TextBox x:Name="EmailBox"
+                             CaretBrush="White"
                              Height="36"
                              FontSize="14"
                              Padding="10,7"
@@ -161,29 +284,79 @@
                              FontFamily="Segoe UI"
                              FontWeight="SemiBold"
                              FontStyle="Normal"
-                             Text="Tên người dùng"
-                             GotFocus="UsernameBox_GotFocus"
-                             LostFocus="UsernameBox_LostFocus"/>
+                             Text="Email"
+                             GotFocus="EmailBox_GotFocus"
+                             LostFocus="EmailBox_LostFocus"
+                             KeyDown="EmailBox_KeyDown"
+                             PreviewKeyDown="EmailBox_PreviewKeyDown">
+                        </TextBox>
+                        <TextBlock x:Name="EmailError"
+                           Foreground="#FF4655"
+                           FontSize="12"
+                           Visibility="Collapsed"/>
+                    </StackPanel>
+
+
                 </Border>
 
-                <Border Grid.Row="2"
-                    Background="#F3F3F3"
-                    CornerRadius="8"
-                    BorderBrush="#CCCCCC"
-                    BorderThickness="1"
-                    Padding="2" Margin="0,15,0,0">
+                <!-- Thông báo sai Email -->
+                <TextBlock x:Name="EmailNotFoundText" 
+                   Text="Không tìm thấy tài khoản với email này"
+                   Grid.Row="2"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Foreground="#FF4655"  
+                   FontFamily="Segoe UI"
+                   FontSize="12"         
+                   FontWeight="Bold"
+                   Margin="9,0,0,0"
+                   Visibility="Collapsed"/>
+
+                <!-- Thông báo sai Password -->
+                <TextBlock x:Name="WrongPassText" 
+                   Text="Mật khẩu không được để trống"
+                   Grid.Row="4"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Foreground="#FF4655"  
+                   FontFamily="Segoe UI"
+                   FontSize="12"         
+                   FontWeight="Bold"
+                   Margin="9,0,0,0"
+                   Visibility="Collapsed"/>
+
+                <!-- Password box -->
+                <Border x:Name="PasswordBorder" 
+                    Grid.Row="3"
+                    Background="#121212"
+                    CornerRadius="0"
+                    BorderBrush="#2A2A2A"
+                    BorderThickness="2"
+                    Padding="2" 
+                    Margin="0,15,0,0">
                     <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="35"/>
+                            <!-- cho nút 👁 -->
+                        </Grid.ColumnDefinitions>
                         <PasswordBox x:Name="PasswordBox"
+                            CaretBrush="White"
                             Height="36"
                             FontSize="14"
                             Padding="10,7"
                             Background="Transparent"
                             BorderThickness="0"
-                            Foreground="Black"
+                            Foreground="White"
                             FontFamily="Segoe UI"
                             FontWeight="SemiBold"
                             FontStyle="Normal"
-                            PasswordChanged="PasswordBox_PasswordChanged"/>
+                            PreviewKeyDown="PasswordBox_PreviewKeyDown"
+                            PasswordChanged="PasswordBox_PasswordChanged" 
+                            LostFocus="PasswordBox_LostFocus"
+                            GotFocus="PasswordBox_GotFocus"
+                            Grid.ColumnSpan="2"/>
+
                         <TextBlock x:Name="PasswordPlaceholder"
                             Text="Mật khẩu"
                             Foreground="Gray"
@@ -193,10 +366,75 @@
                             VerticalAlignment="Center"
                             Margin="12,0,0,0"
                             IsHitTestVisible="False"
-                            Visibility="{Binding ElementName=PasswordBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}"/>
+                            Visibility="{Binding ElementName=PasswordBox, Path=Password, Converter={StaticResource StringEmptyToVisibilityConverter}}" 
+                            Grid.ColumnSpan="2"/>
+
+                        <TextBox x:Name="PasswordVisible"
+                             CaretBrush="White"
+                             Height="36"
+                             FontSize="14"
+                             Padding="10,7"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Foreground="White"
+                             FontFamily="Segoe UI"
+                             FontWeight="SemiBold"
+                             Visibility="Collapsed"
+                             PreviewKeyDown="PasswordVisible_PreviewKeyDown"
+                             TextChanged="PasswordVisible_TextChanged"
+                             GotFocus="PasswordVisible_GotFocus"
+                             Grid.ColumnSpan="2"/>
+
+                        <Button x:Name="TogglePasswordBtn"
+                             Grid.Column="1"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Width="30"
+                             Height="30"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             Click="TogglePasswordBtn_Click">
+                            <Path x:Name="TogglePasswordIcon"
+                                Data="{StaticResource EyeIcon}"
+                                Fill="#FF4655"
+                                Stretch="Uniform"
+                                Width="18"
+                                Height="18"/>
+                        </Button>
                     </Grid>
                 </Border>
             </Grid>
         </Border>
+
+        <Border x:Name="LoadingBorder" 
+        Background="#F9F9F9"
+        BorderBrush="#0078D7"
+        BorderThickness="2"
+        CornerRadius="22"
+        Padding="20"
+        Width="410"
+        Height="300"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center" 
+        Visibility="Collapsed" Opacity="0.7">
+            <Grid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="Đang đăng nhập..."
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="#0078D7"  
+                       FontFamily="Segoe UI"
+                       FontSize="20"         
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
+                    <ProgressBar IsIndeterminate="True" Width="300" Height="20"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+
+        <Frame x:Name="MainFrame"
+            NavigationUIVisibility="Hidden"
+            Visibility="Collapsed" />
     </Grid>
 </Window>

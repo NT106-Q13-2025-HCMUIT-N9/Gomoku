@@ -1,0 +1,320 @@
+﻿<Window x:Name="GamePlayWindow" x:Class="Gomoku_Client.View.GamePlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Gomoku_Client.View"
+        mc:Ignorable="d"
+        Title="Gomoku | Match In Progress" Height="720" Width="1280"
+        FontFamily="Segoe UI" WindowStyle="None" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+
+    <!-- ********************************** TÀI NGUYÊN STYLE CHUNG ********************************** -->
+    <Window.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        
+        
+        <!-- Style cơ sở cho các Border của Panel (góc bo tròn, nền tối, đổ bóng sâu) -->
+        <Style x:Key="PanelBaseStyle" TargetType="Border">
+            <Setter Property="Background" Value="#1A1A2E"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="5" Opacity="0.6"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Style cho các Action Buttons -->
+        <Style x:Key="ActionButtonBaseStyle" TargetType="Button">
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder" 
+                                Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="White" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <!-- BACKGROUND -->
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0F1923" Offset="0"/>
+                <GradientStop Color="#152635" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="280"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- *********************** LEFT COLUMN - Player Panels **************************** -->
+        <Grid Grid.Column="0" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- PLAYER 1 -->
+            <Border Background="#1A1A2E" CornerRadius="12" Padding="20"
+                    Margin="0,3,0,1" Grid.Row="1">
+
+                <Border.Effect>
+                    <DropShadowEffect Color="#00D946" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
+                </Border.Effect>
+
+                <StackPanel VerticalAlignment="Center">
+                    <Border Width="110" Height="110" CornerRadius="55"
+                            BorderBrush="#00D946" BorderThickness="4" Margin="0,0,0,15">
+
+                        <Border.Effect>
+                            <DropShadowEffect Color="#00D946" BlurRadius="20" ShadowDepth="0" Opacity="0.7"/>
+                        </Border.Effect>
+
+                        <Border.Background>
+                            <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                        </Border.Background>
+                    </Border>
+
+                    <TextBlock Text="YOU" FontSize="20" FontWeight="Bold"
+                       Foreground="White" HorizontalAlignment="Center"/>
+
+                    <Border Background="#00D946" CornerRadius="4" Padding="12,4"
+                    HorizontalAlignment="Center" Margin="0,12,0,20">
+                        <TextBlock Text="QUÂN ĐEN ●" FontSize="12"
+                           FontWeight="Bold" Foreground="White"/>
+                    </Border>
+
+                    <Border Background="#0F0F1E" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="THỜI GIAN" FontSize="11" Foreground="#8B8B8B"
+                               HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="Player1TimerText"
+                                   Text="05:00" FontSize="30" FontWeight="Bold"
+                                   Foreground="#00D946" HorizontalAlignment="Center"
+                                   FontFamily="Consolas"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+
+            <!-- PLAYER 2 -->
+            <Border Background="#1A1A2E" CornerRadius="12" Padding="20"
+                 Margin="-1,0,1,0">
+
+                <Border.Effect>
+                    <DropShadowEffect Color="#ECECEC" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
+                </Border.Effect>
+
+                <StackPanel VerticalAlignment="Center">
+                    <Border Width="110" Height="110" CornerRadius="55"
+                            BorderBrush="#ECECEC" BorderThickness="4" Margin="0,0,0,15">
+
+                        <Border.Effect>
+                            <DropShadowEffect Color="#ECECEC" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                        </Border.Effect>
+
+
+                        <Border.Background>
+                            <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                        </Border.Background>
+                    </Border>
+
+                    <TextBlock Text="OPPONENT" FontSize="20" FontWeight="Bold"
+                       Foreground="White" HorizontalAlignment="Center"/>
+
+                    <Border Background="#ECECEC" CornerRadius="4" Padding="12,4"
+                    HorizontalAlignment="Center" Margin="0,12,0,20">
+                        <TextBlock Text="QUÂN TRẮNG ○" FontSize="12"
+                           FontWeight="Bold" Foreground="#1A1A2E"/>
+                    </Border>
+
+                    <Border Background="#0F0F1E" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="THỜI GIAN" FontSize="11" Foreground="#8B8B8B"
+                               HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="Player2TimerText"
+                                   Text="05:00" FontSize="30" FontWeight="Bold"
+                                   Foreground="#ECECEC" HorizontalAlignment="Center"
+                                   FontFamily="Consolas"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+
+
+        <!-- ********************************** COLUMN 1: CENTER PANEL (GAME BOARD) ********************************** -->
+        <Grid Grid.Column="1" Margin="10,20,10,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Game Info Bar -->
+                <RowDefinition Height="*"/>
+                <!-- Game Board -->
+            </Grid.RowDefinitions>
+
+            <!-- Game Info Bar - Valorant Style -->
+            <Border Grid.Row="0" Background="#0F0F1E" Padding="0,12" CornerRadius="4" Margin="0,0,0,15">
+                <Border.Effect>
+                    <DropShadowEffect Color="#FF4655" BlurRadius="60" ShadowDepth="0" Opacity="0.4"/>
+                </Border.Effect>
+
+                <TextBlock x:Name="GameStatusText"
+                           Text="Lượt của {Tên Player}"
+                           FontSize="24"
+                           FontWeight="ExtraBold"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- Game Board -->
+            <Border Grid.Row="1" Style="{StaticResource PanelBaseStyle}" 
+                    Background="#2D3A47" Padding="10">
+
+                <Viewbox Stretch="Uniform">
+                    <Grid Width="700" Height="700">
+                        <!-- Board Background with Wood Texture -->
+                        <Border Background="#D4A574" CornerRadius="8">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
+                            </Border.Effect>
+                        </Border>
+
+                        <!-- Grid Canvas for Board -->
+                        <Canvas x:Name="BoardCanvas" 
+                                Width="700" 
+                                Height="700" 
+                                Background="Transparent" MouseLeftButtonDown="BoardCanvas_MouseLeftButtonDown"/>
+                    </Grid>
+                </Viewbox>
+            </Border>
+        </Grid>
+
+        <!-- ********************************** COLUMN 2: RIGHT PANEL (CHAT & ACTIONS) ********************************** -->
+        <Grid Grid.Column="2" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <!-- Chat Box (Chiếm phần lớn không gian) -->
+                <RowDefinition Height="Auto"/>
+                <!-- Action Buttons -->
+            </Grid.RowDefinitions>
+
+            <!-- Chat Box-->
+            <Border Grid.Row="0" Style="{StaticResource PanelBaseStyle}" Padding="15" Margin="0,0,0,15">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <!-- Chat Messages (Tối đa hóa không gian) -->
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Chat Header -->
+                    <TextBlock Grid.Row="0" Text="CHAT" FontSize="20" FontWeight="Bold" 
+                               Foreground="#FF4655" Margin="0,0,0,10"/>
+
+                    <!-- Chat Messages -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,10">
+                        <StackPanel x:Name="ChatMessagesPanel">
+                            <!-- Message Examples -->
+                            <Border Background="#0F0F1E" CornerRadius="5" Padding="8" Margin="0,0,0,6">
+                                <TextBlock Text="● Trận đấu bắt đầu!" FontSize="10" Foreground="#FFD700" TextWrapping="Wrap"/>
+                            </Border>
+                            <Border Background="#0F0F1E" CornerRadius="5" Padding="8" Margin="0,0,0,6">
+                                <TextBlock Text="YOU: Chúc may mắn!" FontSize="10" Foreground="#00D946" TextWrapping="Wrap"/>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <!-- Chat Input -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="tb_Message" Grid.Column="0" Height="36" 
+                                 Background="#0F0F1E" BorderBrush="#FF4655" BorderThickness="1" 
+                                 Foreground="White" FontSize="12" Padding="8,0"
+                                 VerticalContentAlignment="Center" 
+                                 KeyDown="ChatInput_KeyDown"/>
+
+                        <Button x:Name="btn__SendMessage" Grid.Column="1" Style="{StaticResource ActionButtonBaseStyle}" 
+                                Width="36" Height="36" Background="#FF4655" Margin="5,0,0,0" 
+                                Click="SendMessage_Click" Padding="0">
+                            <Path Data="M2,21 L23,12 L2,3 L2,10 L17,12 L2,14 Z" 
+                                  Fill="White" Width="18" Height="18" Stretch="Uniform"/>
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Action Buttons - Đã chuyển về Grid.Row="1" -->
+            <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,15,0,0">
+
+                <!-- Surrender Button -->
+                <Button x:Name="btn_Surrender" Style="{StaticResource ActionButtonBaseStyle}" 
+                        Background="#FF4655" 
+                        Margin="0,0,0,15" Click="SurrenderButton_Click">
+                    <Button.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="25" ShadowDepth="0" Opacity="0.75"/>
+                    </Button.Effect>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        
+                        <TextBlock Text="ĐẦU HÀNG" FontSize="15" FontWeight="Bold"
+                                   Foreground="White" VerticalAlignment="Center"/>
+
+                    </StackPanel>
+                </Button>
+
+                <!-- Exit Button -->
+                <Button x:Name="btn_Exit" Style="{StaticResource ActionButtonBaseStyle}" 
+                        Background="#0F0F1E" 
+                        BorderBrush="#8B8B8B" BorderThickness="1.5"
+                        Click="ExitButton_Click">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                       
+
+                        <TextBlock Text="THOÁT TRẬN" FontSize="15" FontWeight="Bold"
+                                   Margin="0,0,10,0"
+                                   Foreground="#FF4655" VerticalAlignment="Center"/>
+
+                        <!-- Door frame -->
+                        <Path Fill="#FF4655" 
+                         Data="M10.09,15.59L11.5,17L16.5,12L11.5,7L10.09,8.41L12.67,11H3V13H12.67L10.09,15.59M19,3H5C3.89,3 3,3.9 3,5V9H5V5H19V19H5V15H3V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.9 20.1,3 19,3Z"/>
+
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

@@ -26,6 +26,7 @@
     <None Remove="Assets\firebase_key.json" />
     <None Remove="Assets\Gomoku.ico" />
     <None Remove="Assets\Login_Background.png" />
+    <None Remove="Assets\Main.png" />
     <None Remove="Assets\ServerBrowser_Background.gif" />
     <None Remove="Assets\t1.jpg" />
     <None Remove="Assets\T1_6sao.jpg" />
@@ -33,6 +34,7 @@
 
   <ItemGroup>
     <Resource Include="Assets\delete-friend.png" />
+    <Resource Include="Assets\Main.png" />
     <Resource Include="Assets\Riot_Games_Logo.png" />
   </ItemGroup>
 

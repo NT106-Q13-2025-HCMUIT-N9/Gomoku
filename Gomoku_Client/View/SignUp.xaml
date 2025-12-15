@@ -23,7 +23,190 @@
                 Stretch="UniformToFill"
                 Opacity="1"/>
         </Grid.Background>
-        
+
+        <!-- Confirmation  Overlay -->
+        <Grid x:Name="ConfirmationOverlay" 
+                      Visibility="Collapsed" 
+                      Panel.ZIndex="1000">
+            <Grid.Background>
+                <SolidColorBrush Color="#000000" Opacity="0.7"/>
+            </Grid.Background>
+
+            <Border HorizontalAlignment="Center" 
+                    VerticalAlignment="Center"
+                    RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Border.RenderTransform>
+
+                <!-- popup card -->
+                <Border Background="Black" 
+                        CornerRadius="3" 
+                        Width="500" 
+                        Padding="0"
+                        BorderBrush="#4CAF50" 
+                        BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#4CAF50" BlurRadius="40" ShadowDepth="0" Opacity="0.6"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- vv BELOW ARE POPUP CONTENT vv -->
+                        <StackPanel Grid.Row="1" Margin="40,40,40,30">
+                            <!-- icon -->
+                            <Border Width="80" Height="80" 
+                                    CornerRadius="40" 
+                                    Background="#2A2E39"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,20">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#4CAF50" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+                                </Border.Effect>
+                                <Viewbox Width="45" Height="45" 
+                                         HorizontalAlignment="Center" 
+                                         VerticalAlignment="Center">
+                                    <Canvas Width="24" Height="24">
+                                        <!-- Door frame -->
+                                        <Path Fill="#4CAF50" 
+                                            Data="M9,16.17L4.83,12L3.41,13.41L9,19L21,7L19.59,5.59L9,16.17Z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+
+                            <!-- title -->
+                            <TextBlock Text="TẠO TÀI KHOẢN THÀNH CÔNG" 
+                               FontSize="28" 
+                               FontWeight="Bold" 
+                               FontFamily="Segoe UI"
+                               Foreground="White" 
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,15"/>
+
+                            <!-- message -->
+                            <TextBlock Text="Vui lòng kiểm tra email về thông tin đăng nhập" 
+                               FontSize="16" 
+                               Foreground="#B0B0B0" 
+                               TextWrapping="Wrap"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"
+                               LineHeight="24"/>
+                        </StackPanel>
+
+                        <!-- action -->
+                        <Grid Grid.Row="2" 
+                                Margin="40,0,40,40">
+                            <!-- confirm -->
+                            <Button Grid.Column="2"
+                            x:Name="ConfirmationButton"
+                            Content="VỀ TRANG ĐĂNG NHẬP" 
+                            Height="54"
+                            Width="230"
+                            Click="ConfirmationButton_Click"
+                            Style="{StaticResource ConfirmGreenButton}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Border>
+        </Grid>
+
+        <!-- ConfirmFailedOverlay-->
+        <Grid x:Name="ConfirmFailedOverlay" 
+              Visibility="Collapsed" 
+              Panel.ZIndex="1000">
+            <Grid.Background>
+                <SolidColorBrush Color="#000000" Opacity="0.7"/>
+            </Grid.Background>
+
+            <Border HorizontalAlignment="Center" 
+                    VerticalAlignment="Center"
+                    RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Border.RenderTransform>
+
+                <!-- popup card -->
+                <Border Background="Black" 
+                        CornerRadius="3" 
+                        Width="500" 
+                        Padding="0"
+                        BorderBrush="#FF4655" 
+                        BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="40" ShadowDepth="0" Opacity="0.6"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- vv BELOW ARE POPUP CONTENT vv -->
+                        <StackPanel Grid.Row="1" Margin="40,40,40,30">
+                            <!-- icon -->
+                            <Border Width="80" Height="80" 
+                                    CornerRadius="40" 
+                                    Background="#2A2E39"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,20">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+                                </Border.Effect>
+                                <Viewbox Width="45" Height="45" 
+                                         HorizontalAlignment="Center" 
+                                         VerticalAlignment="Center">
+                                    <Canvas Width="24" Height="24">
+                                        <!-- Door frame -->
+                                        <Path Fill="#FF4655" 
+                                             Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+
+                            <!-- title -->
+                            <TextBlock Text="TẠO TÀI KHOẢN THẤT BẠI" 
+                                       FontSize="28" 
+                                       FontWeight="Bold" 
+                                       FontFamily="Segoe UI"
+                                       Foreground="White" 
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,15"/>
+
+                            <!-- message -->
+                            <TextBlock x:Name="ConfirmationFailedMessage"
+                                       Text="Chương trình đã xảy ra lỗi" 
+                                       FontSize="16" 
+                                       Foreground="#B0B0B0" 
+                                       TextWrapping="Wrap"
+                                       HorizontalAlignment="Center"
+                                       TextAlignment="Center"
+                                       LineHeight="24"/>
+                        </StackPanel>
+
+                        <!-- action -->
+                        <Grid Grid.Row="2" 
+                              Margin="40,0,40,40">
+                            <!-- confirm -->
+                            <Button Grid.Column="2"
+                                    x:Name="ConfirmationFailedButton"
+                                    Content="QUAY LẠI" 
+                                    Height="54"
+                                    Width="230"
+                                    Click="ConfirmationFailedButton_Click"
+                                    Style="{StaticResource ConfirmButton}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Border>
+        </Grid>
+
         <Border x:Name="MainBorder" Background="Black"
              BorderBrush="#FF4655"
              BorderThickness="2"
@@ -314,9 +497,43 @@
                    Margin="9,0,0,0"
                    Visibility="Collapsed"/>
                 
+                <!-- Loading circle-->
+                <Grid Grid.Row="9"
+                      Panel.ZIndex="100">
+                    <Grid.Resources>
+                        <!-- Animation quay -->
+                        <Storyboard x:Key="SpinAnimation" RepeatBehavior="Forever">
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                                From="0" To="360" Duration="0:0:1"
+                                RepeatBehavior="Forever"/>
+                        </Storyboard>
+                    </Grid.Resources>
+
+                    <!-- Loading Circle -->
+                    <Ellipse x:Name="LoadingCircle"
+                        Width="30"
+                        Height="30"
+                        Stroke="White"
+                        StrokeThickness="4"
+                        StrokeDashArray="10 200"
+                        RenderTransformOrigin="0.5,0.5" 
+                        Margin="187,25,0,5"
+                        Visibility="Collapsed">
+                        <Ellipse.RenderTransform>
+                            <RotateTransform Angle="0"/>
+                        </Ellipse.RenderTransform>
+                        <Ellipse.Triggers>
+                            <EventTrigger RoutedEvent="Loaded">
+                                <BeginStoryboard Storyboard="{StaticResource SpinAnimation}"/>
+                            </EventTrigger>
+                        </Ellipse.Triggers>
+                    </Ellipse>
+                </Grid>
+                
                 <!-- Hai nút -->
                 <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0" >
-                    <Button 
+                    <Button x:Name="ReturnButton"
                      Content="Quay lại"
                      Width="170"
                     Height="40"
@@ -331,7 +548,7 @@
                     Cursor="Hand" 
                      Margin="0,0,0,0" Click="GoBack_Click"/>
 
-                    <Button 
+                    <Button x:Name="SignUpButton"
                        Content="Đăng Ký Mới"
                        Width="170"
                        Height="40"

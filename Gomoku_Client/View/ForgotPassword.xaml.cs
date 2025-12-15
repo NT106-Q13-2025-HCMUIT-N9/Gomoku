@@ -12,6 +12,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
@@ -81,7 +82,6 @@ namespace Gomoku_Client
                     }
                     else
                     {
-                        EmailBox.Foreground = Brushes.Gray;
                         EmailBorder.BorderBrush = new SolidColorBrush(
                     (Color)ColorConverter.ConvertFromString("#2A2A2A")
                 );
@@ -109,26 +109,80 @@ namespace Gomoku_Client
             _mainWindow.MainBorder.Visibility = Visibility.Visible;
         }
 
+        private void buttonDisable()
+        {
+            BackButton.IsHitTestVisible = false;
+            SendOTPButton.IsHitTestVisible = false;
+            EmailBox.IsHitTestVisible = false;
+        }
+
+        private void buttonEnable()
+        {
+            BackButton.IsHitTestVisible = true;
+            SendOTPButton.IsHitTestVisible = true;
+            EmailBox.IsHitTestVisible = true;
+        }
+
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
+            LoadingCircle.Visibility = Visibility.Visible;
+            buttonDisable();
+            SendOTPButton.Content = "";
+
             Email_LostFocus(sender, e);
 
             // Thêm điều kiển kiểm tra email hợp lệ và tồn tại trong hệ thống ở đây
             if (!Validate.IsValidEmail(EmailBox.Text) || !await Validate.IsEmailExists(EmailBox.Text))
             {
+                //Loaded
+                LoadingCircle.Visibility = Visibility.Collapsed;
+                buttonEnable();
+                SendOTPButton.Content = "Gửi mã xác thực";
                 return;
             }
 
             else
             {
+                //Loading
+                
                 try
-                {
+                { 
                     await UserAction.SendResetAsync(EmailBox.Text);
-                    MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    //MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    //Hiển thị overlay xác nhận
+                    ConfirmationOverlay.Visibility = Visibility.Visible;
+
+                    var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+                    var border = (Border)((Grid)ConfirmationOverlay).Children[0];
+                    storyboard.Begin(border);
+
+                    
+
+                    //Loaded
+                    LoadingCircle.Visibility = Visibility.Collapsed;
+                    buttonEnable();
+                    SendOTPButton.Content = "Gửi mã xác thực";
+
+                    
+
+                    storyboard.Begin(border);
                 }
-                catch (AuthException auth_ex)
-                {
-                    MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                catch (AuthException auth_ex) {
+                    AuthException a = auth_ex;
+                    //MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    //Loaded
+                    LoadingCircle.Visibility = Visibility.Collapsed;
+                    buttonEnable();
+                    SendOTPButton.Content = "Gửi mã xác thực";
+
+                    //Hiển thị overlay xác nhận thất bại
+                    ConfirmFailedOverlay.Visibility = Visibility.Visible;
+
+                    var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+                    var border = (Border)((Grid)ConfirmFailedOverlay).Children[0];
+                    storyboard.Begin(border);
                 }
             }
         }
@@ -231,6 +285,24 @@ namespace Gomoku_Client
             {
 
             }
+        }
+
+        private void ConfirmationButton_Click(object sender, RoutedEventArgs e)
+        {
+            _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
+            _mainWindow.MainBorder.Visibility = Visibility.Visible;
+        }
+
+        private void ConfirmationFailedButton_Click(object sender, RoutedEventArgs e)
+        {
+            var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
+            var border = (Border)((Grid)ConfirmFailedOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
+            {
+                ConfirmFailedOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            storyboard.Begin(border);
         }
     }
 }

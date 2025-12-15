@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Gomoku_Client
 {
@@ -215,10 +216,32 @@ namespace Gomoku_Client
             }
         }
 
+        private void buttonDisable()
+        {
+            SignUpButton.IsHitTestVisible = false;
+            ReturnButton.IsHitTestVisible = false;
+            UsernameBox.IsHitTestVisible = false;
+            EmailBox.IsHitTestVisible = false;
+            PasswordBox.IsHitTestVisible = false;
+            PasswordConfirmBox.IsHitTestVisible = false;
+        }
+
+        private void buttonEnable()
+        {
+            SignUpButton.IsHitTestVisible = true;
+            ReturnButton.IsHitTestVisible = true;
+            UsernameBox.IsHitTestVisible = true;
+            EmailBox.IsHitTestVisible = true;
+            PasswordBox.IsHitTestVisible = true;
+            PasswordConfirmBox.IsHitTestVisible = true;
+
+        }
         private async void DangKi_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+
+
                 string username = UsernameBox.Text;
                 string password = PasswordBox.Password;
                 string email = EmailBox.Text;
@@ -241,6 +264,11 @@ namespace Gomoku_Client
                     return;
                 }
 
+                //Loading
+                LoadingCircle.Visibility = Visibility.Visible;
+                buttonDisable();
+                SignUpButton.Content = "";
+
                 var temp = await FirebaseInfo.AuthClient.CreateUserWithEmailAndPasswordAsync(email, password, username);
                 await UserAction.SendVeriAsync(await temp.User.GetIdTokenAsync());
 
@@ -252,18 +280,52 @@ namespace Gomoku_Client
 
                 await FireStoreHelper.AddUser(doc);
 
-                MessageBox.Show("Đăng kí thành công. Vui lòng kiểm tra email về thông tin đăng nhập", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                ConfirmationOverlay.Visibility = Visibility.Visible;
 
-                _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
-                _mainWindow.MainBorder.Visibility = Visibility.Visible;
+                //Loaded
+                LoadingCircle.Visibility = Visibility.Collapsed;
+                buttonEnable();
+                SignUpButton.Content = "Đăng Kí Mới";
+
+                var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+                var border = (Border)((Grid)ConfirmationOverlay).Children[0];
+                storyboard.Begin(border);
+
+                
             }
             catch (FirebaseAuthException ex)
             {
-                MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                FirebaseAuthException a = ex;
+                //MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ConfirmFailedOverlay.Visibility = Visibility.Visible;
+
+                var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+                var border = (Border)((Grid)ConfirmFailedOverlay).Children[0];
+                storyboard.Begin(border);
+
+                //ConfirmationFailedMessage.Text = $"{ex.Reason}";
+
+                //Loaded
+                LoadingCircle.Visibility = Visibility.Collapsed;
+                buttonEnable();
+                SignUpButton.Content = "Đăng Kí Mới";
             }
             catch (AuthException ex)
             {
-                MessageBox.Show($"Lỗi: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                AuthException a = ex;
+                //MessageBox.Show($"Lỗi: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                ConfirmFailedOverlay.Visibility = Visibility.Visible;
+
+                var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+                var border = (Border)((Grid)ConfirmFailedOverlay).Children[0];
+                storyboard.Begin(border);
+
+                //ConfirmationFailedMessage.Text = $"{ex.Message}";
+
+                //Loaded
+                LoadingCircle.Visibility = Visibility.Collapsed;
+                buttonEnable();
+                SignUpButton.Content = "Đăng Kí Mới";
             }
         }
 
@@ -602,6 +664,34 @@ namespace Gomoku_Client
             {
                 PasswordConfirmPlaceholder.Visibility = Visibility.Collapsed;
             }
+        }
+
+        private void ConfirmationButton_Click(object sender, RoutedEventArgs e)
+        {
+            /*var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
+            var border = (Border)((Grid)ConfirmationOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
+            {
+                ConfirmationOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            storyboard.Begin(border);*/
+
+            _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
+            _mainWindow.MainBorder.Visibility = Visibility.Visible;
+
+        }
+
+        private void ConfirmationFailedButton_Click(object sender, RoutedEventArgs e)
+        {
+            var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
+            var border = (Border)((Grid)ConfirmFailedOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
+            {
+                ConfirmFailedOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            storyboard.Begin(border);
         }
     }
 }

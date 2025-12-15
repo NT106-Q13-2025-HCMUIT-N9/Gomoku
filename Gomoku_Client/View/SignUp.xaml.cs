@@ -62,7 +62,7 @@ namespace Gomoku_Client
             {
                 try
                 {
-                    if (!await Validate.IsUsernamExists(UsernameBox.Text))
+                    if (await Validate.IsUsernamExists(UsernameBox.Text))
                     {
                         UsernameMsg.Text = "Username đã tồn tại";
                         UsernameBorder.BorderBrush = new SolidColorBrush(

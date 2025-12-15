@@ -15,9 +15,9 @@ namespace Gomoku_Client.ViewModel
 
         public static async Task<bool> IsUsernamExists(string username)
         {
-            CollectionReference user_collection = FirebaseInfo.DB.Collection("UserInfo");
-            QuerySnapshot query_result = await user_collection.WhereEqualTo("UserName", username).GetSnapshotAsync();
-            return query_result.Count != 0;
+            DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
+            DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
+            return doc_snap.Exists;
         }
 
         public static async Task<bool> IsEmailExists(string email)

@@ -301,32 +301,30 @@ namespace Gomoku_Client
             MainFrame.Visibility = Visibility.Visible;
         }
 
-        private bool isShowing = false;
-        private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (!isShowing)
-            {
-                // Hiện mật khẩu
-                PasswordVisible.Text = PasswordBox.Password;
-                PasswordVisible.Visibility = Visibility.Visible;
-                PasswordBox.Visibility = Visibility.Collapsed;
+    private bool isShowing = false;
+    private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
+    {
+      if (!isShowing)
+      {
+        // Hiện mật khẩu
+        PasswordVisible.Text = PasswordBox.Password;
+        PasswordVisible.Visibility = Visibility.Visible;
+        PasswordBox.Visibility = Visibility.Collapsed;
+        TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
+      }
+      else
+      {
+        // Ẩn mật khẩu
+        PasswordBox.Password = PasswordVisible.Text;
+        PasswordBox.Visibility = Visibility.Visible;
+        PasswordVisible.Visibility = Visibility.Collapsed;
+        TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
+      }
 
-                TogglePasswordBtn.Content = "🙈";
-            }
-            else
-            {
-                // Ẩn mật khẩu
-                PasswordBox.Password = PasswordVisible.Text;
-                PasswordBox.Visibility = Visibility.Visible;
-                PasswordVisible.Visibility = Visibility.Collapsed;
+      isShowing = !isShowing;
+    }
 
-                TogglePasswordBtn.Content = "👁";
-            }
-
-            isShowing = !isShowing;
-        }
-
-        private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
             {

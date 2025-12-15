@@ -378,15 +378,20 @@
 
                         <Button x:Name="TogglePasswordBtn"
                             Grid.Column="1"
-                            Content="👁"
-                            Foreground="#FF4655"
                             Background="Transparent"
                             BorderThickness="0"
                             Width="30"
                             Height="30"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Click="TogglePasswordBtn_Click"/>
+                            Click="TogglePasswordBtn_Click">
+                            <Path x:Name="TogglePasswordIcon"
+                                  Data="{StaticResource EyeIcon}"
+                                  Fill="#FF4655"
+                                  Stretch="Uniform"
+                                  Width="18"
+                                  Height="18"/>
+                        </Button>
                     </Grid>
                 </Border>
 
@@ -462,15 +467,20 @@
 
                         <Button x:Name="TogglePasswordConfirmBtn"
                             Grid.Column="1"
-                            Content="👁"
-                            Foreground="#FF4655"
                             Background="Transparent"
                             BorderThickness="0"
                             Width="30"
                             Height="30"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Click="TogglePasswordConfirmBtn_Click"/>
+                            Click="TogglePasswordConfirmBtn_Click">
+                            <Path x:Name="TogglePasswordConfirmIcon"
+                                  Data="{StaticResource EyeIcon}"
+                                  Fill="#FF4655"
+                                  Stretch="Uniform"
+                                  Width="18"
+                                  Height="18" RenderTransformOrigin="0.5,0.659"/>
+                        </Button>
                     </Grid>
                 </Border>
 

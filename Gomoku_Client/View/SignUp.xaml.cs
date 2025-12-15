@@ -392,32 +392,30 @@ namespace Gomoku_Client
             else PasswordConfirmVisible.Focus();
         }
 
-        private bool isShowingPass = false;
-        private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (!isShowingPass)
-            {
-                // Hiện mật khẩu
-                PasswordVisible.Text = PasswordBox.Password;
-                PasswordVisible.Visibility = Visibility.Visible;
-                PasswordBox.Visibility = Visibility.Collapsed;
+    private bool isShowingPass = false;
+    private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
+    {
+      if (!isShowingPass)
+      {
+        // Hiện mật khẩu
+        PasswordVisible.Text = PasswordBox.Password;
+        PasswordVisible.Visibility = Visibility.Visible;
+        PasswordBox.Visibility = Visibility.Collapsed;
+        TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
+      }
+      else
+      {
+        // Ẩn mật khẩu
+        PasswordBox.Password = PasswordVisible.Text;
+        PasswordBox.Visibility = Visibility.Visible;
+        PasswordVisible.Visibility = Visibility.Collapsed;
+        TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
+      }
 
-                TogglePasswordBtn.Content = "🙈";
-            }
-            else
-            {
-                // Ẩn mật khẩu
-                PasswordBox.Password = PasswordVisible.Text;
-                PasswordBox.Visibility = Visibility.Visible;
-                PasswordVisible.Visibility = Visibility.Collapsed;
+      isShowingPass = !isShowingPass;
+    }
 
-                TogglePasswordBtn.Content = "👁";
-            }
-
-            isShowingPass = !isShowingPass;
-        }
-
-        private void PasswordVisible_PreviewKeyDown(object sender, KeyEventArgs e)
+    private void PasswordVisible_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
             {
@@ -528,32 +526,30 @@ namespace Gomoku_Client
             }
         }
 
-        bool isShowingConfirmPass = false;
-        private void TogglePasswordConfirmBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (!isShowingConfirmPass)
-            {
-                // Hiện mật khẩu
-                PasswordConfirmVisible.Text = PasswordConfirmBox.Password;
-                PasswordConfirmVisible.Visibility = Visibility.Visible;
-                PasswordConfirmBox.Visibility = Visibility.Collapsed;
+    bool isShowingConfirmPass = false;
+    private void TogglePasswordConfirmBtn_Click(object sender, RoutedEventArgs e)
+    {
+      if (!isShowingConfirmPass)
+      {
+        // Hiện mật khẩu
+        PasswordConfirmVisible.Text = PasswordConfirmBox.Password;
+        PasswordConfirmVisible.Visibility = Visibility.Visible;
+        PasswordConfirmBox.Visibility = Visibility.Collapsed;
+        TogglePasswordConfirmIcon.Data = (Geometry)FindResource("EyeOffIcon");
+      }
+      else
+      {
+        // Ẩn mật khẩu
+        PasswordConfirmBox.Password = PasswordConfirmVisible.Text;
+        PasswordConfirmBox.Visibility = Visibility.Visible;
+        PasswordConfirmVisible.Visibility = Visibility.Collapsed;
+        TogglePasswordConfirmIcon.Data = (Geometry)FindResource("EyeIcon");
+      }
 
-                TogglePasswordConfirmBtn.Content = "🙈";
-            }
-            else
-            {
-                // Ẩn mật khẩu
-                PasswordConfirmBox.Password = PasswordConfirmVisible.Text;
-                PasswordConfirmBox.Visibility = Visibility.Visible;
-                PasswordConfirmVisible.Visibility = Visibility.Collapsed;
+      isShowingConfirmPass = !isShowingConfirmPass;
+    }
 
-                TogglePasswordConfirmBtn.Content = "👁";
-            }
-
-            isShowingConfirmPass = !isShowingConfirmPass;
-        }
-
-        private void PasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
+    private void PasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
         {
             PasswordBox.Password = PasswordVisible.Text;
         }

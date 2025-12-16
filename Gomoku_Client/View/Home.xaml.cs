@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Gomoku_Client
 {
@@ -30,6 +31,12 @@ namespace Gomoku_Client
         public MainGameUI()
         {
             InitializeComponent();
+
+            DispatcherTimer _timer;
+            _timer = new DispatcherTimer();
+            _timer.Interval = TimeSpan.FromSeconds(2);
+            _timer.Tick += Timer_Tick;
+            _timer.Start();
         }
 
         private void AnimateSlideIn()
@@ -170,11 +177,15 @@ namespace Gomoku_Client
 
             storyboard.Begin(border);
         }
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
+        }
+
+        private async void Timer_Tick(object? sender, EventArgs e)
         {
             try
             {
-                this.Visibility = Visibility.Hidden;
                 tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
                 UserStatsModel? user_stats = await FireStoreHelper.GetUserStats(tb_PlayerName.Text);
 
@@ -182,10 +193,9 @@ namespace Gomoku_Client
                 {
                     lb_matches.Text = user_stats.total_match.ToString();
                     lb_winrate.Text = user_stats.total_match > 0
-                        ? (user_stats.Wins / (double)user_stats.total_match).ToString()
+                        ? ((user_stats.Wins / (double)user_stats.total_match) * 100).ToString("F2") + "%"
                         : "0";
                 }
-                this.Visibility = Visibility.Visible;
             }
             catch (Exception)
             {

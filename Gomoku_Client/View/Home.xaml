@@ -211,12 +211,12 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0">
-                                    <TextBlock x:Name="lb_winrate" Text="68%" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
+                                    <TextBlock x:Name="lb_winrate" Text="-" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
                                     <TextBlock Text="Win Rate" FontSize="11" Foreground="#8B8B8B"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock x:Name="lb_matches" Text="324" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
+                                    <TextBlock x:Name="lb_matches" Text="-" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
                                     <TextBlock Text="Matches" FontSize="11" Foreground="#8B8B8B"/>
                                 </StackPanel>
 

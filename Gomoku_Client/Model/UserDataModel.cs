@@ -37,5 +37,11 @@ namespace Gomoku_Client.Model
 
         [FirestoreProperty]
         public DocumentReference UserStats { get; set; }
+
+        [FirestoreProperty]
+        public List<string> Friends { get; set; }
+
+        [FirestoreProperty]
+        public List<string> FriendsRequests { get; set; }
     }
 }

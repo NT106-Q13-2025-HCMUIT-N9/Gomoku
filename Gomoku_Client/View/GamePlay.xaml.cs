@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -81,37 +82,56 @@ namespace Gomoku_Client.View
 
         private void SurrenderButton_Click(object sender, RoutedEventArgs e)
         {
-            if (isGameOver) return;
+            SurrenderConfirmationOverlay.Visibility = Visibility.Visible;
+            var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+            var border = (Border)((Grid)SurrenderConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
+        }
 
-            MessageBoxResult result = MessageBox.Show(
-                "Bạn có chắc chắn muốn đầu hàng?",
-                "Xác nhận đầu hàng",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question
-            );
+        private void ConfirmSurrenderButton_Click(object sender, RoutedEventArgs e)
+        {
+            player1Timer?.Stop();
+            player2Timer?.Stop();
+            GameOver(false, $"{player1Name} đã đầu hàng! {player2Name} thắng!");
+        }
 
-            if (result == MessageBoxResult.Yes)
+        private void CancelSurrenderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
+            var border = (Border)((Grid)SurrenderConfirmationOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
             {
-                string winner = isPlayerTurn ? player2Name : player1Name;
-                GameOver(!isPlayerTurn, $"{winner} thắng do đối thủ đầu hàng!");
-            }
+                SurrenderConfirmationOverlay.Visibility = Visibility.Collapsed;
+            };
+            storyboard.Begin(border);
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBoxResult result = MessageBox.Show(
-                "Bạn có chắc chắn muốn thoát? Bạn sẽ bị xử thua.",
-                "Xác nhận thoát",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning
-            );
+            QuitConfirmationOverlay.Visibility = Visibility.Visible;
+            var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
+        }
 
-            if (result == MessageBoxResult.Yes)
+        private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            player1Timer?.Stop();
+            player2Timer?.Stop();
+            this.Close();
+        }
+
+        private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
+        {
+            var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
             {
-                player1Timer?.Stop();
-                player2Timer?.Stop();
-                this.Close();
-            }
+                QuitConfirmationOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            storyboard.Begin(border);
         }
 
         private void ChatInput_KeyDown(object sender, KeyEventArgs e)

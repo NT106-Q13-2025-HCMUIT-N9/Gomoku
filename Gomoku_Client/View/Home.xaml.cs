@@ -28,6 +28,8 @@ namespace Gomoku_Client
     /// </summary>
     public partial class MainGameUI : Window
     {
+        FirestoreChangeListener? listener;
+
         public MainGameUI()
         {
             InitializeComponent();
@@ -178,7 +180,7 @@ namespace Gomoku_Client
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(username);
 
-            FirestoreChangeListener listener = doc_ref.Listen(doc_snap => {
+            listener = doc_ref.Listen(doc_snap => {
                 if (doc_snap.Exists)
                 {
                     UserStatsModel user_stats = doc_snap.ConvertTo<UserStatsModel>();
@@ -192,6 +194,15 @@ namespace Gomoku_Client
                     });
                 }
             });
+        }
+
+        private async void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (listener != null)
+            {
+                await listener.StopAsync();
+                listener = null;
+            }
         }
     }
 }

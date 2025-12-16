@@ -21,6 +21,8 @@ namespace Gomoku_Client.View
         private List<string> curr_friend_list = new List<string>();
         private string? _pendingUnfriendUsername;
 
+        FirestoreChangeListener? listener;
+
         public FriendManager(MainGameUI mainWindow)
         {
             InitializeComponent();
@@ -142,9 +144,14 @@ namespace Gomoku_Client.View
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            curr_friend_request.Clear();
+            curr_friend_list.Clear();
+            FriendRequestsPanel.Children.Clear();
+            FriendsListPanel.Children.Clear();
+
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
-            FirestoreChangeListener listener = doc_ref.Listen(doc_snap => {
+            listener = doc_ref.Listen(doc_snap => {
                 if (doc_snap.Exists)
                 {
                     UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
@@ -168,6 +175,15 @@ namespace Gomoku_Client.View
                     });
                 }
             });
+        }
+
+        private async void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (listener != null)
+            {
+                await listener.StopAsync();
+                listener = null;
+            }
         }
     }
 }

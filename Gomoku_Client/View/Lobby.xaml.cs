@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -26,8 +28,7 @@ namespace Gomoku_Client.View
     {
       InitializeComponent();
       _mainWindow = mainGameUI;
-            new GamePlay().Show();
-        }
+    }
 
     private void BackButton_Checked(object sender, RoutedEventArgs e)
     {
@@ -38,10 +39,58 @@ namespace Gomoku_Client.View
       }
       _mainWindow.ShowMenuWithAnimation();
     }
+
     private void MatchMakingButton_Click(object sender, RoutedEventArgs e)
     {
+      if (NavigationService != null)
+      {
+        var matchmakingPage = new Matchmaking(_mainWindow);
 
+        // Create slide out animation for current page
+        var slideOutAnimation = new DoubleAnimation
+        {
+          From = 0,
+          To = -_mainWindow.ActualWidth,
+          Duration = TimeSpan.FromSeconds(0.5),
+          EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+        };
+
+        // Setup RenderTransform if needed
+        if (this.RenderTransform == null || !(this.RenderTransform is TranslateTransform))
+        {
+          this.RenderTransform = new TranslateTransform();
+        }
+
+        var transform = (TranslateTransform)this.RenderTransform;
+
+        slideOutAnimation.Completed += (s, args) =>
+        {
+          // Navigate to Matchmaking page
+          NavigationService.Navigate(matchmakingPage);
+
+          // Slide in the new page
+          if (matchmakingPage.RenderTransform == null || !(matchmakingPage.RenderTransform is TranslateTransform))
+          {
+            matchmakingPage.RenderTransform = new TranslateTransform();
+          }
+
+          var matchmakingTransform = (TranslateTransform)matchmakingPage.RenderTransform;
+
+          var slideInAnimation = new DoubleAnimation
+          {
+            From = _mainWindow.ActualWidth,
+            To = 0,
+            Duration = TimeSpan.FromSeconds(0.5),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+          };
+
+          matchmakingTransform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
+        };
+
+        transform.BeginAnimation(TranslateTransform.XProperty, slideOutAnimation);
+      }
     }
+
     private void AIButton_Click(object sender, RoutedEventArgs e)
     {
 

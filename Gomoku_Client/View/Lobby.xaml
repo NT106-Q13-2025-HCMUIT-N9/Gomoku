@@ -4,7 +4,6 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Gomoku_Client.View"
-      xmlns:gif="clr-namespace:XamlAnimatedGif;assembly=XamlAnimatedGif"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="Lobby">
@@ -122,7 +121,13 @@
                         BorderBrush="#ffffff"
                         Content="TÌM TRẬN"
                         FontSize="60"
-                        Click="MatchMakingButton_Click"/>
+                        Click="MatchMakingButton_Click">
+                        <Button.Background>
+                            <ImageBrush ImageSource="/Assets/Matchmaking_Background.png" 
+                            Stretch="UniformToFill"
+                            Opacity="0.7"/>
+                        </Button.Background>
+                </Button>
 
                 <!-- AI button (top right) -->
                 <Grid Grid.Row="0" Grid.Column="2" ClipToBounds="True">
@@ -133,16 +138,6 @@
                             FontSize="60"
                             IsEnabled="False">
                         <Grid ClipToBounds="False">
-                            <!-- animated background -->
-                            <Image x:Name="AnimatedBackground"
-                                   gif:AnimationBehavior.SourceUri="/Assets/AI_Background.gif"
-                                   gif:AnimationBehavior.RepeatBehavior="Forever"
-                                   gif:AnimationBehavior.AutoStart="True"
-                                   Stretch="UniformToFill"
-                                   Panel.ZIndex="0"
-                                   Margin="-30"
-                                   RenderOptions.BitmapScalingMode="LowQuality"
-                                   RenderOptions.CachingHint="Cache"/>
 
                             <!-- Button Text -->
                             <TextBlock Text="THÁCH ĐẤU AI" 
@@ -259,17 +254,6 @@
                             Click="ServerBrowserButton_Click"
                             FontSize="60">
                         <Grid ClipToBounds="False">
-                            <!-- animated background -->
-                            <Image x:Name="AnimatedBackgroundServerBrowser"
-                                   gif:AnimationBehavior.SourceUri="/Assets/ServerBrowser_Background.gif"
-                                   gif:AnimationBehavior.RepeatBehavior="Forever"
-                                   gif:AnimationBehavior.AutoStart="True"
-                                   Stretch="UniformToFill"
-                                   Panel.ZIndex="0"
-                                   Margin="-30"
-                                   Opacity="0.55"
-                                   RenderOptions.BitmapScalingMode="LowQuality"
-                                   RenderOptions.CachingHint="Cache"/>
                             <!-- Button Text -->
                             <TextBlock Text="TÌM PHÒNG" 
                                        FontFamily="Segoe UI Black"
@@ -292,17 +276,6 @@
                             FontSize="60"
                             IsEnabled="False">
                         <Grid ClipToBounds="False">
-                            <!-- animated background -->
-                            <Image x:Name="AnimatedBackgroundRanked"
-                                   gif:AnimationBehavior.SourceUri="/Assets/AI_Background.gif"
-                                   gif:AnimationBehavior.RepeatBehavior="Forever"
-                                   gif:AnimationBehavior.AutoStart="True"
-                                   Stretch="UniformToFill"
-                                   Panel.ZIndex="0"
-                                   Margin="-30"
-                                   RenderOptions.BitmapScalingMode="LowQuality"
-                                   RenderOptions.CachingHint="Cache"/>
-
                             <!-- Button Text -->
                             <TextBlock Text="XẾP HẠNG" 
                                        FontFamily="Segoe UI Black"

@@ -1,22 +1,13 @@
 ﻿using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
-using System;
-using System.Collections.Generic;
+using Google.Cloud.Firestore;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
+using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Gomoku_Client.View
 {
@@ -34,12 +25,6 @@ namespace Gomoku_Client.View
         {
             InitializeComponent();
             _mainWindow = mainWindow;
-
-            DispatcherTimer _timer;
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(2);
-            _timer.Tick += Timer_Tick;
-            _timer.Start();
         }
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
@@ -143,32 +128,6 @@ namespace Gomoku_Client.View
             fadeIn.Begin(border);
         }
 
-        private async void Timer_Tick(object? sender, EventArgs e)
-        {
-            try
-            {
-                string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
-                List<string>? new_friend_request = await FireStoreHelper.GetNewFriendReqest(username, curr_friend_request);
-                List<string>? new_friend_list = await FireStoreHelper.GetNewFriend(username, curr_friend_list);
-
-                foreach(string request in new_friend_request ?? new List<string>())
-                {
-                    curr_friend_request.Add(request);
-                    FriendRequestsPanel.Children.Add(UIUtils.CreateFriendRequestCard(request, AcceptButton_Click, RefuseButton_Click, this.Resources));
-                }
-
-                foreach (string friend in new_friend_list ?? new List<string>())
-                {
-                    curr_friend_list.Add(friend);
-                    FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, ChallengeButton_Click, UnfriendButton_Click, this.Resources));
-                }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Failed to load friends and friend_request");
-            }
-        }
-
         private async Task DeleteRequestCard(string name)
         {
             var borderToDelete = FriendRequestsPanel.Children
@@ -179,6 +138,36 @@ namespace Gomoku_Client.View
             {
                 FriendRequestsPanel.Children.Remove(borderToDelete);
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
+            FirestoreChangeListener listener = doc_ref.Listen(doc_snap => {
+                if (doc_snap.Exists)
+                {
+                    UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
+
+                    List<string> diff_request = user_data.FriendsRequests.Except(curr_friend_request).ToList();
+                    List<string> diff_friend = user_data.Friends.Except(curr_friend_list).ToList();
+
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        foreach (string request in diff_request)
+                        {
+                            curr_friend_request.Add(request);
+                            FriendRequestsPanel.Children.Add(UIUtils.CreateFriendRequestCard(request, AcceptButton_Click, RefuseButton_Click, this.Resources));
+                        }
+
+                        foreach (string friend in diff_friend)
+                        {
+                            curr_friend_list.Add(friend);
+                            FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, ChallengeButton_Click, UnfriendButton_Click, this.Resources));
+                        }
+                    });
+                }
+            });
         }
     }
 }

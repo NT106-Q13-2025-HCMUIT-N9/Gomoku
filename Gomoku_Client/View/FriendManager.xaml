@@ -6,7 +6,8 @@
       xmlns:local="clr-namespace:Gomoku_Client.View"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
-      Title="FriendManager">
+      Title="FriendManager"
+      Loaded="Page_Loaded">
 
     
     

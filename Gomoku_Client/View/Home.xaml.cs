@@ -31,12 +31,6 @@ namespace Gomoku_Client
         public MainGameUI()
         {
             InitializeComponent();
-
-            DispatcherTimer _timer;
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(2);
-            _timer.Tick += Timer_Tick;
-            _timer.Start();
         }
 
         private void AnimateSlideIn()
@@ -180,28 +174,24 @@ namespace Gomoku_Client
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
-        }
 
-        private async void Timer_Tick(object? sender, EventArgs e)
-        {
-            try
-            {
-                tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
-                UserStatsModel? user_stats = await FireStoreHelper.GetUserStats(tb_PlayerName.Text);
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(username);
 
-                if (user_stats != null)
+            FirestoreChangeListener listener = doc_ref.Listen(doc_snap => {
+                if (doc_snap.Exists)
                 {
-                    lb_matches.Text = user_stats.total_match.ToString();
-                    lb_winrate.Text = user_stats.total_match > 0
-                        ? ((user_stats.Wins / (double)user_stats.total_match) * 100).ToString("F2") + "%"
-                        : "0";
+                    UserStatsModel user_stats = doc_snap.ConvertTo<UserStatsModel>();
+
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        lb_matches.Text = user_stats.total_match.ToString();
+                        lb_winrate.Text = user_stats.total_match > 0
+                            ? ((user_stats.Wins / (double)user_stats.total_match) * 100).ToString("F2") + "%"
+                            : "0";
+                    });
                 }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Failed to load user data.");
-                this.Close();
-            }
+            });
         }
     }
 }

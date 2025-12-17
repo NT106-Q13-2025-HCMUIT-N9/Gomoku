@@ -9,7 +9,12 @@
         mc:Ignorable="d"
         Background="#F0F0F0" 
         Title="Gomoku" Height="720" Width="1280" 
-        WindowStyle="None" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        WindowStyle="SingleBorderWindow" WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        RenderTransformOrigin="0.5,0.5">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="7"/>
+    </WindowChrome.WindowChrome>
 
     <Window.Resources>
         <ResourceDictionary>
@@ -20,12 +25,52 @@
     </Window.Resources>
 
 
-    <Grid Width="1280">
+    <Grid x:Name="RootGrid"
+          Width="1280">
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Login_Background.png" 
                         Stretch="UniformToFill"
                         Opacity="1"/>
         </Grid.Background>
+
+        <!-- TOP BAR -->
+        <Grid Height="40"
+          VerticalAlignment="Top"
+          Panel.ZIndex="500"
+          Background="Transparent">
+
+            <!-- buttons -->
+            <StackPanel Orientation="Horizontal"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Margin="0,0,10,0">
+
+                <!-- MINIMIZE -->
+                <Button x:Name="MinimizeButton"
+                    Width="36"
+                    Height="26"
+                    ToolTip="Ẩn"
+                    Click="MinimizeButton_Click"
+                    Style="{StaticResource WindowControlButton}">
+                    <Path Stroke="White"
+                          StrokeThickness="2"
+                          Data="M0,0 L12,0"/>
+                </Button>
+
+                <!-- CLOSE -->
+                <Button x:Name="CloseButton"
+                    Width="36"
+                    Height="26"
+                    ToolTip="Thoát"
+                    Margin="6,0,0,0"
+                    Click="CloseButton_Click"
+                    Style="{StaticResource CloseWindowButton}">
+                    <Path Stroke="White"
+                        StrokeThickness="2"
+                        Data="M0,0 L12,12 M12,0 L0,12"/>
+                </Button>
+            </StackPanel>
+        </Grid>
 
         <!-- Quit Confirmation Overlay -->
         <Grid x:Name="QuitConfirmationOverlay" 

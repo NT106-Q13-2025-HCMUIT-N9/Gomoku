@@ -10,12 +10,12 @@
       Loaded="Page_Loaded"
       Unloaded="Page_Unloaded">
 
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -24,19 +24,19 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
     <Grid>
-        
-        
-        
+
+
+
         <!-- Background gradient Valorant -->
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -45,9 +45,9 @@
             </LinearGradientBrush>
         </Grid.Background>
 
-        
-        
-        
+
+
+
         <!-- Vùng Nội dung Riêng của Friend Manager -->
         <Grid Margin="30,80,30,30">
             <Grid.ColumnDefinitions>
@@ -171,7 +171,7 @@
                                     </Grid>
                                 </Border>
 
-                                
+
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>
@@ -356,8 +356,8 @@
             </Border>
 
         </Grid>
-        
-        
+
+
 
         <!-- Top Navigation Bar -->
         <Border Height="60" VerticalAlignment="Top" Background="Transparent" Panel.ZIndex="1">
@@ -424,15 +424,32 @@
                                 <Border.Effect>
                                     <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
                                 </Border.Effect>
-                                <Viewbox Width="45" Height="45" 
-                                         HorizontalAlignment="Center" 
-                                         VerticalAlignment="Center">
-                                    <Canvas Width="24" Height="24">
-                                        <!-- Door frame -->
-                                        <Path Fill="#FF4655" 
-                                            Data="M10.09,15.59L11.5,17L16.5,12L11.5,7L10.09,8.41L12.67,11H3V13H12.67L10.09,15.59M19,3H5C3.89,3 3,3.9 3,5V9H5V5H19V19H5V15H3V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.9 20.1,3 19,3Z"/>
-                                    </Canvas>
-                                </Viewbox>
+                                <Grid>
+                                    <!-- Person icon -->
+                                    <Viewbox Width="45" Height="45" 
+                                             HorizontalAlignment="Center" 
+                                             VerticalAlignment="Center">
+                                        <Canvas Width="24" Height="24">
+                                            <Path Fill="#FF4655" 
+                                                  Data="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                    <!-- X mark badge (bottom right) -->
+                                    <Border Width="20" Height="20"
+                                            CornerRadius="10"
+                                            Background="White"
+                                            HorizontalAlignment="Right" 
+                                            VerticalAlignment="Bottom"
+                                            Margin="0,0,10,10">
+                                        <Viewbox Width="12" Height="12">
+                                            <Canvas Width="24" Height="24">
+                                                <Path Stroke="#FF4655" 
+                                                      StrokeThickness="3" 
+                                                      Data="M6,6 L18,18 M18,6 L6,18"/>
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Border>
+                                </Grid>
                             </Border>
 
                             <!-- title -->
@@ -483,14 +500,5 @@
                 </Border>
             </Border>
         </Grid>
-
-
-
-
-
-
-
-
-
     </Grid>
 </Page>

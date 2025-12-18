@@ -14,21 +14,29 @@ namespace Server
 
         /* Client message : 
          * 
-         * Random match : MATCH_REQUEST|username
+         * Random match : [MATCH_REQUEST];username
          * 
-         * Challenge Match : CHALLENGE_REQUEST|username1|username2
+         * Challenge Match : [CHALLENGE_REQUEST];challenger;target
          * 
-         * Accept Challenge : CHALLENGE_ACCEPT|username1|username2
+         * Accept Challenge : [CHALLENGE_ACCEPT];challenger;target
          * 
-         * Decline Challenge : CHALLENGE_DECLINE|username1|username2
+         * Decline Challenge : [CHALLENGE_DECLINE];challenger;target
          * 
-         * note : "username1|username2" is the room key of each challenge match that username1 is the challenger
+         * 
+         * 
+         * (Optional)
+         * If a challenge match is canceled ( the challenger is in match or offline and the target accept the challenge )
+         * Then server will send a message to the target : [CHALLENGE_CANCELED];challenger;target
+         * 
+         * 
+         * 
+         * note : "challenger;target" is the room key of each challenge match 
          */
 
 
         ConcurrentDictionary<string, TcpClient> challenges = new ConcurrentDictionary<string, TcpClient>();
-        Queue<TcpClient> waiting_queue = new Queue<TcpClient>();
         ConcurrentDictionary<TcpClient, string> names = new ConcurrentDictionary<TcpClient, string>();
+        Queue<TcpClient> waiting_queue = new Queue<TcpClient>();
 
 
         private void StartMatch(TcpClient player1, TcpClient player2, string name1, string name2)
@@ -97,14 +105,18 @@ namespace Server
                         if (byteRead == 0) continue;
 
                         string message = Encoding.UTF8.GetString(buffer, 0, byteRead).Trim();
-                        string[] parts = message.Split('|');
+                        string[] parts = message.Split(';');
                         if (parts.Length < 2) continue;
 
                         TcpClient? player1 = null;
                         TcpClient? player2 = null;
                         lock (waiting_queue)
                         {
-                            waiting_queue.Enqueue(client);
+                            if (!waiting_queue.Contains(client))
+                            {
+                                waiting_queue.Enqueue(client);
+                            }
+
                             names.TryAdd(client, parts[1]);
                             Console.WriteLine($"[LOG]: Match request from {parts[1]}");
 
@@ -119,16 +131,20 @@ namespace Server
                         {
                             if (!ServerUtils.StillConnected(player1.Client))
                             {
+                                names.TryRemove(player1, out _);
                                 waiting_queue.Enqueue(player2);
                                 continue;
                             }
                             else if (!ServerUtils.StillConnected(player2.Client))
                             {
+                                names.TryRemove(player2, out _);
                                 waiting_queue.Enqueue(player1);
                                 continue;
                             }
                             new Thread(() =>
                             {
+                                removeChallengesOf(player1);
+                                removeChallengesOf(player2);
                                 StartMatch(player1, player2, names[player1], names[player2]);
                             }).Start();
                         }
@@ -149,7 +165,7 @@ namespace Server
         {
             TcpListener challengeListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8888);
             challengeListener.Start();
-            Console.WriteLine("[LOG]: Server is running on 8888 (Challenged Match)");
+            Console.WriteLine("[LOG]: Server is running on 8888 (Challenge Match)");
             new Thread(() =>
             {
                 while (true)
@@ -178,27 +194,30 @@ namespace Server
 
 
                     string message = Encoding.UTF8.GetString(data, 0, byteRead).Trim();
-                    string[] parts = message.Split('|');
+                    string[] parts = message.Split(';');
                     if (parts.Length < 3) continue;
 
 
                     string command = parts[0];
-                    room = parts[1] + "|" + parts[2];
+                    room = parts[1] + ";" + parts[2];
 
                     switch (command)
                     {
-                        case "CHALLENGE_REQUEST":
+                        case "[CHALLENGE_REQUEST]":
+                            Console.WriteLine($"[LOG]: {parts[1]} is challenging {parts[2]}");
                             challenges.TryAdd(room, client);
                             names.TryAdd(client, parts[1]);
-                            Console.WriteLine($"[LOG]: {parts[1]} is challenging {parts[2]}");
                             break;
 
-                        case "CHALLENGE_ACCEPT":
+
+
+                        case "[CHALLENGE_ACCEPT]":
                             if (challenges.TryRemove(room, out TcpClient? challenger))
                             {
-                                names.TryAdd(client, parts[2]);
                                 Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
-                                // Remove all other challenges created by the challenger
+                                names.TryAdd(client, parts[2]);
+                                removeChallengesOf(challenger);
+                                removeChallengesOf(client);
                                 new Thread(() =>
                                 {
                                     StartMatch(challenger, client, names[challenger], names[client]);
@@ -208,11 +227,13 @@ namespace Server
                             else
                             {
                                 Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge but {parts[1]} is in match or offline now");
-                                ServerUtils.SendMessage(client.Client, $"CHALLENGE_CANCELED|{room}");
+                                ServerUtils.SendMessage(client.Client, $"[CHALLENGE_CANCELED];{room}");
                             }
                             break;
 
-                        case "CHALLENGE_DECLINE":
+
+
+                        case "[CHALLENGE_DECLINE]":
                             Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
                             challenges.TryRemove(room, out TcpClient? removedClient);
                             break;
@@ -230,13 +251,24 @@ namespace Server
             {
                 if (room != null)
                     challenges.TryRemove(room, out _);
-
+                names.TryRemove(client, out _);
                 client.Close();
             }
         }
 
-    }
+        public void removeChallengesOf(TcpClient client)
+        {
+            foreach (var challenge in challenges )
+            {
+                if ( challenge.Value == client )
+                {
+                    challenges.TryRemove(challenge.Key, out _);
+                }
+            }
+        }
 
+
+    }
 
     internal class MainClass()
     {

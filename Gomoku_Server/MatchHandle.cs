@@ -18,6 +18,8 @@ namespace Gomoku_Server
         PlayerTurn current_turn = PlayerTurn.player1;
         TcpClient player1;
         TcpClient player2;
+        string name1;
+        string name2;
         int clock1;
         int clock2;
         object turn_lock = new object();
@@ -222,12 +224,14 @@ namespace Gomoku_Server
             }
         }
 
-        public MatchHandle(TcpClient player1, TcpClient player2, int clock1, int clock2)
+        public MatchHandle(TcpClient player1, TcpClient player2, int clock1, int clock2, string name1, string name2)
         {
             this.player1 = player1;
             this.player2 = player2;
             this.clock1 = clock1;
             this.clock2 = clock2;
+            this.name1 = name1;
+            this.name2 = name2;
         }
     }
 }

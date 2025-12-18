@@ -1,26 +1,42 @@
 ﻿using Gomoku_Server;
+using Microsoft.VisualBasic.FileIO;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Permissions;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Server
 {
     class Server
     {
 
+        /* Client message : 
+         * 
+         * Random match : MATCH_REQUEST|username
+         * 
+         * Challenge Match : CHALLENGE_REQUEST|username1|username2
+         * 
+         * Accept Challenge : CHALLENGE_ACCEPT|username1|username2
+         * 
+         * Decline Challenge : CHALLENGE_DECLINE|username1|username2
+         * 
+         * note : "username1|username2" is the room key of each challenge match that username1 is the challenger
+         */
+
+
         ConcurrentDictionary<string, TcpClient> challenges = new ConcurrentDictionary<string, TcpClient>();
         Queue<TcpClient> waiting_queue = new Queue<TcpClient>();
+        ConcurrentDictionary<TcpClient, string> names = new ConcurrentDictionary<TcpClient, string>();
 
 
-
-        private void StartMatch(TcpClient player1, TcpClient player2)
+        private void StartMatch(TcpClient player1, TcpClient player2, string name1, string name2)
         {
             int clock1 = 600;
             int clock2 = 600;
 
-            MatchHandle matchHandle = new MatchHandle(player1, player2, clock1, clock2);
+            MatchHandle matchHandle = new MatchHandle(player1, player2, clock1, clock2, name1, name2);
 
             try
             {
@@ -74,14 +90,23 @@ namespace Server
                     while (true)
                     {
                         TcpClient client = listener.AcceptTcpClient();
+                        var stream = client.GetStream();
+                        byte[] buffer = new byte[1024];
+
+                        int byteRead = stream.Read(buffer, 0, buffer.Length);
+                        if (byteRead == 0) continue;
+
+                        string message = Encoding.UTF8.GetString(buffer, 0, byteRead).Trim();
+                        string[] parts = message.Split('|');
+                        if (parts.Length < 2) continue;
 
                         TcpClient? player1 = null;
                         TcpClient? player2 = null;
                         lock (waiting_queue)
                         {
                             waiting_queue.Enqueue(client);
-                            
-                            Console.WriteLine($"[LOG]: Connected to {client.Client.RemoteEndPoint?.ToString()}");
+                            names.TryAdd(client, parts[1]);
+                            Console.WriteLine($"[LOG]: Match request from {parts[1]}");
 
                             if (waiting_queue.Count >= 2)
                             {
@@ -104,10 +129,9 @@ namespace Server
                             }
                             new Thread(() =>
                             {
-                                StartMatch(player1, player2);
+                                StartMatch(player1, player2, names[player1], names[player2]);
                             }).Start();
                         }
-
                     }
                 }
                 catch (Exception ex)
@@ -159,24 +183,25 @@ namespace Server
 
 
                     string command = parts[0];
-                    room = CreateRoomKey(parts[1], parts[2]);
-
+                    room = parts[1] + "|" + parts[2];
 
                     switch (command)
                     {
                         case "CHALLENGE_REQUEST":
                             challenges.TryAdd(room, client);
-                            Console.WriteLine($"[LOG]: {parts[1]} is challenging  {parts[2]}");
+                            names.TryAdd(client, parts[1]);
+                            Console.WriteLine($"[LOG]: {parts[1]} is challenging {parts[2]}");
                             break;
 
                         case "CHALLENGE_ACCEPT":
-                            if (challenges.TryRemove(room, out TcpClient? challengeClient))
+                            if (challenges.TryRemove(room, out TcpClient? challenger))
                             {
+                                names.TryAdd(client, parts[2]);
                                 Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
-                                // Remove all other challenges created by the challengeClient
+                                // Remove all other challenges created by the challenger
                                 new Thread(() =>
                                 {
-                                    StartMatch(challengeClient, client);
+                                    StartMatch(challenger, client, names[challenger], names[client]);
                                 }).Start();
 
                             } 
@@ -208,11 +233,6 @@ namespace Server
 
                 client.Close();
             }
-        }
-
-        string CreateRoomKey(string name1, string name2)
-        {
-            return String.Compare(name1, name2) < 0 ? $"{name1}|{name2}" : $"{name2}|{name1}";
         }
 
     }

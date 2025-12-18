@@ -11,6 +11,8 @@ namespace Server
     {
 
         ConcurrentDictionary<string, TcpClient> challenges = new ConcurrentDictionary<string, TcpClient>();
+        Queue<TcpClient> waiting_queue = new Queue<TcpClient>();
+
 
 
         private void StartMatch(TcpClient player1, TcpClient player2)
@@ -57,14 +59,12 @@ namespace Server
 
         public Server()
         {
-            Queue<TcpClient> waiting_queue = new Queue<TcpClient>();
-
             TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9999);
             listener.Start();
 
             new Thread(() =>
             {
-                StartLobbyServer();
+                StartChallengeServer();
             }).Start();
         
             Thread listen_thread = new Thread(() =>
@@ -75,6 +75,8 @@ namespace Server
                     {
                         TcpClient client = listener.AcceptTcpClient();
 
+                        TcpClient? player1 = null;
+                        TcpClient? player2 = null;
                         lock (waiting_queue)
                         {
                             waiting_queue.Enqueue(client);
@@ -83,8 +85,8 @@ namespace Server
 
                             if (waiting_queue.Count >= 2)
                             {
-                                TcpClient player1 = waiting_queue.Dequeue();
-                                TcpClient player2 = waiting_queue.Dequeue();
+                                player1 = waiting_queue.Dequeue();
+                                player2 = waiting_queue.Dequeue();
 
                                 if (!ServerUtils.StillConnected(player1.Client))
                                 {
@@ -96,16 +98,17 @@ namespace Server
                                     waiting_queue.Enqueue(player1);
                                     continue;
                                 }
-
-                                if ( player1 != null  && player2 != null )
-                                {
-                                    new Thread(() =>
-                                    {
-                                        StartMatch(player1, player2);
-                                    }).Start();
-                                }
                             }
                         }
+
+                        if ( player1 != null && player2 != null )
+                        {
+                            new Thread(() =>
+                            {
+                                StartMatch(player1, player2);
+                            }).Start();
+                        }
+
                     }
                 }
                 catch (Exception ex)
@@ -115,15 +118,15 @@ namespace Server
             });
             listen_thread.Start();
 
-            Console.WriteLine("[LOG]: Server is running on 9999 (Match)");
+            Console.WriteLine("[LOG]: Server is running on 9999 (Random Match)");
             listen_thread.Join();
         }
 
-        public void StartLobbyServer()
+        public void StartChallengeServer()
         {
             TcpListener challengeListener = new TcpListener(IPAddress.Parse("127.0.0.1"), 8888);
             challengeListener.Start();
-            Console.WriteLine("[LOG]: Server is running on 8888 (Lobby)");
+            Console.WriteLine("[LOG]: Server is running on 8888 (Challenged Match)");
             new Thread(() =>
             {
                 while (true)
@@ -160,16 +163,19 @@ namespace Server
                     room = parts[1] + parts[2];
 
 
-                    Console.WriteLine(message);
                     switch (command)
                     {
                         case "CHALLENGE_REQUEST":
                             challenges.TryAdd(room, client);
+                            Console.WriteLine($"User {parts[1]} is challenging user {parts[2]}");
+                            // Send challenge request to destination client
+                            // Handle event if destination client is in match
                             break;
 
                         case "CHALLENGE_ACCEPT":
                             if (challenges.TryRemove(room, out TcpClient challengeClient))
                             {
+                                Console.WriteLine($"User {parts[2]} accepted {parts[1]}'s challenge");
                                 new Thread(() =>
                                 {
                                     StartMatch(challengeClient, client);
@@ -178,7 +184,8 @@ namespace Server
                             }
                             break;
 
-                        case "CHALLENGE_REJECT":
+                        case "CHALLENGE_DECLINE":
+                            Console.WriteLine($"User {parts[2]} declined {parts[1]}'s challenge");
                             challenges.TryRemove(room, out TcpClient removedClient);
                             break;
 

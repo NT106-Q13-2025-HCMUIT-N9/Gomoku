@@ -87,22 +87,21 @@ namespace Server
                             {
                                 player1 = waiting_queue.Dequeue();
                                 player2 = waiting_queue.Dequeue();
-
-                                if (!ServerUtils.StillConnected(player1.Client))
-                                {
-                                    waiting_queue.Enqueue(player2);
-                                    continue;
-                                }
-                                else if (!ServerUtils.StillConnected(player2.Client))
-                                {
-                                    waiting_queue.Enqueue(player1);
-                                    continue;
-                                }
                             }
                         }
 
                         if ( player1 != null && player2 != null )
                         {
+                            if (!ServerUtils.StillConnected(player1.Client))
+                            {
+                                waiting_queue.Enqueue(player2);
+                                continue;
+                            }
+                            else if (!ServerUtils.StillConnected(player2.Client))
+                            {
+                                waiting_queue.Enqueue(player1);
+                                continue;
+                            }
                             new Thread(() =>
                             {
                                 StartMatch(player1, player2);
@@ -142,7 +141,7 @@ namespace Server
 
         public void HandleChallenge(TcpClient client)
         {
-            string room = null;
+            string? room = null;
             var stream = client.GetStream();
             byte[] data = new byte[1024];
 
@@ -160,33 +159,37 @@ namespace Server
 
 
                     string command = parts[0];
-                    room = parts[1] + parts[2];
+                    room = CreateRoomKey(parts[1], parts[2]);
 
 
                     switch (command)
                     {
                         case "CHALLENGE_REQUEST":
                             challenges.TryAdd(room, client);
-                            Console.WriteLine($"User {parts[1]} is challenging user {parts[2]}");
-                            // Send challenge request to destination client
-                            // Handle event if destination client is in match
+                            Console.WriteLine($"[LOG]: {parts[1]} is challenging  {parts[2]}");
                             break;
 
                         case "CHALLENGE_ACCEPT":
-                            if (challenges.TryRemove(room, out TcpClient challengeClient))
+                            if (challenges.TryRemove(room, out TcpClient? challengeClient))
                             {
-                                Console.WriteLine($"User {parts[2]} accepted {parts[1]}'s challenge");
+                                Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
+                                // Remove all other challenges created by the challengeClient
                                 new Thread(() =>
                                 {
                                     StartMatch(challengeClient, client);
                                 }).Start();
 
+                            } 
+                            else
+                            {
+                                Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge but {parts[1]} is in match or offline now");
+                                ServerUtils.SendMessage(client.Client, $"CHALLENGE_CANCELED|{room}");
                             }
                             break;
 
                         case "CHALLENGE_DECLINE":
-                            Console.WriteLine($"User {parts[2]} declined {parts[1]}'s challenge");
-                            challenges.TryRemove(room, out TcpClient removedClient);
+                            Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
+                            challenges.TryRemove(room, out TcpClient? removedClient);
                             break;
 
                         default:
@@ -196,7 +199,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine("[ERROR]: " + ex.ToString());
             }
             finally
             {
@@ -207,6 +210,10 @@ namespace Server
             }
         }
 
+        string CreateRoomKey(string name1, string name2)
+        {
+            return String.Compare(name1, name2) < 0 ? $"{name1}|{name2}" : $"{name2}|{name1}";
+        }
 
     }
 

@@ -41,7 +41,7 @@ namespace Server
 
         private void StartMatch(TcpClient player1, TcpClient player2, string name1, string name2)
         {
-            Console.WriteLine($"[LOG]: Match started : name1 - name2");
+            Console.WriteLine($"[LOG]: Match started : {name1} - {name2}");
             int clock1 = 600;
             int clock2 = 600;
 

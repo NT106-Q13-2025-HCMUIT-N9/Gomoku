@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Gomoku_Client.View"
+      xmlns:ctrls="clr-namespace:Gomoku_Client.View"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="History"
@@ -216,6 +217,27 @@
 
             </Grid>
         </Border>
-
+        <!-- Notification Popup -->
+        <ItemsControl ItemsSource="{Binding Source={x:Static ctrls:NotificationManager.Instance}, Path=Notifications}"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              Margin="0,0,20,20"
+              Panel.ZIndex="9999">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ctrls:Notification x:Name="NotificationControl"
+                              Title="{Binding Title}"
+                              Message="{Binding Message}"
+                              Type="{Binding Type}"
+                              AutoCloseDuration="{Binding AutoCloseDuration}"
+                              Margin="0,0,0,5"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Page>

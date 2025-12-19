@@ -90,7 +90,7 @@ namespace Gomoku_Server
                         }
                     }
                 }
-                Console.WriteLine("[LOG]: A match end");
+                Console.WriteLine($"[LOG]: Match ended : {name1} - {name2}");
             }
             catch (Exception ex)
             {
@@ -156,6 +156,7 @@ namespace Gomoku_Server
                                 {
                                     player1.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
                                     player2.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
+                                    EndMatch();
                                 }
                             }
                         }
@@ -212,6 +213,7 @@ namespace Gomoku_Server
                                 {
                                     player1.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
                                     player2.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
+                                    EndMatch();
                                 }
                             }
                         }
@@ -223,6 +225,17 @@ namespace Gomoku_Server
                 Console.WriteLine("[ERROR]: " + ex.ToString());
             }
         }
+
+        public void EndMatch()
+        {
+            try
+            {
+                player1.Close();
+                player2.Close();
+            }
+            catch { }
+        }
+
 
         public MatchHandle(TcpClient player1, TcpClient player2, int clock1, int clock2, string name1, string name2)
         {

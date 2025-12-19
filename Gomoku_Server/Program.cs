@@ -41,6 +41,7 @@ namespace Server
 
         private void StartMatch(TcpClient player1, TcpClient player2, string name1, string name2)
         {
+            Console.WriteLine($"[LOG]: Match started : {names[player1]} - {names[player2]}");
             int clock1 = 600;
             int clock2 = 600;
 
@@ -51,31 +52,21 @@ namespace Server
                 ServerUtils.SendMessage(player1.Client, $"[INIT];{clock1};{clock2};X");
                 ServerUtils.SendMessage(player2.Client, $"[INIT];{clock1};{clock2};O");
 
-                Thread clock_thread = new Thread(() =>
-                {
-                    matchHandle.StartClock();
-                });
-                clock_thread.Start();
+                Thread clockThread = new Thread(matchHandle.StartClock);
+                Thread p1Thread = new Thread(matchHandle.Handle_Player1);
+                Thread p2Thread = new Thread(matchHandle.Handle_Player2);
 
-                Thread player1_thread = new Thread(() =>
-                {
-                    matchHandle.Handle_Player1();
-                });
-                player1_thread.Start();
+                clockThread.IsBackground = true;
+                p1Thread.IsBackground = true;
+                p2Thread.IsBackground = true;
 
-                Thread player2_thread = new Thread(() =>
-                {
-                    matchHandle.Handle_Player2();
-                });
-                player2_thread.Start();
-
-                player1_thread.Join();
-                player2_thread.Join();
-                clock_thread.Join();
+                clockThread.Start();
+                p1Thread.Start();
+                p2Thread.Start();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ERROR]: " + ex.ToString());
+                Console.WriteLine("[MATCH ERROR]: " + ex.ToString());
             }
         }
 
@@ -106,7 +97,7 @@ namespace Server
 
                         string message = Encoding.UTF8.GetString(buffer, 0, byteRead).Trim();
                         string[] parts = message.Split(';');
-                        if (parts.Length < 2) continue;
+                        if (parts.Length < 2 || parts[0] != "[MATCH_REQUEST]") continue;
 
                         TcpClient? player1 = null;
                         TcpClient? player2 = null;
@@ -118,7 +109,7 @@ namespace Server
                             }
 
                             names.TryAdd(client, parts[1]);
-                            Console.WriteLine($"[LOG]: Match request from {parts[1]}");
+                            Console.WriteLine($"[LOG]: Random match request from {parts[1]}");
 
                             if (waiting_queue.Count >= 2)
                             {
@@ -190,12 +181,13 @@ namespace Server
                 while (true)
                 {
                     int byteRead = stream.Read(data, 0, data.Length);
-                    if ( byteRead == 0) break;
+                    if ( byteRead == 0 ) break;
 
+                    
 
                     string message = Encoding.UTF8.GetString(data, 0, byteRead).Trim();
                     string[] parts = message.Split(';');
-                    if (parts.Length < 3) continue;
+                    if (parts.Length < 3) break;
 
 
                     string command = parts[0];

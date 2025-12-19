@@ -285,28 +285,20 @@ namespace Gomoku_Client
 
         private void btn_Test1_Click(object sender, RoutedEventArgs e)
         {
-            var notification = new NotificationItem
-            {
-                Title = "yesno noti test",
-                Message = "lay bo",
-                Type = Notification.NotificationType.YesNo,
-                AutoCloseDuration = 5000
-            };
-
-            notification.AcceptClicked += (s, e) =>
-            {
-                MessageBox.Show("an accept");
-            };
-
-            notification.DeclineClicked += (s, e) =>
-            {
-                MessageBox.Show("an decline");
-            };
-            // DO NOT FORGET THIS
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                NotificationManager.Instance.Notifications.Insert(0, notification);
-            });
+            NotificationManager.Instance.ShowNotification(
+                "yesno noti test",
+                "lay bo",
+                Notification.NotificationType.YesNo,
+                4000,
+                onAccept: (s, ev) =>
+                {
+                    MessageBox.Show("accepted.");
+                },
+                onDecline: (s, ev) =>
+                {
+                    MessageBox.Show("declined.");
+                }
+            );
         }
     }
 }

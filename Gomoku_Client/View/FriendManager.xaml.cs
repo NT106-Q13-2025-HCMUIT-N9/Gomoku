@@ -43,13 +43,13 @@ namespace Gomoku_Client.View
         {
             if (string.IsNullOrEmpty(FriendUsernameInput.Text))
             {
-                MessageBox.Show("Vui long nhap username ban muon ket ban");
+                NotificationManager.Instance.ShowNotification("Lỗi", "Vui lòng nhập tên người dùng.", Notification.NotificationType.Info);
                 return;
             }
 
             if(!await Validate.IsUsernamExists(FriendUsernameInput.Text))
             {
-                MessageBox.Show("Username khong ton tai");
+                NotificationManager.Instance.ShowNotification("Lỗi", "Username không tồn tại.", Notification.NotificationType.Info);
                 return;
             }
 

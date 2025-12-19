@@ -425,5 +425,4 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
     </Grid>
-
 </Window>

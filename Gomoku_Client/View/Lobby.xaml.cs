@@ -97,7 +97,7 @@ namespace Gomoku_Client.View
     }
     private void ServerBrowserButton_Click(object sender, RoutedEventArgs e)
     {
-
+        NotificationManager.Instance.ShowNotification("KHÔNG KHẢ DỤNG", "Chức năng này đang được phát triển, quay lại sau nhé.", Notification.NotificationType.Info);
     }
     private void RankedButton_Click(object sender, RoutedEventArgs e)
     {

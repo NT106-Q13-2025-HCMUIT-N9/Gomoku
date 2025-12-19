@@ -41,7 +41,7 @@ namespace Server
 
         private void StartMatch(TcpClient player1, TcpClient player2, string name1, string name2)
         {
-            Console.WriteLine($"[LOG]: Match started : {names[player1]} - {names[player2]}");
+            Console.WriteLine($"[LOG]: Match started : name1 - name2");
             int clock1 = 600;
             int clock2 = 600;
 
@@ -178,61 +178,59 @@ namespace Server
 
             try
             {
-                while (true)
-                {
-                    int byteRead = stream.Read(data, 0, data.Length);
-                    if ( byteRead == 0 ) break;
+                int byteRead = stream.Read(data, 0, data.Length);
+                if ( byteRead == 0 ) return;
 
                     
 
-                    string message = Encoding.UTF8.GetString(data, 0, byteRead).Trim();
-                    string[] parts = message.Split(';');
-                    if (parts.Length < 3) break;
+                string message = Encoding.UTF8.GetString(data, 0, byteRead).Trim();
+                string[] parts = message.Split(';');
+                if (parts.Length < 3) return;
 
 
-                    string command = parts[0];
-                    room = parts[1] + ";" + parts[2];
+                string command = parts[0];
+                room = parts[1] + ";" + parts[2];
 
-                    switch (command)
-                    {
-                        case "[CHALLENGE_REQUEST]":
-                            Console.WriteLine($"[LOG]: {parts[1]} is challenging {parts[2]}");
-                            challenges.TryAdd(room, client);
-                            names.TryAdd(client, parts[1]);
-                            break;
+                switch (command)
+                {
+                    case "[CHALLENGE_REQUEST]":
+                        Console.WriteLine($"[LOG]: {parts[1]} is challenging {parts[2]}");
+                        challenges.TryAdd(room, client);
+                        names.TryAdd(client, parts[1]);
+                        KeepAliveConnection(client, room, TimeSpan.FromSeconds(20)); 
+                        break;
 
 
-
-                        case "[CHALLENGE_ACCEPT]":
-                            if (challenges.TryRemove(room, out TcpClient? challenger))
+                    case "[CHALLENGE_ACCEPT]":
+                        if (challenges.TryRemove(room, out TcpClient? challenger))
+                        {
+                            Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
+                            names.TryAdd(client, parts[2]);         
+                            names.TryAdd(challenger, parts[1]);
+                            removeChallengesOf(challenger);
+                            removeChallengesOf(client);
+                            new Thread(() =>
                             {
-                                Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
-                                names.TryAdd(client, parts[2]);
-                                removeChallengesOf(challenger);
-                                removeChallengesOf(client);
-                                new Thread(() =>
-                                {
-                                    StartMatch(challenger, client, names[challenger], names[client]);
-                                }).Start();
+                                StartMatch(challenger, client, parts[1], parts[2]);
+                            }).Start();
 
-                            } 
-                            else
-                            {
-                                Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge but {parts[1]} is in match or offline now");
-                                ServerUtils.SendMessage(client.Client, $"[CHALLENGE_CANCELED];{room}");
-                            }
-                            break;
+                        } 
+                        else
+                        {
+                            Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge but {parts[1]} disconnected the room");
+                            ServerUtils.SendMessage(client.Client, $"[CHALLENGE_CANCELED];{room}");
+                        }
+                        break;
 
 
+                    case "[CHALLENGE_DECLINE]":
+                        Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
+                        challenges.TryRemove(room, out TcpClient? removedClient);
+                        break;
 
-                        case "[CHALLENGE_DECLINE]":
-                            Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
-                            challenges.TryRemove(room, out TcpClient? removedClient);
-                            break;
 
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
             }
             catch (Exception ex)
@@ -257,6 +255,31 @@ namespace Server
                     challenges.TryRemove(challenge.Key, out _);
                 }
             }
+        }
+
+        private void KeepAliveConnection(TcpClient client, string room, TimeSpan timeout)
+        {
+            var startTime = DateTime.Now;
+
+            while (DateTime.Now - startTime < timeout)
+            {
+                bool stillConnected = client.Client != null && ServerUtils.StillConnected(client.Client);
+
+                if (!stillConnected)
+                {
+                    Console.WriteLine($"[LOG]: Challenger disconnected for room: {room} (Or the match started)");
+                    challenges.TryRemove(room, out _);
+                    client.Close();
+                    return;
+                }
+
+                Thread.Sleep(1000);
+            }
+
+            // Timeout
+            Console.WriteLine($"[LOG]: Challenge timeout for room: {room}");
+            challenges.TryRemove(room, out _);
+            client.Close();
         }
 
 

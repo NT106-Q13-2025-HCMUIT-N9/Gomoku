@@ -13,6 +13,8 @@ namespace Gomoku_Server
         {
             try
             {
+                if (socket == null) return false;
+
                 if ((socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0) || !socket.Connected)
                     return false;
                 else

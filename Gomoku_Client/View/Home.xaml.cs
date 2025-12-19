@@ -1,4 +1,4 @@
-﻿using Firebase.Auth;
+using Firebase.Auth;
 using Gomoku_Client.Model;
 using Gomoku_Client.View;
 using Gomoku_Client.ViewModel;
@@ -27,6 +27,7 @@ namespace Gomoku_Client
     /// </summary>
     public partial class MainGameUI : Window
     {
+        FirestoreChangeListener? listener;
         public MainGameUI()
         {
             InitializeComponent();
@@ -100,6 +101,63 @@ namespace Gomoku_Client
             sender.IsChecked = false;
         }
 
+        public void NavigateWithAnimation(Page page)
+        {
+            if (MainFrame.Content != null)
+            {
+                if (MainFrame.RenderTransform == null || !(MainFrame.RenderTransform is TranslateTransform))
+                {
+                    MainFrame.RenderTransform = new TranslateTransform();
+                }
+
+                var transform = (TranslateTransform)MainFrame.RenderTransform;
+                /*
+                var slideOutAnimation = new DoubleAnimation
+                {
+                  From = 0,
+                  To = -this.ActualWidth,
+                  Duration = TimeSpan.FromSeconds(0.3),
+                  EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                */
+
+                MainFrame.Navigate(page);
+
+                var slideInAnimation = new DoubleAnimation
+                {
+                    From = this.ActualWidth,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.6),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                transform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
+
+                //transform.BeginAnimation(TranslateTransform.XProperty, slideOutAnimation);
+            }
+            else
+            {
+                MainFrame.Navigate(page);
+
+                if (MainFrame.RenderTransform == null || !(MainFrame.RenderTransform is TranslateTransform))
+                {
+                    MainFrame.RenderTransform = new TranslateTransform();
+                }
+
+                var transform = (TranslateTransform)MainFrame.RenderTransform;
+
+                var slideAnimation = new DoubleAnimation
+                {
+                    From = this.ActualWidth,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                transform.BeginAnimation(TranslateTransform.XProperty, slideAnimation);
+            }
+        }
+
         private void SignOut_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -170,28 +228,85 @@ namespace Gomoku_Client
 
             storyboard.Begin(border);
         }
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                this.Visibility = Visibility.Hidden;
-                tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
-                UserStatsModel? user_stats = await FireStoreHelper.GetUserStats(tb_PlayerName.Text);
+            tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
-                if (user_stats != null)
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(username);
+
+            listener = doc_ref.Listen(doc_snap => {
+                if (doc_snap.Exists)
                 {
-                    lb_matches.Text = user_stats.total_match.ToString();
-                    lb_winrate.Text = user_stats.total_match > 0
-                        ? (user_stats.Wins / (double)user_stats.total_match).ToString()
-                        : "0";
+                    UserStatsModel user_stats = doc_snap.ConvertTo<UserStatsModel>();
+
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        lb_matches.Text = user_stats.total_match.ToString();
+                        lb_winrate.Text = user_stats.total_match > 0
+                            ? ((user_stats.Wins / (double)user_stats.total_match) * 100).ToString("F2") + "%"
+                            : "0";
+                    });
                 }
-                this.Visibility = Visibility.Visible;
-            }
-            catch (Exception)
+            });
+        }
+
+        private async void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (listener != null)
             {
-                MessageBox.Show("Failed to load user data.");
-                this.Close();
+                await listener.StopAsync();
+                listener = null;
             }
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            QuitConfirmationOverlay.Visibility = Visibility.Visible;
+
+            var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
+        }
+        private void btn_Test_Click(object sender, RoutedEventArgs e)
+        {
+            NotificationManager.Instance.ShowNotification(
+                "info noti test",
+                "message mesage skibidi",
+                Notification.NotificationType.Info,
+                5000 
+            );
+        }
+
+        private void btn_Test1_Click(object sender, RoutedEventArgs e)
+        {
+            var notification = new NotificationItem
+            {
+                Title = "yesno noti test",
+                Message = "lay bo",
+                Type = Notification.NotificationType.YesNo,
+                AutoCloseDuration = 5000
+            };
+
+            notification.AcceptClicked += (s, e) =>
+            {
+                MessageBox.Show("an accept");
+            };
+
+            notification.DeclineClicked += (s, e) =>
+            {
+                MessageBox.Show("an decline");
+            };
+            // DO NOT FORGET THIS
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                NotificationManager.Instance.Notifications.Insert(0, notification);
+            });
         }
     }
 }

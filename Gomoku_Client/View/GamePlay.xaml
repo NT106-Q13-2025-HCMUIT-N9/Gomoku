@@ -15,47 +15,89 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-        
-        
-        <!-- Style cơ sở cho các Border của Panel (góc bo tròn, nền tối, đổ bóng sâu) -->
-        <Style x:Key="PanelBaseStyle" TargetType="Border">
-            <Setter Property="Background" Value="#1A1A2E"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="15"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="5" Opacity="0.6"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
+            <!-- fade in anim -->
+            <Storyboard x:Key="FadeInStoryboard">
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                From="0" To="1" Duration="0:0:0.3">
+                    <DoubleAnimation.EasingFunction>
+                        <QuadraticEase EasingMode="EaseOut"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                From="0.8" To="1" Duration="0:0:0.3">
+                    <DoubleAnimation.EasingFunction>
+                        <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                From="0.8" To="1" Duration="0:0:0.3">
+                    <DoubleAnimation.EasingFunction>
+                        <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+            </Storyboard>
 
-        <!-- Style cho các Action Buttons -->
-        <Style x:Key="ActionButtonBaseStyle" TargetType="Button">
-            <Setter Property="Height" Value="48"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="ButtonBorder" 
+            <!-- fade out anim -->
+            <Storyboard x:Key="FadeOutStoryboard">
+                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                From="1" To="0" Duration="0:0:0.25">
+                    <DoubleAnimation.EasingFunction>
+                        <QuadraticEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                From="1" To="0.8" Duration="0:0:0.25">
+                    <DoubleAnimation.EasingFunction>
+                        <QuadraticEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                From="1" To="0.8" Duration="0:0:0.25">
+                    <DoubleAnimation.EasingFunction>
+                        <QuadraticEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+            </Storyboard>
+
+            <!-- Style cơ sở cho các Border của Panel (góc bo tròn, nền tối, đổ bóng sâu) -->
+            <Style x:Key="PanelBaseStyle" TargetType="Border">
+                <Setter Property="Background" Value="#1A1A2E"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="Padding" Value="15"/>
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect Color="#000000" BlurRadius="15" ShadowDepth="5" Opacity="0.6"/>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Style cho các Action Buttons -->
+            <Style x:Key="ActionButtonBaseStyle" TargetType="Button">
+                <Setter Property="Height" Value="48"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="ButtonBorder" 
                                 Background="{TemplateBinding Background}" 
                                 CornerRadius="8" 
                                 Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="White" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ButtonBorder" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect Color="White" BlurRadius="10" ShadowDepth="0" Opacity="0.5"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Window.Resources>
 
@@ -278,7 +320,7 @@
                 </Grid>
             </Border>
 
-            <!-- Action Buttons - Đã chuyển về Grid.Row="1" -->
+            <!-- Action Buttons -->
             <StackPanel Grid.Row="1" VerticalAlignment="Bottom" Margin="0,15,0,0">
 
                 <!-- Surrender Button -->
@@ -289,10 +331,29 @@
                         <DropShadowEffect Color="#FF4655" BlurRadius="25" ShadowDepth="0" Opacity="0.75"/>
                     </Button.Effect>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        
-                        <TextBlock Text="ĐẦU HÀNG" FontSize="15" FontWeight="Bold"
-                                   Foreground="White" VerticalAlignment="Center"/>
 
+                        <TextBlock Text="ĐẦU HÀNG  " FontSize="15" FontWeight="Bold"
+                                   Foreground="White" VerticalAlignment="Center"/>
+                        <Canvas Width="24" Height="24">
+
+                            <Path Stroke="#ECECEC" 
+                                StrokeThickness="2"
+                                StrokeLineJoin="Round"
+                                StrokeStartLineCap="Round"
+                                StrokeEndLineCap="Round"
+                                Data="M4,22 L4,2"/>
+
+                            <Ellipse Fill="#ECECEC" 
+                                Width="3" 
+                                Height="3" 
+                                Canvas.Left="2.5" 
+                                Canvas.Top="1"/>
+
+                            <Path Fill="White" 
+                                Stroke="#CCCCCC" 
+                                StrokeThickness="0.8"
+                                Data="M4,3 C8,3 8,5 12,5 C16,5 16,3 20,3 L20,11 C16,11 16,13 12,13 C8,13 8,11 4,11 Z"/>
+                        </Canvas>
                     </StackPanel>
                 </Button>
 
@@ -302,7 +363,7 @@
                         BorderBrush="#8B8B8B" BorderThickness="1.5"
                         Click="ExitButton_Click">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                       
+
 
                         <TextBlock Text="THOÁT TRẬN" FontSize="15" FontWeight="Bold"
                                    Margin="0,0,10,0"
@@ -315,6 +376,231 @@
                     </StackPanel>
                 </Button>
             </StackPanel>
+        </Grid>
+
+        <!-- ================================ EXIT CONFIRMATION OVERLAY ================================ -->
+        <Grid x:Name="QuitConfirmationOverlay" 
+              Visibility="Collapsed" 
+              Panel.ZIndex="1000"
+              Grid.ColumnSpan="3">
+            <Grid.Background>
+                <SolidColorBrush Color="#000000" Opacity="0.7"/>
+            </Grid.Background>
+
+            <Border HorizontalAlignment="Center" 
+                    VerticalAlignment="Center"
+                    RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Border.RenderTransform>
+
+                <!-- popup card -->
+                <Border Background="#1A1F2E" 
+                    CornerRadius="3" 
+                    Width="500" 
+                    Padding="0"
+                    BorderBrush="#FF4655" 
+                    BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="40" ShadowDepth="0" Opacity="0.6"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- vv BELOW ARE POPUP CONTENT vv -->
+                        <StackPanel Grid.Row="1" Margin="40,40,40,30">
+                            <!-- icon -->
+                            <Border Width="80" Height="80" 
+                                    CornerRadius="40" 
+                                    Background="#2A2E39"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,20">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+                                </Border.Effect>
+                                <Viewbox Width="45" Height="45" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center">
+                                    <Canvas Width="24" Height="24">
+                                        <!-- Door frame -->
+                                        <Path Fill="#FF4655" 
+                                            Data="M10.09,15.59L11.5,17L16.5,12L11.5,7L10.09,8.41L12.67,11H3V13H12.67L10.09,15.59M19,3H5C3.89,3 3,3.9 3,5V9H5V5H19V19H5V15H3V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.9 20.1,3 19,3Z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+
+                            <!-- title -->
+                            <TextBlock Text="XÁC NHẬN THOÁT TRẬN" 
+                                FontSize="32" 
+                                FontWeight="Bold" 
+                                FontFamily="Segoe UI"
+                                Foreground="White" 
+                                HorizontalAlignment="Center"
+                                Margin="0,0,0,15"/>
+
+                            <!-- message -->
+                            <TextBlock Text="Bạn sẽ bị xử thua cho ván đấu này. Bạn có muốn thoát trận không?" 
+                                FontSize="16" 
+                                Foreground="#B0B0B0" 
+                                TextWrapping="Wrap"
+                                HorizontalAlignment="Center"
+                                TextAlignment="Center"
+                                LineHeight="24"/>
+                        </StackPanel>
+
+                        <!-- action -->
+                        <Grid Grid.Row="2" 
+                            Margin="40,0,40,40">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- cancel -->
+                            <Button Grid.Column="0"
+                                    x:Name="CancelQuitButton"
+                                        Content="HỦY BỎ" 
+                                    Height="54"
+                                    Click="CancelQuitButton_Click"
+                                    Style="{StaticResource CancelButton}"/>
+
+                            <!-- confirm -->
+                            <Button Grid.Column="2"
+                                    x:Name="ConfirmQuitButton"
+                                    Content="THOÁT NGAY" 
+                                    Height="54"
+                                    Click="ConfirmQuitButton_Click"
+                                    Style="{StaticResource ConfirmButton}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Border>
+        </Grid>
+
+        <!-- ================================ SURRENDER CONFIRMATION OVERLAY ================================ -->
+        <Grid x:Name="SurrenderConfirmationOverlay" 
+    Visibility="Collapsed" 
+    Panel.ZIndex="1000"
+    Grid.ColumnSpan="3">
+            <Grid.Background>
+                <SolidColorBrush Color="#000000" Opacity="0.7"/>
+            </Grid.Background>
+
+            <Border HorizontalAlignment="Center" 
+        VerticalAlignment="Center"
+        RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Border.RenderTransform>
+
+                <!-- popup card -->
+                <Border Background="#1A1F2E" 
+            CornerRadius="3" 
+            Width="500" 
+            Padding="0"
+            BorderBrush="#FF4655" 
+            BorderThickness="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="40" ShadowDepth="0" Opacity="0.6"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- vv BELOW ARE POPUP CONTENT vv -->
+                        <StackPanel Grid.Row="1" Margin="40,40,40,30">
+                            <!-- icon -->
+                            <Border Width="80" Height="80" 
+                                    CornerRadius="40" 
+                                    Background="#2A2E39"
+                                    HorizontalAlignment="Center"
+                                    Margin="0,0,0,20">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+                                </Border.Effect>
+                                <Viewbox Width="45" Height="45" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center">
+                                    <Canvas Width="24" Height="24">
+                                        <!-- Cột cờ (flag pole) -->
+                                        <Path Stroke="#ECECEC" 
+                                            StrokeThickness="2"
+                                            StrokeLineJoin="Round"
+                                            StrokeStartLineCap="Round"
+                                            StrokeEndLineCap="Round"
+                                            Data="M4,22 L4,2"/>
+
+                                        <!-- Đầu cột cờ (top cap) -->
+                                        <Ellipse Fill="#ECECEC" 
+                                            Width="3" 
+                                            Height="3" 
+                                            Canvas.Left="2.5" 
+                                            Canvas.Top="1"/>
+
+                                        <!-- Lá cờ (flag with wave) -->
+                                        <Path Fill="White" 
+                                            Stroke="#CCCCCC" 
+                                            StrokeThickness="0.8"
+                                            Data="M4,3 C8,3 8,5 12,5 C16,5 16,3 20,3 L20,11 C16,11 16,13 12,13 C8,13 8,11 4,11 Z"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+
+                            <!-- title -->
+                            <TextBlock Text="XÁC NHẬN ĐẦU HÀNG" 
+                        FontSize="32" 
+                        FontWeight="Bold" 
+                        FontFamily="Segoe UI"
+                        Foreground="White" 
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,15"/>
+
+                            <!-- message -->
+                            <TextBlock Text="Bạn có chắc chắn muốn đầu hàng không?" 
+                        FontSize="16" 
+                        Foreground="#B0B0B0" 
+                        TextWrapping="Wrap"
+                        HorizontalAlignment="Center"
+                        TextAlignment="Center"
+                        LineHeight="24"/>
+                        </StackPanel>
+
+                        <!-- action -->
+                        <Grid Grid.Row="2" 
+                    Margin="40,0,40,40">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- cancel -->
+                            <Button Grid.Column="0"
+                        x:Name="CancelSurrenderButton"
+                        Content="HỦY BỎ" 
+                        Height="54"
+                        Click="CancelSurrenderButton_Click"
+                        Style="{StaticResource CancelButton}"/>
+
+                            <!-- confirm -->
+                            <Button Grid.Column="2"
+                        x:Name="ConfirmSurrenderButton"
+                        Content="ĐẦU HÀNG" 
+                        Height="54"
+                        Click="ConfirmSurrenderButton_Click"
+                        Style="{StaticResource ConfirmButton}"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Border>
         </Grid>
     </Grid>
 </Window>

@@ -301,34 +301,38 @@ namespace Gomoku_Client
             MainFrame.Visibility = Visibility.Visible;
         }
 
-    private bool isShowing = false;
-    private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
-    {
-      if (!isShowing)
-      {
-        // Hiện mật khẩu
-        PasswordVisible.Text = PasswordBox.Password;
-        PasswordVisible.Visibility = Visibility.Visible;
-        PasswordBox.Visibility = Visibility.Collapsed;
-        TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
-      }
-      else
-      {
-        // Ẩn mật khẩu
-        PasswordBox.Password = PasswordVisible.Text;
-        PasswordBox.Visibility = Visibility.Visible;
-        PasswordVisible.Visibility = Visibility.Collapsed;
-        TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
-      }
+        private bool isShowing = false;
+        private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
+        {
+          if (!isShowing)
+          {
+            // Hiện mật khẩu
+            PasswordVisible.Text = PasswordBox.Password;
+            PasswordVisible.Visibility = Visibility.Visible;
+            PasswordBox.Visibility = Visibility.Collapsed;
+            TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
+          }
+          else
+          {
+            // Ẩn mật khẩu
+            PasswordBox.Password = PasswordVisible.Text;
+            PasswordBox.Visibility = Visibility.Visible;
+            PasswordVisible.Visibility = Visibility.Collapsed;
+            TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
+          }
 
-      isShowing = !isShowing;
-    }
+          isShowing = !isShowing;
+        }
 
-    private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
             {
                 e.Handled = true; // chặn phím Space
+            }
+            if (e.Key == Key.Enter)
+            {
+                LoginButton_Click(sender, e);
             }
         }
 
@@ -414,6 +418,20 @@ namespace Gomoku_Client
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            QuitConfirmationOverlay.Visibility = Visibility.Visible;
+
+            var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
         }
     }
 }

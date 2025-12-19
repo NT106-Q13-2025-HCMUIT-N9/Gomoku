@@ -4,14 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gomoku_Client"
+        xmlns:ctrls="clr-namespace:Gomoku_Client.View"
         mc:Ignorable="d"
         Icon="\Assets\Gomoku.ico"
         Title="Gomoku" Height="720" Width="1280" 
-        WindowStyle="None" 
+        WindowStyle="SingleBorderWindow" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize"
         Background="#0F1923"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        Unloaded="Window_Unloaded">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="7"/>
+    </WindowChrome.WindowChrome>
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -39,6 +46,7 @@
                     </DoubleAnimation.EasingFunction>
                 </DoubleAnimation>
             </Storyboard>
+
 
             <!-- fade out anim -->
             <Storyboard x:Key="FadeOutStoryboard">
@@ -102,6 +110,48 @@
                         Opacity="0.4"/>
         </Grid.Background>
 
+        <!-- TOP BAR -->
+        <Border Height="40"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Top"
+        Panel.ZIndex="500"
+        Background="Transparent"
+        Margin="0,5,5,0">
+
+            <!-- buttons -->
+            <StackPanel Grid.Column="2"
+                         Orientation="Horizontal"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Center"
+                         Margin="0,0,10,0">
+
+                <!-- MINIMIZE -->
+                <Button x:Name="MinimizeButton"
+                         Width="36"
+                         Height="26"
+                         ToolTip="Ẩn"
+                         Click="MinimizeButton_Click"
+                         Style="{StaticResource WindowControlButton}">
+                    <Path Stroke="White"
+                           StrokeThickness="2"
+                           Data="M0,0 L12,0"/>
+                </Button>
+
+                <!-- CLOSE -->
+                <Button x:Name="CloseButton"
+                         Width="36"
+                         Height="26"
+                         ToolTip="Thoát"
+                         Margin="6,0,0,0"
+                         Click="CloseButton_Click"
+                         Style="{StaticResource CloseWindowButton}">
+                    <Path Stroke="White"
+                         StrokeThickness="2"
+                         Data="M0,0 L12,12 M12,0 L0,12"/>
+                </Button>
+            </StackPanel>
+        </Border>
+
         <Grid>
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
@@ -110,6 +160,11 @@
                     <GradientStop Color="Transparent" Offset="1.0"/>
                 </LinearGradientBrush>
             </Grid.Background>
+            <!--TODO: delete this after tested-->
+            <Button x:Name="btn_Test" Content="test noti" HorizontalAlignment="Left" Margin="244,592,0,0" VerticalAlignment="Top" Height="65" Width="144" Background="White" Click="btn_Test_Click"/>
+            <Button x:Name="btn_Test1" HorizontalAlignment="Left" Margin="448,590,0,0" VerticalAlignment="Top" Height="66" Width="144" Background="White" Click="btn_Test1_Click">
+                <Button Content="test noti1"/>
+            </Button>
         </Grid>
 
         <StackPanel x:Name="StackPanelMenu"
@@ -120,8 +175,8 @@
             <RadioButton x:Name="SettingButton" Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="SettingButton_Checked"/>
             <RadioButton x:Name="ExitButton" Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="ExitButton_Checked"/>
         </StackPanel>
-        
-        
+
+
         <Grid>
 
             <!-- Main Content Grid -->
@@ -131,10 +186,8 @@
                     <ColumnDefinition Width="350"/>
                 </Grid.ColumnDefinitions>
 
-
-
                 <!-- Right Side - Player Info & Content -->
-                <StackPanel Grid.Column="1" Margin="20,40,40,40">
+                <StackPanel Grid.Column="1" Margin="20,60,40,40">
 
                     <!-- Player Profile Card -->
                     <Border  CornerRadius="10" Padding="20" Margin="0,0,0,20" Height="623">
@@ -211,12 +264,12 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0">
-                                    <TextBlock x:Name="lb_winrate" Text="68%" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
+                                    <TextBlock x:Name="lb_winrate" Text="-" FontSize="20" FontWeight="Bold" Foreground="#FF4655"/>
                                     <TextBlock Text="Win Rate" FontSize="11" Foreground="#8B8B8B"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock x:Name="lb_matches" Text="324" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
+                                    <TextBlock x:Name="lb_matches" Text="-" FontSize="20" FontWeight="Bold" Foreground="#ECECEC"/>
                                     <TextBlock Text="Matches" FontSize="11" Foreground="#8B8B8B"/>
                                 </StackPanel>
 
@@ -227,8 +280,8 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        
-        
+
+
         <Frame x:Name="MainFrame"
                NavigationUIVisibility="Hidden"
                Visibility="Collapsed">
@@ -236,9 +289,9 @@
                 <TranslateTransform X="0" Y="0"/>
             </Frame.RenderTransform>
         </Frame>
-        
-        
-        
+
+
+
         <!-- quit confirmation overlay -->
         <Grid x:Name="QuitConfirmationOverlay" 
               Visibility="Collapsed" 
@@ -349,10 +402,28 @@
                 </Border>
             </Border>
         </Grid>
-        
-        
-        
-        
+        <!-- noti -->
+        <ItemsControl ItemsSource="{Binding Source={x:Static ctrls:NotificationManager.Instance}, Path=Notifications}"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              Margin="0,0,20,20"
+              Panel.ZIndex="9999">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ctrls:Notification x:Name="NotificationControl"
+                              Title="{Binding Title}"
+                              Message="{Binding Message}"
+                              Type="{Binding Type}"
+                              AutoCloseDuration="{Binding AutoCloseDuration}"
+                              Margin="0,0,0,5"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 
 </Window>

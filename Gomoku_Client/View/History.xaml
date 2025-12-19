@@ -4,9 +4,12 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Gomoku_Client.View"
+      xmlns:ctrls="clr-namespace:Gomoku_Client.View"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
-      Title="History">
+      Title="History"
+      Loaded="Page_Loaded"
+      Unloaded="Page_Unloaded">
 
     <Page.Resources>
         <!-- Kế thừa ResourceDictionary từ TemplatePage -->
@@ -58,8 +61,6 @@
                                        Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
                             <TextBlock Grid.Column="1" Text="ĐỐI THỦ" FontSize="14" FontWeight="Bold" 
                                        Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
-                            <TextBlock Grid.Column="2" Text="THỜI GIAN" FontSize="14" FontWeight="Bold" 
-                                       Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
                             <TextBlock Grid.Column="3" Text="THỜI LƯỢNG" FontSize="14" FontWeight="Bold" 
                                        Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
                         </Grid>
@@ -103,10 +104,6 @@
                                                    Foreground="#ECECEC" VerticalAlignment="Center"/>
                                     </StackPanel>
 
-                                    <!-- Time -->
-                                    <TextBlock Grid.Column="2" Text="2 giờ trước" FontSize="13" 
-                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
-
                                     <!-- Duration -->
                                     <TextBlock Grid.Column="3" Text="15 phút 32 giây" FontSize="13" 
                                                Foreground="#ECECEC" VerticalAlignment="Center"/>
@@ -146,10 +143,6 @@
                                         <TextBlock Text="ProGamer999" FontSize="14" FontWeight="SemiBold" 
                                                    Foreground="#ECECEC" VerticalAlignment="Center"/>
                                     </StackPanel>
-
-                                    <!-- Time -->
-                                    <TextBlock Grid.Column="2" Text="5 giờ trước" FontSize="13" 
-                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
 
                                     <!-- Duration -->
                                     <TextBlock Grid.Column="3" Text="12 phút 08 giây" FontSize="13" 
@@ -191,10 +184,6 @@
                                                    Foreground="#ECECEC" VerticalAlignment="Center"/>
                                     </StackPanel>
 
-                                    <!-- Time -->
-                                    <TextBlock Grid.Column="2" Text="1 ngày trước" FontSize="13" 
-                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
-
                                     <!-- Duration -->
                                     <TextBlock Grid.Column="3" Text="20 phút 15 giây" FontSize="13" 
                                                Foreground="#ECECEC" VerticalAlignment="Center"/>
@@ -228,6 +217,27 @@
 
             </Grid>
         </Border>
-
+        <!-- Notification Popup -->
+        <ItemsControl ItemsSource="{Binding Source={x:Static ctrls:NotificationManager.Instance}, Path=Notifications}"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              Margin="0,0,20,20"
+              Panel.ZIndex="9999">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ctrls:Notification x:Name="NotificationControl"
+                              Title="{Binding Title}"
+                              Message="{Binding Message}"
+                              Type="{Binding Type}"
+                              AutoCloseDuration="{Binding AutoCloseDuration}"
+                              Margin="0,0,0,5"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </Page>

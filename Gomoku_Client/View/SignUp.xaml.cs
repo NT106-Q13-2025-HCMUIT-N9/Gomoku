@@ -275,7 +275,9 @@ namespace Gomoku_Client
                 UserDataModel doc = new UserDataModel
                 {
                     Username = username,
-                    Email = email
+                    Email = email,
+                    Friends = new List<string>(),
+                    FriendsRequests = new List<string>()
                 };
 
                 await FireStoreHelper.AddUser(doc);

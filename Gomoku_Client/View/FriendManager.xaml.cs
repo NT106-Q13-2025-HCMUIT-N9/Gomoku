@@ -186,6 +186,8 @@ namespace Gomoku_Client.View
                             curr_friend_list.Add(friend);
                             FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, ChallengeButton_Click, UnfriendButton_Click, this.Resources));
                         }
+
+                        TotalFriendsCount.Text = curr_friend_list.Count.ToString() + " bạn bè";
                     });
                 }
             });

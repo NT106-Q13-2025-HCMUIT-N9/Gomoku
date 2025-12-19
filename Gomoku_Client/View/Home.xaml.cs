@@ -259,5 +259,19 @@ namespace Gomoku_Client
                 listener = null;
             }
         }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            QuitConfirmationOverlay.Visibility = Visibility.Visible;
+
+            var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
+        }
     }
 }

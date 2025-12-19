@@ -419,5 +419,19 @@ namespace Gomoku_Client
         {
             Application.Current.Shutdown();
         }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            QuitConfirmationOverlay.Visibility = Visibility.Visible;
+
+            var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
+        }
     }
 }

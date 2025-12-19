@@ -4,15 +4,21 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gomoku_Client"
+        xmlns:ctrls="clr-namespace:Gomoku_Client.View"
         mc:Ignorable="d"
         Icon="\Assets\Gomoku.ico"
         Title="Gomoku" Height="720" Width="1280" 
-        WindowStyle="None" 
+        WindowStyle="SingleBorderWindow" 
         WindowStartupLocation="CenterScreen" 
         ResizeMode="NoResize"
         Background="#0F1923"
         Loaded="Window_Loaded"
         Unloaded="Window_Unloaded">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="7"/>
+    </WindowChrome.WindowChrome>
+    
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -41,6 +47,7 @@
                 </DoubleAnimation>
             </Storyboard>
 
+            
             <!-- fade out anim -->
             <Storyboard x:Key="FadeOutStoryboard">
                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
@@ -103,6 +110,48 @@
                         Opacity="0.4"/>
         </Grid.Background>
 
+        <!-- TOP BAR -->
+        <Border Height="40"
+        HorizontalAlignment="Right"
+        VerticalAlignment="Top"
+        Panel.ZIndex="500"
+        Background="Transparent"
+        Margin="0,5,5,0">
+
+            <!-- buttons -->
+            <StackPanel Grid.Column="2"
+                         Orientation="Horizontal"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Center"
+                         Margin="0,0,10,0">
+
+                <!-- MINIMIZE -->
+                <Button x:Name="MinimizeButton"
+                         Width="36"
+                         Height="26"
+                         ToolTip="Ẩn"
+                         Click="MinimizeButton_Click"
+                         Style="{StaticResource WindowControlButton}">
+                    <Path Stroke="White"
+                           StrokeThickness="2"
+                           Data="M0,0 L12,0"/>
+                </Button>
+
+                <!-- CLOSE -->
+                <Button x:Name="CloseButton"
+                         Width="36"
+                         Height="26"
+                         ToolTip="Thoát"
+                         Margin="6,0,0,0"
+                         Click="CloseButton_Click"
+                         Style="{StaticResource CloseWindowButton}">
+                    <Path Stroke="White"
+                         StrokeThickness="2"
+                         Data="M0,0 L12,12 M12,0 L0,12"/>
+                </Button>
+            </StackPanel>
+        </Border>
+
         <Grid>
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
@@ -132,10 +181,8 @@
                     <ColumnDefinition Width="350"/>
                 </Grid.ColumnDefinitions>
 
-
-
                 <!-- Right Side - Player Info & Content -->
-                <StackPanel Grid.Column="1" Margin="20,40,40,40">
+                <StackPanel Grid.Column="1" Margin="20,60,40,40">
 
                     <!-- Player Profile Card -->
                     <Border  CornerRadius="10" Padding="20" Margin="0,0,0,20" Height="623">

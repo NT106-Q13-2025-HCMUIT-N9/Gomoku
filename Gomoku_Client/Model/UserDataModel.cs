@@ -11,9 +11,6 @@ namespace Gomoku_Client.Model
     public class UserStatsModel
     {
         [FirestoreProperty]
-        public string UserHandle { get; set; }
-
-        [FirestoreProperty]
         public int Draws { get; set; }
 
         [FirestoreProperty]
@@ -43,5 +40,21 @@ namespace Gomoku_Client.Model
 
         [FirestoreProperty]
         public List<string> FriendsRequests { get; set; }
+    }
+
+    [FirestoreData]
+    public class MatchInfoModel
+    {
+        [FirestoreProperty]
+        public List<string> Players { get; set; }
+
+        [FirestoreProperty]
+        public bool isDraw { get; set; }
+
+        [FirestoreProperty]
+        public string? Winner { get; set; }
+
+        [FirestoreProperty]
+        public int Duration { get; set; }
     }
 }

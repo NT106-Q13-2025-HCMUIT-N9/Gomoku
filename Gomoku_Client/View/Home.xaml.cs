@@ -1,4 +1,4 @@
-﻿using Firebase.Auth;
+using Firebase.Auth;
 using Gomoku_Client.Model;
 using Gomoku_Client.View;
 using Gomoku_Client.ViewModel;
@@ -19,7 +19,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace Gomoku_Client
 {
@@ -29,7 +28,6 @@ namespace Gomoku_Client
     public partial class MainGameUI : Window
     {
         FirestoreChangeListener? listener;
-
         public MainGameUI()
         {
             InitializeComponent();
@@ -101,6 +99,63 @@ namespace Gomoku_Client
             }
 
             sender.IsChecked = false;
+        }
+
+        public void NavigateWithAnimation(Page page)
+        {
+            if (MainFrame.Content != null)
+            {
+                if (MainFrame.RenderTransform == null || !(MainFrame.RenderTransform is TranslateTransform))
+                {
+                    MainFrame.RenderTransform = new TranslateTransform();
+                }
+
+                var transform = (TranslateTransform)MainFrame.RenderTransform;
+                /*
+                var slideOutAnimation = new DoubleAnimation
+                {
+                  From = 0,
+                  To = -this.ActualWidth,
+                  Duration = TimeSpan.FromSeconds(0.3),
+                  EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                */
+
+                MainFrame.Navigate(page);
+
+                var slideInAnimation = new DoubleAnimation
+                {
+                    From = this.ActualWidth,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.6),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                transform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
+
+                //transform.BeginAnimation(TranslateTransform.XProperty, slideOutAnimation);
+            }
+            else
+            {
+                MainFrame.Navigate(page);
+
+                if (MainFrame.RenderTransform == null || !(MainFrame.RenderTransform is TranslateTransform))
+                {
+                    MainFrame.RenderTransform = new TranslateTransform();
+                }
+
+                var transform = (TranslateTransform)MainFrame.RenderTransform;
+
+                var slideAnimation = new DoubleAnimation
+                {
+                    From = this.ActualWidth,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+
+                transform.BeginAnimation(TranslateTransform.XProperty, slideAnimation);
+            }
         }
 
         private void SignOut_Click(object sender, RoutedEventArgs e)
@@ -203,6 +258,20 @@ namespace Gomoku_Client
                 await listener.StopAsync();
                 listener = null;
             }
+        }
+
+        private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            QuitConfirmationOverlay.Visibility = Visibility.Visible;
+
+            var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+            var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
+            storyboard.Begin(border);
         }
     }
 }

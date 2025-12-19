@@ -671,17 +671,76 @@
         </Setter>
     </Style>
 
+    <!-- Nút ẩn -->
+    <Style x:Key="WindowControlButton" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="bd"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Background="Transparent"
+                        CornerRadius="3">
+                        <ContentPresenter
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
+                    </Border>
 
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="bd"
+                                Property="Background"
+                                Value="#33FFFFFF"/>
+                        </Trigger>
 
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="bd"
+                                Property="Opacity"
+                                Value="0.6"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
+    <!-- Nút thoát -->
+    <Style x:Key="CloseWindowButton"
+       TargetType="Button"
+       BasedOn="{StaticResource WindowControlButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="bd"
+                        Width="{TemplateBinding Width}"
+                        Height="{TemplateBinding Height}"
+                        Background="Transparent"
+                        CornerRadius="3">
+                        <ContentPresenter
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"/>
+                    </Border>
 
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="bd"
+                                Property="Background"
+                                Value="#FF4655"/>
+                        </Trigger>
 
-
-
-
-
-
-
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="bd"
+                                Property="Opacity"
+                                Value="0.7"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
 
 </ResourceDictionary>

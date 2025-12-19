@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -123,6 +124,7 @@ namespace Gomoku_Server
                 {
                     if (player1.Client.Available == 0)
                     {
+                        Thread.Sleep(5);
                         continue;
                     }
 
@@ -179,6 +181,7 @@ namespace Gomoku_Server
                 {
                     if (player2.Client.Available == 0)
                     {
+                        Thread.Sleep(5);
                         continue;
                     }
 
@@ -232,6 +235,8 @@ namespace Gomoku_Server
             {
                 player1.Close();
                 player2.Close();
+                Server.Server.inMatch.TryRemove(name1, out _);
+                Server.Server.inMatch.TryRemove(name2, out _);
             }
             catch { }
         }

@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Google.Protobuf.WellKnownTypes;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -263,6 +264,270 @@ namespace Gomoku_Client.View
             newFriendCard.Child = grid;
 
             return newFriendCard;
+        }
+
+        public static Border CreateDrawMatchItem(string opponentName, string duration)
+        {
+            Border mainBorder = new Border
+            {
+                Padding = new Thickness(20, 15, 20, 15),
+                Margin = new Thickness(0),
+                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFD700"),
+                BorderThickness = new Thickness(0, 0, 6, 0),
+                Name = opponentName
+            };
+
+            LinearGradientBrush backgroundBrush = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0.5),
+                EndPoint = new Point(1, 0.5)
+            };
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#FFD700"), 0));
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#0F0F1E"), 0.13));
+            mainBorder.Background = backgroundBrush;
+
+            Grid contentGrid = new Grid();
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(180) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+
+            TextBlock txtResult = new TextBlock
+            {
+                Text = "Hòa",
+                FontSize = 14,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.White,
+                FontFamily = new FontFamily("Segoe UI Black"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(txtResult, 0);
+            contentGrid.Children.Add(txtResult);
+
+            StackPanel opponentPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(opponentPanel, 1);
+
+            Border avatarBorder = new Border
+            {
+                Width = 35,
+                Height = 35,
+                CornerRadius = new CornerRadius(17.5),
+                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FFD700"),
+                BorderThickness = new Thickness(2),
+                Margin = new Thickness(0, 0, 12, 0)
+            };
+
+            avatarBorder.Background = new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                Stretch = Stretch.UniformToFill
+            };
+            opponentPanel.Children.Add(avatarBorder);
+
+            TextBlock txtOpponent = new TextBlock
+            {
+                Text = opponentName,
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#ECECEC"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            opponentPanel.Children.Add(txtOpponent);
+
+            contentGrid.Children.Add(opponentPanel);
+
+            TextBlock txtDuration = new TextBlock
+            {
+                Text = duration,
+                FontSize = 13,
+                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#ECECEC"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(txtDuration, 3);
+            contentGrid.Children.Add(txtDuration);
+
+            mainBorder.Child = contentGrid;
+            return mainBorder;
+        }
+
+        public static Border CreateWinMatchItem(string opponentName, string duration)
+        {
+            Border mainBorder = new Border
+            {
+                Padding = new Thickness(20, 15, 20, 15),
+                Margin = new Thickness(0),
+                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#00D946"),
+                BorderThickness = new Thickness(0, 0, 6, 0),
+                Name = opponentName
+            };
+
+            LinearGradientBrush backgroundBrush = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0.5),
+                EndPoint = new Point(1, 0.5)
+            };
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#00D946"), 0));
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#0F0F1E"), 0.13));
+            mainBorder.Background = backgroundBrush;
+
+            Grid contentGrid = new Grid();
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(180) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+
+            TextBlock txtResult = new TextBlock
+            {
+                Text = "Thắng",
+                FontSize = 14,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.White,
+                FontFamily = new FontFamily("Segoe UI Black"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(txtResult, 0);
+            contentGrid.Children.Add(txtResult);
+
+            StackPanel opponentPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(opponentPanel, 1);
+
+            Border avatarBorder = new Border
+            {
+                Width = 35,
+                Height = 35,
+                CornerRadius = new CornerRadius(17.5),
+                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#00D946"),
+                BorderThickness = new Thickness(2),
+                Margin = new Thickness(0, 0, 12, 0)
+            };
+
+            avatarBorder.Background = new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                Stretch = Stretch.UniformToFill
+            };
+            opponentPanel.Children.Add(avatarBorder);
+
+            TextBlock txtOpponent = new TextBlock
+            {
+                Text = opponentName,
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#ECECEC"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            opponentPanel.Children.Add(txtOpponent);
+
+            contentGrid.Children.Add(opponentPanel);
+
+            TextBlock txtDuration = new TextBlock
+            {
+                Text = duration,
+                FontSize = 13,
+                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#ECECEC"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(txtDuration, 3);
+            contentGrid.Children.Add(txtDuration);
+
+            mainBorder.Child = contentGrid;
+            return mainBorder;
+        }
+
+        public static Border CreateLoseMatchItem(string opponentName, string duration)
+        {
+            Border mainBorder = new Border
+            {
+                Padding = new Thickness(20, 15, 20, 15),
+                Margin = new Thickness(0),
+                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF4655"),
+                BorderThickness = new Thickness(0, 0, 6, 0),
+                Name = opponentName
+            };
+
+            LinearGradientBrush backgroundBrush = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0.5),
+                EndPoint = new Point(1, 0.5)
+            };
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#FF4655"), 0));
+            backgroundBrush.GradientStops.Add(new GradientStop((Color)ColorConverter.ConvertFromString("#0F0F1E"), 0.13));
+            mainBorder.Background = backgroundBrush;
+
+            Grid contentGrid = new Grid();
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(140) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(180) });
+            contentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(150) });
+
+            TextBlock txtResult = new TextBlock
+            {
+                Text = "Thua",
+                FontSize = 14,
+                FontWeight = FontWeights.Bold,
+                Foreground = Brushes.White,
+                FontFamily = new FontFamily("Segoe UI Black"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(txtResult, 0);
+            contentGrid.Children.Add(txtResult);
+
+            StackPanel opponentPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(opponentPanel, 1);
+
+            Border avatarBorder = new Border
+            {
+                Width = 35,
+                Height = 35,
+                CornerRadius = new CornerRadius(17.5),
+                BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF4655"),
+                BorderThickness = new Thickness(2),
+                Margin = new Thickness(0, 0, 12, 0)
+            };
+
+            avatarBorder.Background = new ImageBrush
+            {
+                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                Stretch = Stretch.UniformToFill
+            };
+            opponentPanel.Children.Add(avatarBorder);
+
+            TextBlock txtOpponent = new TextBlock
+            {
+                Text = opponentName,
+                FontSize = 14,
+                FontWeight = FontWeights.SemiBold,
+                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#ECECEC"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            opponentPanel.Children.Add(txtOpponent);
+
+            contentGrid.Children.Add(opponentPanel);
+
+            TextBlock txtDuration = new TextBlock
+            {
+                Text = duration,
+                FontSize = 13,
+                Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#ECECEC"),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(txtDuration, 3);
+            contentGrid.Children.Add(txtDuration);
+
+            mainBorder.Child = contentGrid;
+            return mainBorder;
         }
     }
 }

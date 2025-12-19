@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Google.Cloud.Firestore;
 using System.Linq.Expressions;
+using Grpc.Core;
 
 namespace Gomoku_Client.ViewModel
 {
@@ -15,7 +16,6 @@ namespace Gomoku_Client.ViewModel
         {
             UserStatsModel userStatsModel = new UserStatsModel
             {
-                UserHandle = user_data.Username,
                 Wins = 0,
                 Draws = 0,
                 Losses = 0,
@@ -42,6 +42,19 @@ namespace Gomoku_Client.ViewModel
             else
             {
                 return null;
+            }
+        }
+
+        public static async Task SendFriendRequest(string sender, string receiver)
+        {
+            DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(receiver);
+            DocumentSnapshot user_doc_snap = await doc_ref.GetSnapshotAsync();
+
+            if (user_doc_snap.Exists)
+            {
+                UserDataModel receiver_data = user_doc_snap.ConvertTo<UserDataModel>();
+                receiver_data.FriendsRequests.Add(sender);
+                await doc_ref.SetAsync(receiver_data);
             }
         }
 
@@ -178,6 +191,27 @@ namespace Gomoku_Client.ViewModel
             else
             {
                 return null;
+            }
+        }
+
+        public static async Task AddMatchInfo(bool isDraw, List<string> Players, int duration, string? winner = null)
+        {
+            DocumentReference new_doc_ref = FirebaseInfo.DB.Collection("MatchInfo").Document();
+
+            MatchInfoModel matchInfoModel = new MatchInfoModel() { 
+                isDraw = isDraw,
+                Players = Players,
+                Duration = duration
+            };
+
+            if (isDraw)
+            {
+                await new_doc_ref.SetAsync(matchInfoModel);
+            }
+            else
+            {
+                matchInfoModel.Winner = winner;
+                await new_doc_ref.SetAsync(matchInfoModel);
             }
         }
     }

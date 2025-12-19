@@ -39,9 +39,23 @@ namespace Gomoku_Client.View
             _mainWindow.ShowMenuWithAnimation();
         }
 
-        private void SendFriendRequest_Click(object sender, RoutedEventArgs e)
+        private async void SendFriendRequest_Click(object sender, RoutedEventArgs e)
         {
-            // Send friend request
+            if (string.IsNullOrEmpty(FriendUsernameInput.Text))
+            {
+                MessageBox.Show("Vui long nhap username ban muon ket ban");
+                return;
+            }
+
+            if(!await Validate.IsUsernamExists(FriendUsernameInput.Text))
+            {
+                MessageBox.Show("Username khong ton tai");
+                return;
+            }
+
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            await FireStoreHelper.SendFriendRequest(username, FriendUsernameInput.Text);
+            MessageBox.Show("Thanks i sent it");
         }
 
 
@@ -172,6 +186,8 @@ namespace Gomoku_Client.View
                             curr_friend_list.Add(friend);
                             FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, ChallengeButton_Click, UnfriendButton_Click, this.Resources));
                         }
+
+                        TotalFriendsCount.Text = curr_friend_list.Count.ToString() + " bạn bè";
                     });
                 }
             });

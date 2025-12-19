@@ -6,7 +6,9 @@
       xmlns:local="clr-namespace:Gomoku_Client.View"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
-      Title="History">
+      Title="History"
+      Loaded="Page_Loaded"
+      Unloaded="Page_Unloaded">
 
     <Page.Resources>
         <!-- Kế thừa ResourceDictionary từ TemplatePage -->
@@ -58,8 +60,6 @@
                                        Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
                             <TextBlock Grid.Column="1" Text="ĐỐI THỦ" FontSize="14" FontWeight="Bold" 
                                        Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
-                            <TextBlock Grid.Column="2" Text="THỜI GIAN" FontSize="14" FontWeight="Bold" 
-                                       Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
                             <TextBlock Grid.Column="3" Text="THỜI LƯỢNG" FontSize="14" FontWeight="Bold" 
                                        Foreground="#8B8B8B" FontFamily="Segoe UI Black"/>
                         </Grid>
@@ -103,10 +103,6 @@
                                                    Foreground="#ECECEC" VerticalAlignment="Center"/>
                                     </StackPanel>
 
-                                    <!-- Time -->
-                                    <TextBlock Grid.Column="2" Text="2 giờ trước" FontSize="13" 
-                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
-
                                     <!-- Duration -->
                                     <TextBlock Grid.Column="3" Text="15 phút 32 giây" FontSize="13" 
                                                Foreground="#ECECEC" VerticalAlignment="Center"/>
@@ -147,10 +143,6 @@
                                                    Foreground="#ECECEC" VerticalAlignment="Center"/>
                                     </StackPanel>
 
-                                    <!-- Time -->
-                                    <TextBlock Grid.Column="2" Text="5 giờ trước" FontSize="13" 
-                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
-
                                     <!-- Duration -->
                                     <TextBlock Grid.Column="3" Text="12 phút 08 giây" FontSize="13" 
                                                Foreground="#ECECEC" VerticalAlignment="Center"/>
@@ -190,10 +182,6 @@
                                         <TextBlock Text="EqualSkill88" FontSize="14" FontWeight="SemiBold" 
                                                    Foreground="#ECECEC" VerticalAlignment="Center"/>
                                     </StackPanel>
-
-                                    <!-- Time -->
-                                    <TextBlock Grid.Column="2" Text="1 ngày trước" FontSize="13" 
-                                               Foreground="#8B8B8B" VerticalAlignment="Center"/>
 
                                     <!-- Duration -->
                                     <TextBlock Grid.Column="3" Text="20 phút 15 giây" FontSize="13" 

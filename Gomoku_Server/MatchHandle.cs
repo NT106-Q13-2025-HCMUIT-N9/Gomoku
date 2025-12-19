@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Server;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -18,6 +19,8 @@ namespace Gomoku_Server
         PlayerTurn current_turn = PlayerTurn.player1;
         TcpClient player1;
         TcpClient player2;
+        string name1;
+        string name2;
         int clock1;
         int clock2;
         object turn_lock = new object();
@@ -88,7 +91,7 @@ namespace Gomoku_Server
                         }
                     }
                 }
-                Console.WriteLine("[LOG]: A match end");
+                Console.WriteLine($"[LOG]: Match ended : {name1} - {name2}");
             }
             catch (Exception ex)
             {
@@ -121,6 +124,7 @@ namespace Gomoku_Server
                 {
                     if (player1.Client.Available == 0)
                     {
+                        Thread.Sleep(5);
                         continue;
                     }
 
@@ -154,6 +158,7 @@ namespace Gomoku_Server
                                 {
                                     player1.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
                                     player2.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
+                                    EndMatch();
                                 }
                             }
                         }
@@ -176,6 +181,7 @@ namespace Gomoku_Server
                 {
                     if (player2.Client.Available == 0)
                     {
+                        Thread.Sleep(5);
                         continue;
                     }
 
@@ -210,6 +216,7 @@ namespace Gomoku_Server
                                 {
                                     player1.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
                                     player2.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
+                                    EndMatch();
                                 }
                             }
                         }
@@ -222,12 +229,27 @@ namespace Gomoku_Server
             }
         }
 
-        public MatchHandle(TcpClient player1, TcpClient player2, int clock1, int clock2)
+        public void EndMatch()
+        {
+            try
+            {
+                player1.Close();
+                player2.Close();
+                Server.Server.inMatch.TryRemove(name1, out _);
+                Server.Server.inMatch.TryRemove(name2, out _);
+            }
+            catch { }
+        }
+
+
+        public MatchHandle(TcpClient player1, TcpClient player2, int clock1, int clock2, string name1, string name2)
         {
             this.player1 = player1;
             this.player2 = player2;
             this.clock1 = clock1;
             this.clock2 = clock2;
+            this.name1 = name1;
+            this.name2 = name2;
         }
     }
 }

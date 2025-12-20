@@ -237,7 +237,8 @@ namespace Gomoku_Client.View
                 Cursor = Cursors.Hand,
                 Margin = new Thickness(0, 0, 20, 0),
                 ToolTip = "Thách đấu",
-                Template = GetCircleTemplate("pack://application:,,,/Assets/Riot_Games_Logo.png")
+                Template = GetCircleTemplate("pack://application:,,,/Assets/Riot_Games_Logo.png"),
+                Name = name
             };
             challengeBtn.Click += (s, e) => ChallengeButton_Click(s, e);
 

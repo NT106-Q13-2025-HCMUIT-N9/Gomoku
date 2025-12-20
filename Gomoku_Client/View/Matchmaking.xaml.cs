@@ -205,6 +205,7 @@ namespace Gomoku_Client.View
                 var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.3));
                 fadeOut.Completed += (s, e) =>
                 {
+                    _mainWindow.MainBGM.Stop();
                     var gamePlayWindow = new GamePlay();
                     gamePlayWindow.Show();
                     _mainWindow.Close();

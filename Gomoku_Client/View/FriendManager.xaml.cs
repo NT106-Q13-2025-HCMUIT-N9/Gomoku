@@ -31,6 +31,8 @@ namespace Gomoku_Client.View
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             if (_mainWindow == null)
             {
                 MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -41,6 +43,8 @@ namespace Gomoku_Client.View
 
         private async void SendFriendRequest_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             if (string.IsNullOrEmpty(FriendUsernameInput.Text))
             {
                 MessageBox.Show("Vui long nhap username ban muon ket ban");
@@ -61,6 +65,8 @@ namespace Gomoku_Client.View
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             var border = (Border)((Grid)UnfriendConfirmationOverlay).Children[0];
             Storyboard fadeOut = (Storyboard)FindResource("PopupFadeOut");
             fadeOut.Begin(border);
@@ -74,6 +80,8 @@ namespace Gomoku_Client.View
 
         private async void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             if (string.IsNullOrEmpty(_pendingUnfriendUsername)) return;
 
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
@@ -100,6 +108,8 @@ namespace Gomoku_Client.View
 
         private async void AcceptButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
@@ -117,6 +127,8 @@ namespace Gomoku_Client.View
 
         private async void RefuseButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
@@ -130,11 +142,14 @@ namespace Gomoku_Client.View
 
         private void ChallengeButton_Click(object sender, RoutedEventArgs e)
         {
-
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
         }
 
         private void UnfriendButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             _pendingUnfriendUsername = sender_handle?.Name;
 
@@ -146,6 +161,7 @@ namespace Gomoku_Client.View
 
         private async Task DeleteRequestCard(string name)
         {
+            await Task.Yield();
             var borderToDelete = FriendRequestsPanel.Children
             .OfType<Border>()
             .FirstOrDefault(b => b.Name == name);
@@ -200,6 +216,12 @@ namespace Gomoku_Client.View
                 await listener.StopAsync();
                 listener = null;
             }
+        }
+
+        private void FriendUsernameInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
         }
     }
 }

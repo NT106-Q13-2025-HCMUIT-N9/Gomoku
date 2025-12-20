@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,9 +29,80 @@ namespace Gomoku_Client
     public partial class MainGameUI : Window
     {
         FirestoreChangeListener? listener;
+        public MediaPlayer MainBGM = new MediaPlayer();
+        public MediaPlayer ButtonClick = new MediaPlayer();
+        public MediaPlayer Keyboard = new MediaPlayer();
+
+        public static MainGameUI? Instance { get; private set; }
         public MainGameUI()
         {
             InitializeComponent();
+            Instance = this;
+            UpdateActualBGM();
+            SoundStart();
+        }
+
+        public double MasterVolValue = 0.5;
+        public double BGMVolValue = 0.15;
+        public double SFXVolValue = 1;
+
+        public void UpdateActualBGM()
+        {
+            MainBGM.Volume = MasterVolValue * BGMVolValue;
+            ButtonClick.Volume = SFXVolValue * MasterVolValue;
+            Keyboard.Volume = SFXVolValue * MasterVolValue;
+        }
+
+        void SoundStart()
+        {
+
+            List<string> BGM = new List<string>();
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "meow.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "frog.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "chess.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "doodle.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Joy.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Matchmakers.mp3"));
+            int BGMNumber = Random.Shared.Next(0, 6);
+
+            string buttonPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "ButtonHover.wav"
+            );
+
+            string keyboardPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "Keyboard.wav"
+            );
+
+
+            MainBGM.MediaOpened += (s, e) =>
+            {
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaEnded += (s, e) =>
+            {
+                BGMNumber = Random.Shared.Next(0, 6);
+                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                //MainBGM.Position = TimeSpan.Zero;
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaFailed += (s, e) =>
+            {
+                MessageBox.Show(e.ErrorException.Message);
+            };
+
+            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+        
+            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+
+            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
         }
 
         private void AnimateSlideIn()
@@ -162,6 +234,8 @@ namespace Gomoku_Client
         {
             try
             {
+                ButtonClick.Stop();
+                ButtonClick.Play();
                 FirebaseInfo.AuthClient.SignOut();
 
                 MainWindow main = new MainWindow();
@@ -184,26 +258,36 @@ namespace Gomoku_Client
 
         private void PlayButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new Lobby(this), (RadioButton)sender);
         }
 
         private void HistoryButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new History(this), (RadioButton)sender);
         }
 
         private void FriendManagerButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new FriendManager(this), (RadioButton)sender);
         }
 
         private void SettingButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new Setting(this), (RadioButton)sender);
         }
 
         private void ExitButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
 
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
@@ -214,11 +298,15 @@ namespace Gomoku_Client
         }
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             Application.Current.Shutdown();
         }
 
         private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Completed += (s, args) =>
@@ -262,11 +350,15 @@ namespace Gomoku_Client
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             WindowState = WindowState.Minimized;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
 
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];

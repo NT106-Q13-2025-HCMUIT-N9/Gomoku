@@ -41,6 +41,10 @@ namespace Gomoku_Client.View
         private string player1Name = "YOU";
         private string player2Name = "OPPONENT";
 
+        //SoundMaker
+        public MediaPlayer MainBGM = new MediaPlayer();
+        public MediaPlayer ButtonClick = new MediaPlayer();
+        public MediaPlayer Keyboard = new MediaPlayer();
         public GamePlay()
         {
             InitializeComponent();
@@ -48,6 +52,56 @@ namespace Gomoku_Client.View
             DrawBoard();
             SetupTimers();
             UpdateGameStatus();
+            StarSound();
+        }
+
+        private void StarSound()
+        {
+            List<string> BGM = new List<string>();
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "LOLTheme.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Awaken.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "LegendsNeverDie.mp3"));
+
+            int BGMNumber = Random.Shared.Next(0, 3);
+
+            string buttonPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "ButtonHover.wav"
+            );
+
+            string keyboardPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "Keyboard.wav"
+            );
+
+
+            MainBGM.MediaOpened += (s, e) =>
+            {
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaEnded += (s, e) =>
+            {
+                BGMNumber = Random.Shared.Next(0, 3);
+                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                //MainBGM.Position = TimeSpan.Zero;
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaFailed += (s, e) =>
+            {
+                MessageBox.Show(e.ErrorException.Message);
+            };
+
+            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+
+            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+
+            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
         }
         
         private void BoardCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -77,11 +131,15 @@ namespace Gomoku_Client.View
 
         private void SendMessage_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             SendChatMessage();
         }
 
         private void SurrenderButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             SurrenderConfirmationOverlay.Visibility = Visibility.Visible;
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
             var border = (Border)((Grid)SurrenderConfirmationOverlay).Children[0];
@@ -90,6 +148,8 @@ namespace Gomoku_Client.View
 
         private void ConfirmSurrenderButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             player1Timer?.Stop();
             player2Timer?.Stop();
             GameOver(false, $"{player1Name} đã đầu hàng! {player2Name} thắng!");
@@ -97,6 +157,8 @@ namespace Gomoku_Client.View
 
         private void CancelSurrenderButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
             var border = (Border)((Grid)SurrenderConfirmationOverlay).Children[0];
             storyboard.Completed += (s, args) =>
@@ -108,6 +170,8 @@ namespace Gomoku_Client.View
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
@@ -116,7 +180,8 @@ namespace Gomoku_Client.View
 
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
         {
-
+            ButtonClick.Stop();
+            ButtonClick.Play();
             player1Timer?.Stop();
             player2Timer?.Stop();
             this.Close();
@@ -124,6 +189,8 @@ namespace Gomoku_Client.View
 
         private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Completed += (s, args) =>
@@ -141,13 +208,17 @@ namespace Gomoku_Client.View
                 SendMessage_Click(sender, e);
 
                 e.Handled = true;
+                return;
             }
 
             if ( e.Key == Key.Escape)
             {
                 tb_Message.Clear();
                 e.Handled = true;
+                return;
             }
+            Keyboard.Stop();
+            Keyboard.Play();
 
         }
 

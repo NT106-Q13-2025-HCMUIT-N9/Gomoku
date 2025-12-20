@@ -258,7 +258,8 @@
                             BorderBrush="#FF4655"
                             BorderThickness="0"
                             Cursor="Hand" 
-                            Margin="0,0,0,0" Click="LoginButton_Click"/>
+                            Margin="0,0,0,0" Click="LoginButton_Click"
+                            MouseEnter="LoginButton_MouseEnter"/>
 
                     <Button x:Name="ExitButton" 
                             Content="Thoát"

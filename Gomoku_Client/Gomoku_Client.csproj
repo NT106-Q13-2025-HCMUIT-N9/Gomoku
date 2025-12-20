@@ -29,6 +29,18 @@
     <None Remove="Assets\Main.png" />
     <None Remove="Assets\Matchmaking_Background.png" />
     <None Remove="Assets\ServerBrowser_Background.gif" />
+    <None Remove="Assets\Sounds\Awaken.mp3" />
+    <None Remove="Assets\Sounds\ButtonHover.wav" />
+    <None Remove="Assets\Sounds\chess.mp3" />
+    <None Remove="Assets\Sounds\doodle.mp3" />
+    <None Remove="Assets\Sounds\frog.mp3" />
+    <None Remove="Assets\Sounds\Joy.mp3" />
+    <None Remove="Assets\Sounds\Keyboard.wav" />
+    <None Remove="Assets\Sounds\LegendsNeverDie.mp3" />
+    <None Remove="Assets\Sounds\LOLTheme.mp3" />
+    <None Remove="Assets\Sounds\Matchmakers.mp3" />
+    <None Remove="Assets\Sounds\meow.mp3" />
+    <None Remove="Assets\Sounds\RelaxedScene.mp3" />
     <None Remove="Assets\t1.jpg" />
     <None Remove="Assets\T1_6sao.jpg" />
   </ItemGroup>
@@ -54,13 +66,48 @@
     <Resource Include="Assets\Gomoku.ico" />
     <Resource Include="Assets\Login_Background.png" />
     <Resource Include="Assets\ServerBrowser_Background.gif" />
+    <Content Include="Assets\Sounds\Awaken.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\ButtonHover.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\chess.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\doodle.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\frog.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\Joy.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\Keyboard.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\LegendsNeverDie.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\LOLTheme.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\Matchmakers.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\meow.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Sounds\RelaxedScene.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Assets\t1.jpg" />
     <Resource Include="Assets\T1_6sao.jpg" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Assets\Images\" />
-    <Folder Include="Assets\Sounds\" />
   </ItemGroup>
 
 </Project>

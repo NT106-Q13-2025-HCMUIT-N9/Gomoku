@@ -105,7 +105,7 @@
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Main.png" 
+            <ImageBrush ImageSource="/Assets/Images/Main.png" 
                         Stretch="UniformToFill" 
                         Opacity="0.4"/>
         </Grid.Background>
@@ -192,7 +192,7 @@
                     <!-- Player Profile Card -->
                     <Border  CornerRadius="10" Padding="20" Margin="0,0,0,20" Height="623">
                         <Border.Background>
-                            <ImageBrush ImageSource="/Assets/t1.jpg" Stretch="UniformToFill" Opacity="0.4"/>
+                            <ImageBrush ImageSource="/Assets/Images/t1_card.jpg" Stretch="UniformToFill" Opacity="0.4"/>
                         </Border.Background>
                         <Border.Effect>
                             <DropShadowEffect Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.6"/>
@@ -219,7 +219,7 @@
                                         <DropShadowEffect Color="#FF4655" BlurRadius="15" ShadowDepth="0" Opacity="0.8"/>
                                     </Border.Effect>
                                     <Border.Background>
-                                        <ImageBrush ImageSource="/Assets/T1_6sao.jpg" Stretch="UniformToFill"/>
+                                        <ImageBrush ImageSource="/Assets/Images/T1.png" Stretch="Uniform"/>
                                     </Border.Background>
                                 </Border>
 

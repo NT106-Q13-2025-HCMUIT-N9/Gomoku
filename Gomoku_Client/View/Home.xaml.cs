@@ -28,6 +28,8 @@ namespace Gomoku_Client
     public partial class MainGameUI : Window
     {
         FirestoreChangeListener? listener;
+        FirestoreChangeListener? match_listener;
+        List<string> old_match_request = new List<string>();
         public MainGameUI()
         {
             InitializeComponent();
@@ -249,6 +251,33 @@ namespace Gomoku_Client
                     });
                 }
             });
+
+            Google.Cloud.Firestore.DocumentReference match_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
+            match_listener = match_ref.Listen(snapshot => {
+                if (snapshot.Exists)
+                {
+                    UserDataModel user_data = snapshot.ConvertTo<UserDataModel>();
+                    List<string> deleted_request = old_match_request.Except(user_data.MatchRequests).ToList();
+                    foreach(string del in deleted_request)
+                    {
+                        old_match_request.Remove(del);
+                    }
+
+                    List<string> diff_request = user_data.MatchRequests.Except(old_match_request).ToList();
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        foreach (string request in diff_request)
+                        {
+                            NotificationManager.Instance.ShowNotification(
+                                "Dual Challenge",
+                                $"{request} want to have a dual. Want to destroy them?",
+                                Notification.NotificationType.YesNo,
+                                15000
+                            );
+                        }
+                    });
+                }
+            });
         }
 
         private async void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -257,6 +286,12 @@ namespace Gomoku_Client
             {
                 await listener.StopAsync();
                 listener = null;
+            }
+
+            if(match_listener != null)
+            {
+                await match_listener.StopAsync();
+                match_listener = null;
             }
         }
 

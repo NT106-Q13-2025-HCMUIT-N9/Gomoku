@@ -40,6 +40,9 @@ namespace Gomoku_Client.Model
 
         [FirestoreProperty]
         public List<string> FriendsRequests { get; set; }
+
+        [FirestoreProperty]
+        public List<string> MatchRequests { get; set; }
     }
 
     [FirestoreData]

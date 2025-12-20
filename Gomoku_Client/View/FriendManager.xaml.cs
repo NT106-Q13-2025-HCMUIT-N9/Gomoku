@@ -2,6 +2,7 @@
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
 using System.Diagnostics;
+using System.Net.Sockets;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -128,9 +129,48 @@ namespace Gomoku_Client.View
             }
         }
 
-        private void ChallengeButton_Click(object sender, RoutedEventArgs e)
+        private async void ChallengeButton_Click(object sender, RoutedEventArgs e)
         {
+            Button butt = sender as Button;
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            CancellationTokenSource cts = new CancellationTokenSource();
 
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(butt?.Name);
+            
+            DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
+            UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
+            user_data.MatchRequests.Add(username);
+            await doc_ref.SetAsync(user_data);
+
+            FirestoreChangeListener listener = doc_ref.Listen(snapshot => {
+                if (snapshot.Exists)
+                {
+                    UserDataModel user_date = doc_snap.ConvertTo<UserDataModel>();
+
+                    if (!user_data.MatchRequests.Contains(username))
+                    {
+                        cts.Cancel();
+                    }
+                }
+            });
+
+            try
+            {
+                await Task.Delay(15000, cts.Token);
+
+                await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(username));
+                MessageBox.Show("Timed out: Request revoked.");
+            }
+            catch (TaskCanceledException)
+            {
+                // Handle người chơi chấp nhận hay từ chối thông qua tcp
+                MessageBox.Show("Opponent accepted or declined!");
+            }
+            finally
+            {
+                await listener.StopAsync();
+                cts.Dispose();
+            }
         }
 
         private void UnfriendButton_Click(object sender, RoutedEventArgs e)

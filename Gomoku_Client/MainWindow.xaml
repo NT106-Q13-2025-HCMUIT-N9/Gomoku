@@ -28,7 +28,7 @@
     <Grid x:Name="RootGrid"
           Width="1280">
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+            <ImageBrush ImageSource="/Assets/Images/Login_Background.png" 
                         Stretch="UniformToFill"
                         Opacity="1"/>
         </Grid.Background>

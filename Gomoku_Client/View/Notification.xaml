@@ -25,22 +25,22 @@
         <Storyboard x:Key="SlideOut">
             <DoubleAnimation Storyboard.TargetName="NotificationBorder"
                            Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
-                           From="0" To="450" Duration="0:0:0.2">
+                           From="0" To="450" Duration="0:0:0.3">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseIn"/>
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
             <DoubleAnimation Storyboard.TargetName="NotificationBorder"
                            Storyboard.TargetProperty="Opacity"
-                           From="1" To="0" Duration="0:0:0.25"/>
+                           From="1" To="0" Duration="0:0:0.4"/>
         </Storyboard>
 
         <!-- button style -->
         <Style x:Key="AcceptButtonStyle" TargetType="Button">
-            <Setter Property="Background" Value="#00D946"/>
+            <Setter Property="Background" Value="#0A8711"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontFamily" Value="Segoe UI Black"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -50,7 +50,7 @@
                         <Border Background="{TemplateBinding Background}"
                                 Padding="20,12">
                             <Border.Effect>
-                                <DropShadowEffect Color="#00D946" BlurRadius="15" ShadowDepth="0" Opacity="0.5"/>
+                                <DropShadowEffect Color="#0A8711" BlurRadius="6" ShadowDepth="0" Opacity="0.5"/>
                             </Border.Effect>
                             <ContentPresenter HorizontalAlignment="Center"
                                             VerticalAlignment="Center"/>
@@ -60,10 +60,10 @@
             </Setter>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#00FF52"/>
+                    <Setter Property="Background" Value="#0DA815"/>
                 </Trigger>
                 <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#00B83A"/>
+                    <Setter Property="Background" Value="#06540A"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -72,7 +72,7 @@
             <Setter Property="Background" Value="#4A4A4A"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="FontFamily" Value="Segoe UI Black"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -128,7 +128,7 @@
 
             <!-- title bar -->
             <Border Grid.Row="0" 
-                    Padding="25,20">
+                    Padding="12,8">
                 <Border.Background>
                     <LinearGradientBrush StartPoint="0,0.5" EndPoint="0.75,0.5">
                         <GradientStop Color="#FF4655" Offset="0"/>
@@ -138,7 +138,7 @@
                 <Grid>
                     <TextBlock x:Name="TitleText"
                                Text="THÔNG BÁO" 
-                               FontSize="20" 
+                               FontSize="18" 
                                FontWeight="Bold" 
                                FontFamily="Segoe UI Black"
                                Foreground="White"
@@ -182,12 +182,12 @@
 
             <!-- content -->
             <Border Grid.Row="1" 
-                    Padding="30,25"
+                    Padding="20,14"
                     Background="#0F1923">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
                     <TextBlock x:Name="MessageText"
                                Text="Đây là nội dung thông báo của bạn. Bạn có thể viết nội dung dài ở đây." 
-                               FontSize="15" 
+                               FontSize="16" 
                                Foreground="#ECECEC"
                                TextWrapping="Wrap"
                                LineHeight="24"/>
@@ -197,7 +197,7 @@
             <!-- action -->
             <Border x:Name="ActionButtonsContainer"
                     Grid.Row="2" 
-                    Padding="30,20,30,25"
+                    Padding="10,20,10,10"
                     Background="#0F1923">
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -257,10 +257,13 @@ namespace Gomoku_Client
                 if (snapshot.Exists)
                 {
                     UserDataModel user_data = snapshot.ConvertTo<UserDataModel>();
-                    List<string> deleted_request = old_match_request.Except(user_data.MatchRequests).ToList();
-                    foreach(string del in deleted_request)
+                    if(old_match_request.Count >= 1)
                     {
-                        old_match_request.Remove(del);
+                        List<string> deleted_request = old_match_request.Except(user_data.MatchRequests).ToList();
+                        foreach (string del in deleted_request)
+                        {
+                            old_match_request.Remove(del);
+                        }
                     }
 
                     List<string> diff_request = user_data.MatchRequests.Except(old_match_request).ToList();

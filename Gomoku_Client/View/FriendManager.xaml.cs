@@ -42,6 +42,8 @@ namespace Gomoku_Client.View
 
         private async void SendFriendRequest_Click(object sender, RoutedEventArgs e)
         {
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+
             if (string.IsNullOrEmpty(FriendUsernameInput.Text))
             {
                 NotificationManager.Instance.ShowNotification("Lỗi", "Vui lòng nhập tên người dùng.", Notification.NotificationType.Info);
@@ -54,9 +56,25 @@ namespace Gomoku_Client.View
                 return;
             }
 
-            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            if(await FireStoreHelper.IsFriendWith(username, FriendUsernameInput.Text))
+            {
+                NotificationManager.Instance.ShowNotification("Lỗi", "Hai bạn đã là bạn bè", Notification.NotificationType.Info);
+                return;
+            }
+
+            if(username == FriendUsernameInput.Text)
+            {
+                NotificationManager.Instance.ShowNotification("Lỗi", "Bạn cô đơn đến thế sao :)))", Notification.NotificationType.Info);
+                return;
+            }
+
             await FireStoreHelper.SendFriendRequest(username, FriendUsernameInput.Text);
-            MessageBox.Show("Thanks i sent it");
+            NotificationManager.Instance.ShowNotification(
+                "Success",
+                $"Friend request has been sent to {FriendUsernameInput.Text}",
+                Notification.NotificationType.Info,
+                3000
+            );
         }
 
 
@@ -106,10 +124,10 @@ namespace Gomoku_Client.View
 
             if (sender_handle != null)
             {
+                await DeleteRequestCard(sender_handle.Name);
                 bool successed = await FireStoreHelper.AcceptFriendRequest(username, sender_handle.Name);
                 if (successed)
                 {
-                    await DeleteRequestCard(sender_handle.Name);
                     await FireStoreHelper.DeleteFriendRequest(username, sender_handle.Name);
                     curr_friend_request.Remove(sender_handle.Name);
                 }
@@ -139,10 +157,19 @@ namespace Gomoku_Client.View
             
             DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
-            user_data.MatchRequests.Add(username);
-            await doc_ref.SetAsync(user_data);
 
-            FirestoreChangeListener listener = doc_ref.Listen(snapshot => {
+            if (!user_data.MatchRequests.Contains(username))
+            {
+                user_data.MatchRequests.Add(username);
+                await doc_ref.SetAsync(user_data);
+            }
+            else
+            {
+                return;
+            }
+
+            FirestoreChangeListener listener = doc_ref.Listen(snapshot =>
+            {
                 if (snapshot.Exists)
                 {
                     UserDataModel user_date = doc_snap.ConvertTo<UserDataModel>();
@@ -159,7 +186,12 @@ namespace Gomoku_Client.View
                 await Task.Delay(15000, cts.Token);
 
                 await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(username));
-                MessageBox.Show("Timed out: Request revoked.");
+                NotificationManager.Instance.ShowNotification(
+                    "Declined",
+                    $"{butt?.Name} didn't response to your challenge. What a coward they are.",
+                    Notification.NotificationType.Info,
+                    3000
+                );
             }
             catch (TaskCanceledException)
             {

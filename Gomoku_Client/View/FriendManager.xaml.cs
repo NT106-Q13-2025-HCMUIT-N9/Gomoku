@@ -2,10 +2,14 @@
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using static Google.Rpc.Context.AttributeContext.Types;
@@ -158,15 +162,23 @@ namespace Gomoku_Client.View
             DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
 
+            TcpClient client = new TcpClient();
+            client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+            var stream = client.GetStream();
+            
             if (!user_data.MatchRequests.Contains(username))
             {
+                byte[] data = Encoding.UTF8.GetBytes($"[CHALLENGE_REQUEST];{username};{butt?.Name}");
+
+                stream.Write(data, 0, data.Length);
+                
+
+
                 user_data.MatchRequests.Add(username);
                 await doc_ref.SetAsync(user_data);
             }
-            else
-            {
-                return;
-            }
+            
+            // Nếu đã gửi thách đấu rồi thì lắng nghe phản hồi
 
             FirestoreChangeListener listener = doc_ref.Listen(snapshot =>
             {
@@ -187,15 +199,50 @@ namespace Gomoku_Client.View
 
                 await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(username));
                 NotificationManager.Instance.ShowNotification(
-                    "Declined",
-                    $"{butt?.Name} didn't response to your challenge. What a coward they are.",
+                    $"{butt?.Name} không phản hồi thách đấu",
+                    $"Chắc con vợ này rén rồi 😏",
                     Notification.NotificationType.Info,
-                    3000
+                    5000
                 );
             }
             catch (TaskCanceledException)
             {
                 // Handle người chơi chấp nhận hay từ chối thông qua tcp
+                byte[] buffer = new byte[1024];
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                if (bytesRead == 0) return;
+
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                string[] parts = message.Split(';');
+
+                if (parts.Length < 3) return;
+
+                string response = parts[0];
+
+                switch (response)
+                {
+                    case "[CHALLENGE_ACCEPT]":
+                        NotificationManager.Instance.ShowNotification(
+                            $"{butt?.Name} đã chấp nhận thách đấu",
+                            "Chuẩn bị vào trận đấu!",
+                            Notification.NotificationType.Info,
+                            5000
+                            );
+                        break;
+
+                    case "[CHALLENGE_DECLINE]":
+                        NotificationManager.Instance.ShowNotification(
+                            $"{butt?.Name} đã từ chối thách đấu",
+                            "Chắc con vợ này rén rồi 😏",
+                            Notification.NotificationType.Info,
+                            5000
+                            );
+                        break;
+
+                    default:
+                        break;
+                }
+
                 MessageBox.Show("Opponent accepted or declined!");
             }
             finally

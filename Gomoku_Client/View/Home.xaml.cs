@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Printing.IndexedProperties;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -232,9 +235,9 @@ namespace Gomoku_Client
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
-
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            tb_PlayerName.Text = username;
+
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(username);
 
             listener = doc_ref.Listen(doc_snap => {
@@ -272,15 +275,104 @@ namespace Gomoku_Client
                         foreach (string request in diff_request)
                         {
                             NotificationManager.Instance.ShowNotification(
-                                "Dual Challenge",
-                                $"{request} want to have a dual. Want to destroy them?",
+                                $"{request} muốn thách đấu bạn",
+                                "Bạn sợ à ?",
                                 Notification.NotificationType.YesNo,
-                                15000
+                                15000,
+                                onAccept: (s, e) =>
+                                {
+                                    respondChallenge("[CHALLENGE_ACCEPT]", request, username);                                  
+                                },
+                                onDecline: (s, e) =>
+                                {
+                                    respondChallenge("[CHALLENGE_DECLINE]", request, username);
+                                }
                             );
                         }
                     });
                 }
             });
+        }
+
+        private TcpClient client;
+
+        void respondChallenge(string response, string challenger, string me)
+        {
+            client = new TcpClient();
+
+            try
+            {
+                client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+            }
+            catch
+            {
+                NotificationManager.Instance.ShowNotification(
+                        "Lỗi",
+                        "Server có thể đang không hoạt động",
+                        Notification.NotificationType.Info,
+                        5000
+                    );
+                return;
+            }
+
+            if (!client.Connected) return;
+            switch (response)
+            {
+                case "[CHALLENGE_ACCEPT]":
+                    acceptChallenge(client, response, challenger, me);
+                    break;
+
+                case "[CHALLENGE_DECLINE]":
+                    declineChallenge(client, response, challenger, me);
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+
+        void acceptChallenge(TcpClient client, string response, string challenger, string me) 
+        {
+            if ( UserState.currentState == State.InMatch)
+            {
+                NotificationManager.Instance.ShowNotification(
+                    "Chấp nhận thách đấu thất bại",
+                    "Hiện giờ bạn không thể tham gia trận đấu khác",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+                return;
+            }
+            UserState.currentState = State.InMatch;
+            var stream = client.GetStream();
+            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
+            stream.Write(data, 0, data.Length);
+
+            NotificationManager.Instance.ShowNotification(
+                    $"Đã chấp nhận lời thách đấu của {challenger}",
+                    "Chuẩn bị vào trận đấu!",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+        }
+
+        void declineChallenge(TcpClient client, string response, string challenger, string me)
+        {
+            var stream = client.GetStream();
+            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
+            stream.Write(data, 0, data.Length);
+
+            NotificationManager.Instance.ShowNotification(
+                    $"Đã từ chối lời thách đấu của {challenger}",
+                    "Không đủ trình!",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+            stream.Close();
+            client.Close();
+            client = null;
+            return;
         }
 
         private async void Window_Unloaded(object sender, RoutedEventArgs e)

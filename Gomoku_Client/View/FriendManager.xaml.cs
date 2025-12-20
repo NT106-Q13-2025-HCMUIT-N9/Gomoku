@@ -163,16 +163,36 @@ namespace Gomoku_Client.View
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
 
             TcpClient client = new TcpClient();
-            client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+            try
+            {
+                client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+            }
+            catch
+            {
+                NotificationManager.Instance.ShowNotification(
+                        "Lỗi",
+                        "Server có thể đang không hoạt động",
+                        Notification.NotificationType.Info,
+                        5000
+                    );
+                return;
+            }
+
+            if (!client.Connected) return;
+
             var stream = client.GetStream();
             
             if (!user_data.MatchRequests.Contains(username))
             {
                 byte[] data = Encoding.UTF8.GetBytes($"[CHALLENGE_REQUEST];{username};{butt?.Name}");
-
                 stream.Write(data, 0, data.Length);
-                
 
+                NotificationManager.Instance.ShowNotification(
+                        "Thách đấu thành công",
+                        $"Đã gửi thách đấu tới {butt?.Name}",
+                        Notification.NotificationType.Info,
+                        5000
+                    );
 
                 user_data.MatchRequests.Add(username);
                 await doc_ref.SetAsync(user_data);
@@ -200,7 +220,7 @@ namespace Gomoku_Client.View
                 await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(username));
                 NotificationManager.Instance.ShowNotification(
                     $"{butt?.Name} không phản hồi thách đấu",
-                    $"Chắc con vợ này rén rồi 😏",
+                    $"Chắc con vợ này rén rồi",
                     Notification.NotificationType.Info,
                     5000
                 );
@@ -233,7 +253,7 @@ namespace Gomoku_Client.View
                     case "[CHALLENGE_DECLINE]":
                         NotificationManager.Instance.ShowNotification(
                             $"{butt?.Name} đã từ chối thách đấu",
-                            "Chắc con vợ này rén rồi 😏",
+                            "Chắc con vợ này rén rồi",
                             Notification.NotificationType.Info,
                             5000
                             );

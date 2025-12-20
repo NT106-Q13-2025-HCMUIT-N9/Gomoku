@@ -139,11 +139,14 @@ namespace Gomoku_Client.View
             var slideOut = (Storyboard)this.Resources["SlideOut"];
             slideOut.Completed += (s, e) =>
             {
-                var item = this.DataContext as NotificationItem;
-                if (item != null)
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    NotificationManager.Instance.RemoveNotification(item);
-                }
+                    var item = this.DataContext as NotificationItem;
+                    if (item != null)
+                    {
+                        NotificationManager.Instance.RemoveNotification(item);
+                    }
+                }), System.Windows.Threading.DispatcherPriority.ContextIdle);
             };
             slideOut.Begin();
         }

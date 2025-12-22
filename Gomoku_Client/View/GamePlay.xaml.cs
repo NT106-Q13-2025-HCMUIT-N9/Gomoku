@@ -73,7 +73,7 @@ namespace Gomoku_Client.View
             SetupTimers();
             UpdateGameStatus();
 
-            Player1NameText.Text = $"{player1Name}";
+            Player1NameText.Text = $"{player1Name} (BẠN)";
             Player2NameText.Text = $"{player2Name}";
 
             GameStatusText.Text = isPlayerTurn
@@ -434,9 +434,7 @@ namespace Gomoku_Client.View
             Dispatcher.Invoke(() =>
             {
                 UpdateTurnUI();
-                string currentPlayer = isPlayerTurn ? player1Name : player2Name;
-                char currentSymbol = isPlayerTurn ? playerSymbol : GetOpponentSymbol();
-                GameStatusText.Text = $"Lượt của {currentPlayer}";
+                GameStatusText.Text = isPlayerTurn ? "Lượt của bạn" : $"Lượt của {player2Name}";
             });
         }
 
@@ -480,19 +478,80 @@ namespace Gomoku_Client.View
 
             Dispatcher.Invoke(() =>
             {
-                MessageBoxResult result = MessageBox.Show(
-                    message + "\n\nThoát về màn hình chính?",
-                    "Kết thúc trận đấu",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Information
-                );
+                bool isLocalPlayerWinner = player1Wins.HasValue && player1Wins.Value;
+                bool isDraw = !player1Wins.HasValue;
 
-                if (result == MessageBoxResult.Yes)
+                Border blackOverlay = new Border
                 {
-                    ExitToHome();
+                    Background = new SolidColorBrush(Colors.Black),
+                    Opacity = 0,
+                    Width = mainWindow.ActualWidth,
+                    Height = mainWindow.ActualHeight
+                };
+
+                var rootGrid = this.Content as Grid;
+                if (rootGrid != null)
+                {
+                    rootGrid.Children.Add(blackOverlay);
+                    Panel.SetZIndex(blackOverlay, 9999);
                 }
+
+                var fadeToBlack = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
+                };
+
+                fadeToBlack.Completed += (s, args) =>
+                {
+                    MatchResult resultPage = new MatchResult(
+                        isLocalPlayerWinner,
+                        player1Name,
+                        player2Name,
+                        mainWindow,
+                        isDraw
+                    );
+
+                    resultPage.Opacity = 0;
+
+                    if (mainWindow != null)
+                    {
+                        try
+                        {
+                            mainWindow.NavigateWithAnimation(resultPage);
+
+                            Dispatcher.BeginInvoke(new Action(() =>
+                            {
+                                var fadeIn = new DoubleAnimation
+                                {
+                                    From = 0,
+                                    To = 1,
+                                    Duration = TimeSpan.FromSeconds(0.5),
+                                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                                };
+                                resultPage.BeginAnimation(OpacityProperty, fadeIn);
+                            }), DispatcherPriority.Loaded);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"[ERROR] Navigation failed: {ex.Message}");
+                            MessageBox.Show(message);
+                            ExitToHome();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show(message);
+                        ExitToHome();
+                    }
+                };
+
+                blackOverlay.BeginAnimation(OpacityProperty, fadeToBlack);
             });
         }
+
 
         private void SendMoveToServer(int row, int col)
         {
@@ -960,8 +1019,6 @@ namespace Gomoku_Client.View
                         isGameOver = true;
                         player1Timer.Stop();
                         player2Timer.Stop();
-                        MessageBox.Show("Trận đấu đã kết thúc", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                        ExitToHome();
                     });
                     break;
 

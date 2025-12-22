@@ -407,32 +407,5 @@ namespace Gomoku_Client
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Begin(border);
         }
-        private void btn_Test_Click(object sender, RoutedEventArgs e)
-        {
-            NotificationManager.Instance.ShowNotification(
-                "info noti test",
-                "message mesage skibidi",
-                Notification.NotificationType.Info,
-                5000 
-            );
-        }
-
-        private void btn_Test1_Click(object sender, RoutedEventArgs e)
-        {
-            NotificationManager.Instance.ShowNotification(
-                "yesno noti test",
-                "lay bo",
-                Notification.NotificationType.YesNo,
-                4000,
-                onAccept: (s, ev) =>
-                {
-                    MessageBox.Show("accepted.");
-                },
-                onDecline: (s, ev) =>
-                {
-                    MessageBox.Show("declined.");
-                }
-            );
-        }
     }
 }

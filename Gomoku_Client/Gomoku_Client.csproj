@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\a1.jpg" />
+    <None Remove="Assets\a2.jpg" />
+    <None Remove="Assets\a3.jpg" />
+    <None Remove="Assets\a4.jpg" />
+    <None Remove="Assets\a5.jpg" />
+    <None Remove="Assets\a6.jpg" />
     <None Remove="Assets\AI_Background.gif" />
     <Compile Remove="Helpers\**" />
     <Compile Remove="Services\**" />
@@ -22,6 +28,49 @@
 
   <ItemGroup>
     <None Remove="Assets\api.env" />
+    <None Remove="Assets\Avatar\GenG Canyon.jpg" />
+    <None Remove="Assets\Avatar\GenG Chovy.jpg" />
+    <None Remove="Assets\Avatar\GenG Kiin.jpg" />
+    <None Remove="Assets\Avatar\GenG Lehends.jpg" />
+    <None Remove="Assets\Avatar\GenG Logo.jpg" />
+    <None Remove="Assets\Avatar\GenG Ruler.jpg" />
+    <None Remove="Assets\Avatar\GomokuBanner.png" />
+    <None Remove="Assets\Avatar\GomokuBannerAlt.png" />
+    <None Remove="Assets\Avatar\HLE Kanavi.jpg" />
+    <None Remove="Assets\Avatar\HLE Logo.jpg" />
+    <None Remove="Assets\Avatar\HLE Peanut.jpg" />
+    <None Remove="Assets\Avatar\HLE Viper.jpg" />
+    <None Remove="Assets\Avatar\HLE Zeka.jpg" />
+    <None Remove="Assets\Avatar\HLE Zeus.jpg" />
+    <None Remove="Assets\Avatar\KT Aiming.jpg" />
+    <None Remove="Assets\Avatar\KT Bdd.jpg" />
+    <None Remove="Assets\Avatar\KT Flash.jpg" />
+    <None Remove="Assets\Avatar\KT Logo.jpg" />
+    <None Remove="Assets\Avatar\KT Score.jpg" />
+    <None Remove="Assets\Avatar\KT Smeb.jpg" />
+    <None Remove="Assets\Avatar\Random Baka.jpg" />
+    <None Remove="Assets\Avatar\Random BigChungus.jpg" />
+    <None Remove="Assets\Avatar\Random Charlie.jpg" />
+    <None Remove="Assets\Avatar\Random CoolerFreddy.jpg" />
+    <None Remove="Assets\Avatar\Random DonaldTrump.jpg" />
+    <None Remove="Assets\Avatar\Random Freddy.jpg" />
+    <None Remove="Assets\Avatar\Random GermanArtist.jpg" />
+    <None Remove="Assets\Avatar\Random IShowMeat.jpg" />
+    <None Remove="Assets\Avatar\Random J97.jpg" />
+    <None Remove="Assets\Avatar\Random J97v2.jpg" />
+    <None Remove="Assets\Avatar\Random Larry.jpg" />
+    <None Remove="Assets\Avatar\Random Michael.jpg" />
+    <None Remove="Assets\Avatar\Random Teto.jpg" />
+    <None Remove="Assets\Avatar\Random Truo.jpg" />
+    <None Remove="Assets\Avatar\Random Tuanas.jpg" />
+    <None Remove="Assets\Avatar\Random Tus.jpg" />
+    <None Remove="Assets\Avatar\Random Yippe.jpg" />
+    <None Remove="Assets\Avatar\T1 Faker.jpg" />
+    <None Remove="Assets\Avatar\T1 Gumayusi.jpg" />
+    <None Remove="Assets\Avatar\T1 Keria.jpg" />
+    <None Remove="Assets\Avatar\T1 Oner.jpg" />
+    <None Remove="Assets\Avatar\T1 Zeus.jpg" />
+    <None Remove="Assets\Avatar\T1_6sao.jpg" />
     <None Remove="Assets\delete-friend.png" />
     <None Remove="Assets\firebase_key.json" />
     <None Remove="Assets\Gomoku.ico" />
@@ -46,6 +95,49 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Avatar\GenG Canyon.jpg" />
+    <Resource Include="Assets\Avatar\GenG Chovy.jpg" />
+    <Resource Include="Assets\Avatar\GenG Kiin.jpg" />
+    <Resource Include="Assets\Avatar\GenG Lehends.jpg" />
+    <Resource Include="Assets\Avatar\GenG Logo.jpg" />
+    <Resource Include="Assets\Avatar\GenG Ruler.jpg" />
+    <Resource Include="Assets\Avatar\GomokuBanner.png" />
+    <Resource Include="Assets\Avatar\GomokuBannerAlt.png" />
+    <Resource Include="Assets\Avatar\HLE Kanavi.jpg" />
+    <Resource Include="Assets\Avatar\HLE Logo.jpg" />
+    <Resource Include="Assets\Avatar\HLE Peanut.jpg" />
+    <Resource Include="Assets\Avatar\HLE Viper.jpg" />
+    <Resource Include="Assets\Avatar\HLE Zeka.jpg" />
+    <Resource Include="Assets\Avatar\HLE Zeus.jpg" />
+    <Resource Include="Assets\Avatar\KT Aiming.jpg" />
+    <Resource Include="Assets\Avatar\KT Bdd.jpg" />
+    <Resource Include="Assets\Avatar\KT Flash.jpg" />
+    <Resource Include="Assets\Avatar\KT Logo.jpg" />
+    <Resource Include="Assets\Avatar\KT Score.jpg" />
+    <Resource Include="Assets\Avatar\KT Smeb.jpg" />
+    <Resource Include="Assets\Avatar\Random Baka.jpg" />
+    <Resource Include="Assets\Avatar\Random BigChungus.jpg" />
+    <Resource Include="Assets\Avatar\Random Charlie.jpg" />
+    <Resource Include="Assets\Avatar\Random CoolerFreddy.jpg" />
+    <Resource Include="Assets\Avatar\Random DonaldTrump.jpg" />
+    <Resource Include="Assets\Avatar\Random Freddy.jpg" />
+    <Resource Include="Assets\Avatar\Random GermanArtist.jpg" />
+    <Resource Include="Assets\Avatar\Random IShowMeat.jpg" />
+    <Resource Include="Assets\Avatar\Random J97.jpg" />
+    <Resource Include="Assets\Avatar\Random J97v2.jpg" />
+    <Resource Include="Assets\Avatar\Random Larry.jpg" />
+    <Resource Include="Assets\Avatar\Random Michael.jpg" />
+    <Resource Include="Assets\Avatar\Random Teto.jpg" />
+    <Resource Include="Assets\Avatar\Random Truo.jpg" />
+    <Resource Include="Assets\Avatar\Random Tuanas.jpg" />
+    <Resource Include="Assets\Avatar\Random Tus.jpg" />
+    <Resource Include="Assets\Avatar\Random Yippe.jpg" />
+    <Resource Include="Assets\Avatar\Random DirtBlock.jpg" />
+    <Resource Include="Assets\Avatar\T1 Faker.jpg" />
+    <Resource Include="Assets\Avatar\T1 Gumayusi.jpg" />
+    <Resource Include="Assets\Avatar\T1 Keria.jpg" />
+    <Resource Include="Assets\Avatar\T1 Oner.jpg" />
+    <Resource Include="Assets\Avatar\T1 Zeus.jpg" />
     <Resource Include="Assets\delete-friend.png" />
     <Resource Include="Assets\Main.png" />
     <Resource Include="Assets\Matchmaking_Background.png" />
@@ -102,6 +194,7 @@
     <Content Include="Assets\Sounds\RelaxedScene.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Assets\Avatar\T1_6sao.jpg" />
     <Resource Include="Assets\t1.jpg" />
     <Resource Include="Assets\T1_6sao.jpg" />
   </ItemGroup>

@@ -18,7 +18,7 @@
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="7"/>
     </WindowChrome.WindowChrome>
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -63,7 +63,7 @@
                 </DoubleAnimation>
             </Storyboard>
 
-            
+
             <!-- fade out anim -->
             <Storyboard x:Key="FadeOutStoryboard">
                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
@@ -121,7 +121,7 @@
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Main.png" 
+            <ImageBrush ImageSource="/Assets/Images/Main.png" 
                         Stretch="UniformToFill" 
                         Opacity="0.4"/>
         </Grid.Background>
@@ -176,6 +176,11 @@
                     <GradientStop Color="Transparent" Offset="1.0"/>
                 </LinearGradientBrush>
             </Grid.Background>
+            <!--TODO: delete this after tested-->
+            <Button x:Name="btn_Test" Content="test noti" HorizontalAlignment="Left" Margin="244,592,0,0" VerticalAlignment="Top" Height="65" Width="144" Background="White" Click="btn_Test_Click"/>
+            <Button x:Name="btn_Test1" HorizontalAlignment="Left" Margin="448,590,0,0" VerticalAlignment="Top" Height="66" Width="144" Background="White" Click="btn_Test1_Click">
+                <Button Content="test noti1"/>
+            </Button>
         </Grid>
 
         <StackPanel x:Name="StackPanelMenu"
@@ -280,8 +285,8 @@
             <RadioButton x:Name="SettingButton" Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="SettingButton_Checked"/>
             <RadioButton x:Name="ExitButton" Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="ExitButton_Checked"/>
         </StackPanel>
-        
-        
+
+
         <Grid>
 
             <!-- Main Content Grid -->
@@ -298,6 +303,7 @@
                     <Border x:Name="PlayerCard" CornerRadius="0" Padding="20" Margin="0,0,0,20" Height="604">
                         <Border.Background>
                             <ImageBrush ImageSource="/Assets/Avatar/GomokuBannerAlt.png" Stretch="Fill" Opacity="0.4"/>
+                            <ImageBrush ImageSource="/Assets/Images/t1_card.jpg" Stretch="UniformToFill" Opacity="0.4"/>
                         </Border.Background>
                         <Border.Effect>
                             <DropShadowEffect x:Name="GlowEffect" Color="#FF4655" BlurRadius="20" ShadowDepth="0" Opacity="0.6"/>
@@ -404,8 +410,8 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        
-        
+
+
         <Frame x:Name="MainFrame"
                NavigationUIVisibility="Hidden"
                Visibility="Collapsed">
@@ -839,6 +845,27 @@
                 </Border>
             </Border>
         </Grid>
+        <!-- noti -->
+        <ItemsControl ItemsSource="{Binding Source={x:Static ctrls:NotificationManager.Instance}, Path=Notifications}"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              Margin="0,0,20,20"
+              Panel.ZIndex="9999">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ctrls:Notification x:Name="NotificationControl"
+                              Title="{Binding Title}"
+                              Message="{Binding Message}"
+                              Type="{Binding Type}"
+                              AutoCloseDuration="{Binding AutoCloseDuration}"
+                              Margin="0,0,0,5"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
-
 </Window>

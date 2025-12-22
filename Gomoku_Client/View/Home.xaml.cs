@@ -10,6 +10,9 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Media;
+using System.Net;
+using System.Net.Sockets;
+using System.Printing.IndexedProperties;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -49,6 +52,8 @@ namespace Gomoku_Client
         public ObservableCollection<AvatarItem>? Avatars { get; set; }
         public ObservableCollection<AvatarItem>? SecretAvatars { get; set; }
 
+        FirestoreChangeListener? match_listener;
+        List<string> old_match_request = new List<string>();
         public MainGameUI()
         {
             InitializeComponent();
@@ -338,6 +343,10 @@ namespace Gomoku_Client
             NavigateWithSlideAnimation(new Lobby(this), (RadioButton)sender);
         }
 
+        public void NavigateToLobby()
+        {
+            MainFrame.Navigate(new Lobby(this));
+        }
         private void HistoryButton_Checked(object sender, RoutedEventArgs e)
         {
             ButtonClick.Stop();
@@ -393,9 +402,9 @@ namespace Gomoku_Client
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
-
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            tb_PlayerName.Text = username;
+
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(username);
 
             listener = doc_ref.Listen(doc_snap => {
@@ -412,6 +421,125 @@ namespace Gomoku_Client
                     });
                 }
             });
+
+            Google.Cloud.Firestore.DocumentReference match_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
+            match_listener = match_ref.Listen(snapshot => {
+                if (snapshot.Exists)
+                {
+                    UserDataModel user_data = snapshot.ConvertTo<UserDataModel>();
+                    if(old_match_request.Count >= 1)
+                    {
+                        List<string> deleted_request = old_match_request.Except(user_data.MatchRequests).ToList();
+                        foreach (string del in deleted_request)
+                        {
+                            old_match_request.Remove(del);
+                        }
+                    }
+
+                    List<string> diff_request = user_data.MatchRequests.Except(old_match_request).ToList();
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        foreach (string request in diff_request)
+                        {
+                            NotificationManager.Instance.ShowNotification(
+                                $"{request} muốn thách đấu bạn",
+                                "Bạn sợ à ?",
+                                Notification.NotificationType.YesNo,
+                                15000,
+                                onAccept: (s, e) =>
+                                {
+                                    respondChallenge("[CHALLENGE_ACCEPT]", request, username);                                  
+                                },
+                                onDecline: (s, e) =>
+                                {
+                                    respondChallenge("[CHALLENGE_DECLINE]", request, username);
+                                }
+                            );
+                        }
+                    });
+                }
+            });
+        }
+
+        private TcpClient client;
+
+        void respondChallenge(string response, string challenger, string me)
+        {
+            client = new TcpClient();
+
+            try
+            {
+                client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+            }
+            catch
+            {
+                NotificationManager.Instance.ShowNotification(
+                        "Lỗi",
+                        "Server có thể đang không hoạt động",
+                        Notification.NotificationType.Info,
+                        5000
+                    );
+                return;
+            }
+
+            if (!client.Connected) return;
+            switch (response)
+            {
+                case "[CHALLENGE_ACCEPT]":
+                    acceptChallenge(client, response, challenger, me);
+                    break;
+
+                case "[CHALLENGE_DECLINE]":
+                    declineChallenge(client, response, challenger, me);
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+
+        void acceptChallenge(TcpClient client, string response, string challenger, string me) 
+        {
+            if ( UserState.currentState == State.InMatch)
+            {
+                NotificationManager.Instance.ShowNotification(
+                    "Chấp nhận thách đấu thất bại",
+                    "Hiện giờ bạn không thể tham gia trận đấu khác",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+                return;
+            }
+            UserState.currentState = State.InMatch;
+            var stream = client.GetStream();
+            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
+            stream.Write(data, 0, data.Length);
+
+            NotificationManager.Instance.ShowNotification(
+                    $"Đã chấp nhận lời thách đấu của {challenger}",
+                    "Chuẩn bị vào trận đấu!",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+        }
+
+        void declineChallenge(TcpClient client, string response, string challenger, string me)
+        {
+            var stream = client.GetStream();
+            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
+            stream.Write(data, 0, data.Length);
+
+            NotificationManager.Instance.ShowNotification(
+                    $"Đã từ chối lời thách đấu của {challenger}",
+                    "Không đủ trình!",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+            stream.Close();
+            client.Close();
+            client = null;
+            return;
         }
 
         private async void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -420,6 +548,12 @@ namespace Gomoku_Client
             {
                 await listener.StopAsync();
                 listener = null;
+            }
+
+            if(match_listener != null)
+            {
+                await match_listener.StopAsync();
+                match_listener = null;
             }
         }
 
@@ -638,6 +772,32 @@ namespace Gomoku_Client
             };
 
             storyboard.Begin(border);
+        private void btn_Test_Click(object sender, RoutedEventArgs e)
+        {
+            NotificationManager.Instance.ShowNotification(
+                "info noti test",
+                "message mesage skibidi",
+                Notification.NotificationType.Info,
+                5000 
+            );
+        }
+
+        private void btn_Test1_Click(object sender, RoutedEventArgs e)
+        {
+            NotificationManager.Instance.ShowNotification(
+                "yesno noti test",
+                "lay bo",
+                Notification.NotificationType.YesNo,
+                4000,
+                onAccept: (s, ev) =>
+                {
+                    MessageBox.Show("accepted.");
+                },
+                onDecline: (s, ev) =>
+                {
+                    MessageBox.Show("declined.");
+                }
+            );
         }
     }
 }

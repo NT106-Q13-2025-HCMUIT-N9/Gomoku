@@ -78,6 +78,9 @@
     <None Remove="Assets\delete-friend.png" />
     <None Remove="Assets\firebase_key.json" />
     <None Remove="Assets\Gomoku.ico" />
+    <None Remove="Assets\hle.png" />
+    <None Remove="Assets\Images\t1.png" />
+    <None Remove="Assets\Images\T1_Card.jpg" />
     <None Remove="Assets\Login_Background.png" />
     <None Remove="Assets\Main.png" />
     <None Remove="Assets\Matchmaking_Background.png" />
@@ -153,6 +156,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Assets\Images\hle.png" />
+    <Resource Include="Assets\Images\Delete_Friend.png" />
+    <Resource Include="Assets\Images\T1.png" />
+    <Resource Include="Assets\Images\Main.png" />
+    <Resource Include="Assets\Images\Matchmaking_Background.png" />
+    <Resource Include="Assets\Images\Riot_Games_Logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
     <PackageReference Include="Google.Cloud.Firestore" Version="3.12.0" />
@@ -160,7 +172,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\AI_Background.gif" />
+    <Resource Include="Assets\Images\AI_Background.gif" />
     <Resource Include="Assets\api.env" />
     <Resource Include="Assets\firebase_key.json" />
     <Resource Include="Assets\Gomoku.ico" />
@@ -209,6 +221,13 @@
 
   <ItemGroup>
     <Folder Include="Assets\Images\" />
+    <Resource Include="Assets\Images\Login_Background.png" />
+    <Resource Include="Assets\Images\ServerBrowser_Background.gif" />
+    <Resource Include="Assets\Images\T1_Card.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\Sounds\" />
   </ItemGroup>
 
 </Project>

@@ -97,11 +97,14 @@ namespace Gomoku_Client
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Baka.jpg", Name="Baka" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Larry.jpg", Name="Larry" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Yippe.jpg", Name="Yippe" },
-                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Teto.jpg", Name="Teto" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Miku.jpg", Name="Miku" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Teto.jpg", Name="Teto" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Charlie.jpg", Name="Charlie" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DonaldTrump.jpg", Name="Đô Năm Trăm" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random GermanArtist.jpg", Name="Họa sĩ Dức" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Floyd.jpg", Name="George Floyd" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Droid.jpg", Name="George Droid" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Epstein.jpg", Name="Kẻ bí ẩn" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random IShowMeat.jpg", Name="IShowMeat" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random BigChungus.jpg", Name="Big Chungus" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Freddy.jpg", Name="Freddy" },
@@ -568,6 +571,7 @@ namespace Gomoku_Client
             {
                 AvatarBrush.ImageSource = new BitmapImage(new Uri(selectedAvatar.Image ?? "", UriKind.RelativeOrAbsolute));
 
+                
                 if (selectedAvatar.Name?.Contains("T1|") == true)
                     ColorChangeUI("#FF4655", "#FF4655");
                 else if (selectedAvatar.Name?.Contains("GenG|") == true)

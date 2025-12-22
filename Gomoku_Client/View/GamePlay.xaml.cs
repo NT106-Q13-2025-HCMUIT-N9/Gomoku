@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -39,7 +40,6 @@ namespace Gomoku_Client.View
         private string player2Name = "OPPONENT";
 
         private TcpClient tcpClient;
-        private NetworkStream stream;
         private Thread receiveThread;
         private bool isConnected = false;
         private MainGameUI mainWindow;
@@ -57,15 +57,15 @@ namespace Gomoku_Client.View
                 return;
             }
 
+            this.isConnected = true;
             this.tcpClient = client;
-            this.stream = client.GetStream();
+
             this.player1Name = username;
             this.playerSymbol = symbol;
             this.opponentName = opponent;
             this.player2Name = opponent;
 
             this.isPlayerTurn = (symbol == 'X');
-            this.isConnected = true;
             this.isGameOver = false;
 
             InitializeGame();
@@ -73,52 +73,25 @@ namespace Gomoku_Client.View
             SetupTimers();
             UpdateGameStatus();
 
+            Player1NameText.Text = $"{player1Name} ({playerSymbol})";
+            Player2NameText.Text = $"{player2Name} ({GetOpponentSymbol()})";
+
+            GameStatusText.Text = isPlayerTurn
+                ? $"Lượt của bạn ({playerSymbol})"
+                : $"Lượt của đối thủ ({GetOpponentSymbol()})";
+
+            Console.WriteLine($"[INIT] Player: {username}, Symbol: {symbol}, IsPlayerTurn: {isPlayerTurn}, IsGameOver: {isGameOver}");
+
             receiveThread = new Thread(ReceiveFromServer);
             receiveThread.IsBackground = true;
             receiveThread.Start();
-
-            Dispatcher.Invoke(() =>
-            {
-                Player1NameText.Text = $"{player1Name} ({playerSymbol})";
-                Player2NameText.Text = $"{player2Name} ({GetOpponentSymbol()})";
-
-                if (isPlayerTurn)
-                {
-                    player1Timer.Start();
-                    GameStatusText.Text = $"Lượt của bạn ({playerSymbol})";
-                }
-                else
-                {
-                    player2Timer.Start();
-                    GameStatusText.Text = $"Lượt của đối thủ ({GetOpponentSymbol()})";
-                }
-
-                SendReadyToServer();
-            });
-
-            Console.WriteLine($"[INIT] Player: {username}, Symbol: {symbol}, IsPlayerTurn: {isPlayerTurn}, IsGameOver: {isGameOver}");
+            Console.WriteLine("[INIT] Receive thread started immediately");
         }
-
         private char GetOpponentSymbol()
         {
             return playerSymbol == 'X' ? 'O' : 'X';
         }
 
-        private void SendReadyToServer()
-        {
-            try
-            {
-                string message = $"[READY];{player1Name}";
-                byte[] data = Encoding.UTF8.GetBytes(message);
-                stream.Write(data, 0, data.Length);
-                stream.Flush();
-                Console.WriteLine($"[SEND] {message}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ERROR] SendReadyToServer: {ex.Message}");
-            }
-        }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -137,21 +110,24 @@ namespace Gomoku_Client.View
 
                 if (receiveThread != null && receiveThread.IsAlive)
                 {
-                    receiveThread.Join(100);
+                    receiveThread.Join(500);
                 }
 
-                if (stream != null)
-                    stream.Close();
-
                 if (tcpClient != null)
-                    tcpClient.Close();
+                {
+                    try { tcpClient.Close(); } catch { }
+                    tcpClient = null;
+                }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Disconnect: {ex.Message}");
+            }
         }
 
         private void BoardCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Console.WriteLine($"[CLICK] isGameOver: {isGameOver}, isPlayerTurn: {isPlayerTurn}");
+            Console.WriteLine($"[CLICK] isGameOver: {isGameOver}, isPlayerTurn: {isPlayerTurn}, playerSymbol: {playerSymbol}");
 
             if (isGameOver)
             {
@@ -161,7 +137,7 @@ namespace Gomoku_Client.View
 
             if (!isPlayerTurn)
             {
-                Console.WriteLine("[CLICK] Not player's turn, click ignored");
+                Console.WriteLine($"[CLICK] Not player's turn (isPlayerTurn={isPlayerTurn}), click ignored");
                 return;
             }
 
@@ -180,14 +156,13 @@ namespace Gomoku_Client.View
 
             if (board[row, col] != 0)
             {
-                Console.WriteLine("[CLICK] Cell already occupied");
+                Console.WriteLine($"[CLICK] Cell already occupied: board[{row},{col}] = {board[row, col]}");
                 return;
             }
 
             Console.WriteLine($"[CLICK] Valid move, sending to server");
             SendMoveToServer(row, col);
         }
-
         private void SendMessage_Click(object sender, RoutedEventArgs e)
         {
             SendChatMessage();
@@ -266,30 +241,6 @@ namespace Gomoku_Client.View
             }
         }
 
-        private void SendChatMessage()
-        {
-            string message = tb_Message.Text.Trim();
-
-            if (string.IsNullOrEmpty(message))
-                return;
-
-            DisplayChatMessage(player1Name, message, true);
-
-            try
-            {
-                string chatMessage = $"[CHAT];{player1Name};{message}";
-                byte[] data = Encoding.UTF8.GetBytes(chatMessage);
-                stream.Write(data, 0, data.Length);
-                stream.Flush();
-                Console.WriteLine($"[SEND] {chatMessage}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[ERROR] SendChatMessage: {ex.Message}");
-            }
-
-            tb_Message.Clear();
-        }
 
         private void DisplayChatMessage(string senderName, string message, bool isOwnMessage)
         {
@@ -392,11 +343,9 @@ namespace Gomoku_Client.View
         {
             player1Timer = new DispatcherTimer();
             player1Timer.Interval = TimeSpan.FromSeconds(1);
-            player1Timer.Tick += Player1Timer_Tick;
 
             player2Timer = new DispatcherTimer();
             player2Timer.Interval = TimeSpan.FromSeconds(1);
-            player2Timer.Tick += Player2Timer_Tick;
 
             player1TimeLeft = TimeSpan.FromMinutes(5);
             player2TimeLeft = TimeSpan.FromMinutes(5);
@@ -429,30 +378,6 @@ namespace Gomoku_Client.View
             {
                 Player2TimerText.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#ECECEC"));
             }
-        }
-
-        private TextBlock FindTimerTextBlock(bool isPlayer1)
-        {
-            var textBlocks = FindVisualChildren<TextBlock>(this);
-
-            foreach (var tb in textBlocks)
-            {
-                if (tb.FontFamily.Source == "Consolas" && tb.FontSize == 30)
-                {
-                    if (isPlayer1 && tb.Foreground is SolidColorBrush brush &&
-                        brush.Color.ToString() == "#FF00D946")
-                    {
-                        return tb;
-                    }
-                    else if (!isPlayer1 && tb.Foreground is SolidColorBrush brush2 &&
-                             brush2.Color.ToString() == "#FFECECEC")
-                    {
-                        return tb;
-                    }
-                }
-            }
-
-            return null;
         }
 
         private static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
@@ -501,28 +426,6 @@ namespace Gomoku_Client.View
                 Canvas.SetTop(stone, y);
 
                 BoardCanvas.Children.Add(stone);
-            });
-        }
-
-        private void SwitchTurn()
-        {
-            Dispatcher.Invoke(() =>
-            {
-                isPlayerTurn = !isPlayerTurn;
-
-                if (isPlayerTurn)
-                {
-                    player2Timer.Stop();
-                    player1Timer.Start();
-                }
-                else
-                {
-                    player1Timer.Stop();
-                    player2Timer.Start();
-                }
-
-                UpdateGameStatus();
-                Console.WriteLine($"[SWITCH] isPlayerTurn: {isPlayerTurn}");
             });
         }
 
@@ -590,39 +493,36 @@ namespace Gomoku_Client.View
             });
         }
 
-        private void Player1Timer_Tick(object sender, EventArgs e)
-        {
-            player1TimeLeft = player1TimeLeft.Subtract(TimeSpan.FromSeconds(1));
-            UpdatePlayer1TimerDisplay();
-
-            if (player1TimeLeft.TotalSeconds <= 0)
-            {
-                player1Timer.Stop();
-                GameOver(false, $"{player2Name} thắng do {player1Name} hết thời gian!");
-            }
-        }
-
-        private void Player2Timer_Tick(object sender, EventArgs e)
-        {
-            player2TimeLeft = player2TimeLeft.Subtract(TimeSpan.FromSeconds(1));
-            UpdatePlayer2TimerDisplay();
-
-            if (player2TimeLeft.TotalSeconds <= 0)
-            {
-                player2Timer.Stop();
-                GameOver(true, $"{player1Name} thắng do {player2Name} hết thời gian!");
-            }
-        }
-
         private void SendMoveToServer(int row, int col)
         {
             try
             {
-                string message = $"[MOVE];{row};{col}";
+                if (!isConnected || tcpClient == null || !tcpClient.Connected)
+                {
+                    Console.WriteLine("[ERROR] Not connected to server");
+                    return;
+                }
+
+                Socket socket = tcpClient.Client;
+                if (socket == null || !socket.Connected)
+                {
+                    Console.WriteLine("[ERROR] Socket is not available for sending");
+                    return;
+                }
+
+                string message = $"[MOVE];{row};{col}\n";
                 byte[] data = Encoding.UTF8.GetBytes(message);
-                stream.Write(data, 0, data.Length);
-                stream.Flush();
-                Console.WriteLine($"[SEND] {message}");
+                socket.Send(data);
+                Console.WriteLine($"[SEND] {message.TrimEnd()}");
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Console.WriteLine($"[ERROR] SendMoveToServer: Socket disposed - {ex.Message}");
+                Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show("Mất kết nối với server.", "Lỗi kết nối", MessageBoxButton.OK, MessageBoxImage.Error);
+                    NavigationService?.GoBack();
+                });
             }
             catch (Exception ex)
             {
@@ -630,15 +530,48 @@ namespace Gomoku_Client.View
             }
         }
 
+        private void SendChatMessage()
+        {
+            string message = tb_Message.Text.Trim();
+
+            if (string.IsNullOrEmpty(message))
+                return;
+
+            DisplayChatMessage(player1Name, message, true);
+
+            try
+            {
+                Socket socket = tcpClient?.Client;
+                if (socket == null || !socket.Connected)
+                {
+                    Console.WriteLine("[ERROR] Socket not available for chat");
+                    return;
+                }
+
+                string chatMessage = $"[CHAT];{player1Name};{message}\n";  // ← THÊM \n
+                byte[] data = Encoding.UTF8.GetBytes(chatMessage);
+                socket.Send(data);
+                Console.WriteLine($"[SEND] {chatMessage.TrimEnd()}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] SendChatMessage: {ex.Message}");
+            }
+
+            tb_Message.Clear();
+        }
+
         private void SendResignToServer()
         {
             try
             {
-                string message = "[RESIGN]";
+                Socket socket = tcpClient?.Client;
+                if (socket == null) return;
+
+                string message = "[RESIGN]\n";
                 byte[] data = Encoding.UTF8.GetBytes(message);
-                stream.Write(data, 0, data.Length);
-                stream.Flush();
-                Console.WriteLine($"[SEND] {message}");
+                socket.Send(data);
+                Console.WriteLine($"[SEND] {message.TrimEnd()}");
             }
             catch (Exception ex)
             {
@@ -650,11 +583,13 @@ namespace Gomoku_Client.View
         {
             try
             {
-                string message = $"[MATCH_END];{player1Name}";
+                Socket socket = tcpClient?.Client;
+                if (socket == null) return;
+
+                string message = $"[MATCH_END];{player1Name}\n";
                 byte[] data = Encoding.UTF8.GetBytes(message);
-                stream.Write(data, 0, data.Length);
-                stream.Flush();
-                Console.WriteLine($"[SEND] {message}");
+                socket.Send(data);
+                Console.WriteLine($"[SEND] {message.TrimEnd()}");
             }
             catch (Exception ex)
             {
@@ -665,29 +600,144 @@ namespace Gomoku_Client.View
         private void ReceiveFromServer()
         {
             byte[] buffer = new byte[4096];
+            StringBuilder messageBuffer = new StringBuilder();
+            DateTime lastMessageTime = DateTime.Now;
+            const int TIMEOUT_SECONDS = 30;
+
+            Console.WriteLine("[RECEIVE] Thread started");
 
             try
             {
-                while (isConnected && tcpClient.Connected)
+                Thread.Sleep(100);
+                Console.WriteLine("[RECEIVE] Starting main receive loop");
+
+                while (isConnected && tcpClient != null)
                 {
-                    if (!stream.DataAvailable)
+                    try
                     {
-                        Thread.Sleep(10);
-                        continue;
+                        Socket socket = tcpClient.Client;
+
+                        if (socket == null)
+                        {
+                            Console.WriteLine("[ERROR] Socket is null");
+                            break;
+                        }
+
+                        if (!socket.Connected)
+                        {
+                            Console.WriteLine("[ERROR] Socket not connected, checking if data available...");
+                            if (socket.Available == 0)
+                            {
+                                break;
+                            }
+                        }
+
+                        TimeSpan timeSinceLastMessage = DateTime.Now - lastMessageTime;
+                        if (timeSinceLastMessage.TotalSeconds > TIMEOUT_SECONDS)
+                        {
+                            Console.WriteLine($"[TIMEOUT] No message for {TIMEOUT_SECONDS}s");
+
+                            try
+                            {
+                                Dispatcher.BeginInvoke(() =>
+                                {
+                                    GameOver(null, "Mất kết nối với server do timeout!");
+                                });
+                            }
+                            catch { }
+                            break;
+                        }
+
+                        if (socket.Available == 0)
+                        {
+                            Thread.Sleep(50);
+                            continue;
+                        }
+
+                        int bytesRead = socket.Receive(buffer);
+
+                        if (bytesRead == 0)
+                        {
+                            Console.WriteLine("[INFO] Server closed connection (0 bytes)");
+                            break;
+                        }
+
+                        lastMessageTime = DateTime.Now;
+                        Console.WriteLine($"[RECEIVE] Got {bytesRead} bytes, timeout reset");
+
+                        string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                        messageBuffer.Append(data);
+
+                        string bufferedData = messageBuffer.ToString();
+                        string[] lines = bufferedData.Split('\n');
+
+                        for (int i = 0; i < lines.Length - 1; i++)
+                        {
+                            string msg = lines[i].Trim();
+                            if (!string.IsNullOrEmpty(msg))
+                            {
+                                Console.WriteLine($"[RECV] {msg}");
+                                try
+                                {
+                                    ProcessServerMessage(msg);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"[ERROR] ProcessServerMessage: {ex.Message}");
+                                }
+                            }
+                        }
+
+                        messageBuffer.Clear();
+                        if (lines.Length > 0)
+                        {
+                            string lastLine = lines[lines.Length - 1];
+                            if (!string.IsNullOrEmpty(lastLine) && !bufferedData.EndsWith("\n"))
+                            {
+                                messageBuffer.Append(lastLine);
+                            }
+                        }
                     }
-
-                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bytesRead == 0) break;
-
-                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
-                    Console.WriteLine($"[RECV] {message}");
-                    ProcessServerMessage(message);
+                    catch (SocketException sockEx)
+                    {
+                        if (isConnected)
+                            Console.WriteLine($"[ERROR] SocketException: {sockEx.ErrorCode} - {sockEx.Message}");
+                        break;
+                    }
+                    catch (IOException ioEx)
+                    {
+                        if (isConnected)
+                            Console.WriteLine($"[ERROR] IOException: {ioEx.Message}");
+                        break;
+                    }
                 }
+            }
+            catch (ObjectDisposedException ex)
+            {
+                Console.WriteLine($"[ERROR] Socket disposed: {ex.Message}");
             }
             catch (Exception ex)
             {
                 if (isConnected)
                     Console.WriteLine($"[ERROR] ReceiveFromServer: {ex.Message}");
+            }
+            finally
+            {
+                Console.WriteLine("[RECEIVE] Thread ended");
+
+                if (isConnected && !isGameOver)
+                {
+                    try
+                    {
+                        Dispatcher.BeginInvoke(() =>
+                        {
+                            MessageBox.Show("Mất kết nối với server.", "Lỗi kết nối",
+                                MessageBoxButton.OK, MessageBoxImage.Error);
+                            NavigationService?.GoBack();
+                        });
+                    }
+                    catch { }
+                }
             }
         }
 
@@ -700,15 +750,39 @@ namespace Gomoku_Client.View
 
             switch (command)
             {
+                case "[INIT]":
+                    Console.WriteLine($"[PROCESS] INIT received - Match started");
+                    Dispatcher.Invoke(() =>
+                    {
+                        UpdateGameStatus();
+                    });
+                    break;
+
                 case "[MOVE1]":
                     if (parts.Length >= 3)
                     {
                         int row = int.Parse(parts[1]);
                         int col = int.Parse(parts[2]);
-                        Console.WriteLine($"[PROCESS] MOVE1 at ({row},{col})");
+                        Console.WriteLine($"[PROCESS] MOVE1 at ({row},{col}), mySymbol: {playerSymbol}");
+
                         Dispatcher.Invoke(() =>
                         {
                             PlaceStone(row, col, true);
+
+                            // ← CHỈ SWITCH TURN, KHÔNG ĐIỀU KHIỂN TIMER
+                            if (playerSymbol == 'X')
+                            {
+                                isPlayerTurn = false;
+                                Console.WriteLine("[PROCESS] My move (X), turn OFF");
+                            }
+                            else
+                            {
+                                isPlayerTurn = true;
+                                Console.WriteLine("[PROCESS] Opponent move (X), turn ON");
+                            }
+
+                            UpdateGameStatus();
+
                             if (CheckWin(row, col, 1))
                             {
                                 string winnerName = (playerSymbol == 'X') ? player1Name : player2Name;
@@ -717,10 +791,6 @@ namespace Gomoku_Client.View
                             else if (moveCount >= boardSize * boardSize)
                             {
                                 GameOver(null, "Hòa! Bàn cờ đã đầy!");
-                            }
-                            else
-                            {
-                                SwitchTurn();
                             }
                         });
                     }
@@ -731,10 +801,25 @@ namespace Gomoku_Client.View
                     {
                         int row = int.Parse(parts[1]);
                         int col = int.Parse(parts[2]);
-                        Console.WriteLine($"[PROCESS] MOVE2 at ({row},{col})");
+                        Console.WriteLine($"[PROCESS] MOVE2 at ({row},{col}), mySymbol: {playerSymbol}");
+
                         Dispatcher.Invoke(() =>
                         {
                             PlaceStone(row, col, false);
+
+                            if (playerSymbol == 'O')
+                            {
+                                isPlayerTurn = false;
+                                Console.WriteLine("[PROCESS] My move (O), turn OFF");
+                            }
+                            else
+                            {
+                                isPlayerTurn = true;
+                                Console.WriteLine("[PROCESS] Opponent move (O), turn ON");
+                            }
+
+                            UpdateGameStatus();
+
                             if (CheckWin(row, col, 2))
                             {
                                 string winnerName = (playerSymbol == 'O') ? player1Name : player2Name;
@@ -743,10 +828,6 @@ namespace Gomoku_Client.View
                             else if (moveCount >= boardSize * boardSize)
                             {
                                 GameOver(null, "Hòa! Bàn cờ đã đầy!");
-                            }
-                            else
-                            {
-                                SwitchTurn();
                             }
                         });
                     }
@@ -835,28 +916,44 @@ namespace Gomoku_Client.View
                 case "[TIME1]":
                     if (parts.Length >= 2)
                     {
-                        Dispatcher.Invoke(() =>
+                        if (int.TryParse(parts[1], out int time))
                         {
-                            if (int.TryParse(parts[1], out int time))
+                            Dispatcher.Invoke(() =>
                             {
-                                player1TimeLeft = TimeSpan.FromSeconds(time);
-                                UpdatePlayer1TimerDisplay();
-                            }
-                        });
+                                if (playerSymbol == 'X')
+                                {
+                                    player1TimeLeft = TimeSpan.FromSeconds(time);
+                                    UpdatePlayer1TimerDisplay();
+                                }
+                                else
+                                {
+                                    player2TimeLeft = TimeSpan.FromSeconds(time);
+                                    UpdatePlayer2TimerDisplay();
+                                }
+                            });
+                        }
                     }
                     break;
 
                 case "[TIME2]":
                     if (parts.Length >= 2)
                     {
-                        Dispatcher.Invoke(() =>
+                        if (int.TryParse(parts[1], out int time))
                         {
-                            if (int.TryParse(parts[1], out int time))
+                            Dispatcher.Invoke(() =>
                             {
-                                player2TimeLeft = TimeSpan.FromSeconds(time);
-                                UpdatePlayer2TimerDisplay();
-                            }
-                        });
+                                if (playerSymbol == 'O')
+                                {
+                                    player1TimeLeft = TimeSpan.FromSeconds(time);
+                                    UpdatePlayer1TimerDisplay();
+                                }
+                                else
+                                {
+                                    player2TimeLeft = TimeSpan.FromSeconds(time);
+                                    UpdatePlayer2TimerDisplay();
+                                }
+                            });
+                        }
                     }
                     break;
 

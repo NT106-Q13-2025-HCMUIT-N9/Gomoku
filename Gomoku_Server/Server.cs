@@ -56,24 +56,59 @@ namespace Gomoku_Server
 
         public void Start(int port)
         {
+            try
+            {
+                TcpListener?.Stop();
+            }
+            catch { }
+
             TcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            TcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+
             Thread listenThread = new Thread(ListenForClients);
             listenThread.IsBackground = false;
             listenThread.Start();
         }
 
+        public void Stop()
+        {
+            try
+            {
+                TcpListener?.Stop();
+                Console.WriteLine("[LOG]: Server stopped");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Stop: {ex.Message}");
+            }
+        }
+
         private void ListenForClients()
         {
-            TcpListener.Start();
-            while (true)
+            try
             {
-                TcpClient client = TcpListener.AcceptTcpClient();
-                Thread t = new Thread(() =>
+                TcpListener.Start();
+                Console.WriteLine($"[LOG]: Server started successfully");
+
+                while (true)
                 {
-                    HandleClient(client);
-                });
-                t.IsBackground = true;
-                t.Start();
+                    TcpClient client = TcpListener.AcceptTcpClient();
+                    Thread t = new Thread(() =>
+                    {
+                        HandleClient(client);
+                    });
+                    t.IsBackground = true;
+                    t.Start();
+                }
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine($"[ERROR] ListenForClients: {ex.Message}");
+                Console.WriteLine("[INFO] Port may already be in use. Try a different port or close other instances.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] ListenForClients: {ex.Message}");
             }
         }
 
@@ -81,20 +116,27 @@ namespace Gomoku_Server
         {
             try
             {
-                var stream = client.GetStream();
+                Socket socket = client.Client;
                 byte[] buffer = new byte[1024];
-                int byteRead = stream.Read(buffer, 0, buffer.Length);
+
+                Console.WriteLine($"[HANDLE_CLIENT] Waiting for initial message...");
+
+                int byteRead = socket.Receive(buffer);
                 if (byteRead == 0)
                 {
+                    Console.WriteLine($"[HANDLE_CLIENT] Connection closed (0 bytes)");
                     client.Close();
                     return;
                 }
+
                 string message = Encoding.UTF8.GetString(buffer, 0, byteRead).Trim();
                 string[] parts = message.Split(';');
 
+                Console.WriteLine($"[HANDLE_CLIENT] Received: {message}");
+
                 if (parts.Length < 2)
                 {
-                    ServerUtils.SendMessage(client.Client, "[INVALID_REQUEST]");
+                    ServerUtils.SendMessage(socket, "[INVALID_REQUEST]");
                     client.Close();
                     return;
                 }
@@ -105,12 +147,16 @@ namespace Gomoku_Server
                 {
                     case "[MATCH_REQUEST]":
                         HandleRandomMatchRequest(client, parts);
+                        Console.WriteLine($"[HANDLE_CLIENT] Exiting for {parts[1]} - match threads will handle connection");
                         break;
+
                     case "[CHALLENGE_REQUEST]":
                     case "[CHALLENGE_ACCEPT]":
                     case "[CHALLENGE_DECLINE]":
                         HandleChallenge(client, parts);
+                        Console.WriteLine($"[HANDLE_CLIENT] Exiting for challenge - match threads will handle connection");
                         break;
+
                     case "[MATCH_END]":
                         if (parts.Length >= 2)
                         {
@@ -118,18 +164,17 @@ namespace Gomoku_Server
                         }
                         removeChallengesOf(client);
                         client.Close();
+                        Console.WriteLine($"[HANDLE_CLIENT] Match ended, connection closed");
                         break;
-                    case "[READY]":
-                        if (parts.Length >= 2)
-                        {
-                            Console.WriteLine($"[LOG]: {parts[1]} đã sẵn sàng");
-                        }
-                        break;
+
                     default:
-                        ServerUtils.SendMessage(client.Client, "[INVALID_REQUEST]");
+                        Console.WriteLine($"[HANDLE_CLIENT] Invalid command: {command}");
+                        ServerUtils.SendMessage(socket, "[INVALID_REQUEST]");
                         client.Close();
                         break;
                 }
+
+                Console.WriteLine($"[HANDLE_CLIENT] Thread exiting");
             }
             catch (Exception ex)
             {
@@ -146,9 +191,10 @@ namespace Gomoku_Server
             removeChallengesOf(player2);
             inMatch.TryAdd(name1, true);
             inMatch.TryAdd(name2, true);
-            Console.WriteLine($"[LOG]: Match started : {name1} - {name2}");
-            int clock1 = 600;
-            int clock2 = 600;
+            Console.WriteLine($"[MATCH] Starting: {name1} vs {name2}");
+
+            int clock1 = 300;
+            int clock2 = 300;
 
             MatchHandle matchHandle = new MatchHandle(player1, player2, clock1, clock2, name1, name2);
 
@@ -156,6 +202,13 @@ namespace Gomoku_Server
             {
                 ServerUtils.SendMessage(player1.Client, $"[INIT];{clock1};{clock2};X");
                 ServerUtils.SendMessage(player2.Client, $"[INIT];{clock1};{clock2};O");
+
+                Console.WriteLine($"[MATCH] Sent [INIT] to both players");
+
+                Console.WriteLine($"[MATCH] Waiting for HandleClient threads to exit...");
+                Thread.Sleep(500);
+
+                Console.WriteLine($"[MATCH] Starting match threads...");
 
                 Thread clockThread = new Thread(matchHandle.StartClock);
                 Thread p1Thread = new Thread(matchHandle.Handle_Player1);
@@ -168,10 +221,12 @@ namespace Gomoku_Server
                 clockThread.Start();
                 p1Thread.Start();
                 p2Thread.Start();
+
+                Console.WriteLine($"[MATCH] All threads started for {name1} vs {name2}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[MATCH ERROR]: " + ex.ToString());
+                Console.WriteLine($"[MATCH ERROR]: {ex}");
             }
         }
 
@@ -370,7 +425,6 @@ namespace Gomoku_Server
                 Thread.Sleep(1000);
             }
 
-            // Timeout
             Console.WriteLine($"[LOG]: Challenge request timeout for room: {room}");
             ServerUtils.SendMessage(client.Client, $"[CHALLENGE_TIMEOUT];{room}");
             challenges.TryRemove(room, out _);

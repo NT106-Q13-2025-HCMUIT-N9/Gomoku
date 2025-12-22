@@ -15,19 +15,14 @@ namespace Gomoku_Server
             {
                 if (socket == null) return false;
 
-                if ((socket.Poll(1000, SelectMode.SelectRead) && socket.Available == 0) || !socket.Connected)
-                    return false;
-                else
-                    return true;
+                return socket.Connected;
             }
-            catch (SocketException e)
+            catch (ObjectDisposedException)
             {
-                Console.WriteLine($"[ERROR] StillConnected: {e.Message}");
                 return false;
             }
-            catch (ObjectDisposedException e)
+            catch
             {
-                Console.WriteLine($"[ERROR] StillConnected - Socket disposed: {e.Message}");
                 return false;
             }
         }
@@ -36,27 +31,35 @@ namespace Gomoku_Server
         {
             try
             {
-                if (socket == null || !StillConnected(socket))
+                if (socket == null)
+                {
+                    Console.WriteLine($"[SEND_ERROR] Socket is null");
                     return false;
+                }
+
+                if (!message.EndsWith("\n"))
+                {
+                    message += "\n";
+                }
 
                 byte[] data = Encoding.UTF8.GetBytes(message);
                 int bytesSent = socket.Send(data);
 
-                return true;
+                return bytesSent > 0;
             }
             catch (SocketException e)
             {
-                Console.WriteLine($"[ERROR] SendMessage SocketException: {e.Message}");
+                Console.WriteLine($"[SEND_ERROR] SocketException: {e.ErrorCode} - {e.Message}");
                 return false;
             }
             catch (ObjectDisposedException e)
             {
-                Console.WriteLine($"[ERROR] SendMessage - Socket disposed: {e.Message}");
+                Console.WriteLine($"[SEND_ERROR] Socket disposed: {e.Message}");
                 return false;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[ERROR] SendMessage: {e.Message}");
+                Console.WriteLine($"[SEND_ERROR] {e.GetType().Name}: {e.Message}");
                 return false;
             }
         }
@@ -78,12 +81,12 @@ namespace Gomoku_Server
             }
             catch (SocketException e)
             {
-                Console.WriteLine($"[ERROR] ReceiveMessage: {e.Message}");
+                Console.WriteLine($"[RECV_ERROR] SocketException: {e.Message}");
                 return null;
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[ERROR] ReceiveMessage: {e.Message}");
+                Console.WriteLine($"[RECV_ERROR] {e.GetType().Name}: {e.Message}");
                 return null;
             }
         }

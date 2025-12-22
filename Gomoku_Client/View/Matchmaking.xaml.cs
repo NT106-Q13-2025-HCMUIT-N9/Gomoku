@@ -289,16 +289,34 @@ namespace Gomoku_Client.View
             {
                 _isConnected = false;
 
-                if (_stream != null)
-                    _stream.Close();
+                if (sp_FindingOpponent?.Visibility == Visibility.Visible)
+                {
+                    Console.WriteLine("[MATCHMAKING] Closing connection (user cancelled)");
 
-                if (_tcpClient != null)
-                    _tcpClient.Close();
+                    if (_stream != null)
+                    {
+                        _stream.Close();
+                        _stream = null;
+                    }
+
+                    if (_tcpClient != null)
+                    {
+                        _tcpClient.Close();
+                        _tcpClient = null;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("[MATCHMAKING] Keeping connection alive for GamePlay");
+                }
 
                 if (_receiveThread != null && _receiveThread.IsAlive)
                     _receiveThread.Join(100);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] DisconnectFromServer: {ex.Message}");
+            }
         }
 
         public async Task ShowOpponentFound(string opponent_name, char playerSymbol)
@@ -308,6 +326,15 @@ namespace Gomoku_Client.View
                 _queueTimer.Stop();
                 _stopwatch.Reset();
                 _movingDotStoryboard?.Stop();
+
+                Console.WriteLine("[MATCHMAKING] Stopping receive thread before navigation");
+                _isConnected = false;
+
+                if (_receiveThread != null && _receiveThread.IsAlive)
+                {
+                    _receiveThread.Join(500);
+                    Console.WriteLine("[MATCHMAKING] Receive thread stopped");
+                }
 
                 sp_FindingOpponent.Visibility = Visibility.Collapsed;
                 BackButton.Visibility = Visibility.Collapsed;
@@ -347,7 +374,6 @@ namespace Gomoku_Client.View
 
                 await Task.Delay(2000);
 
-                // Tạo slide animation để chuyển sang GamePlay
                 var slideOut = new DoubleAnimation
                 {
                     From = 0,
@@ -365,12 +391,12 @@ namespace Gomoku_Client.View
 
                 slideOut.Completed += (s, args) =>
                 {
-                    // Dừng thread receive từ Matchmaking
-                    _isConnected = false;
-
-                    // Navigation sang GamePlay Page
                     Dispatcher.Invoke(() =>
                     {
+                        Console.WriteLine("[MATCHMAKING] Navigating to GamePlay");
+                        Console.WriteLine($"[MATCHMAKING] TcpClient.Connected: {_tcpClient?.Connected}");
+                        Console.WriteLine($"[MATCHMAKING] Stream.CanRead: {_stream?.CanRead}");
+
                         GamePlay gamePlayPage = new GamePlay(_tcpClient, _username, playerSymbol, opponent_name, _mainWindow);
 
                         var slideIn = new DoubleAnimation

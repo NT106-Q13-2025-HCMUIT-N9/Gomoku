@@ -28,8 +28,6 @@ namespace Gomoku_Server
         bool matchEnded = false;
         int moveCount = 0;
         const int MAX_MOVES = 15 * 15;
-        int readyCount = 0;
-        object ready_lock = new object();
 
         char[,] table = new char[15, 15];
 
@@ -75,9 +73,11 @@ namespace Gomoku_Server
             try
             {
                 DateTime lastTick = DateTime.Now;
-                while (!matchEnded &&
-                       ServerUtils.StillConnected(player1.Client) &&
-                       ServerUtils.StillConnected(player2.Client))
+                Console.WriteLine($"[CLOCK] Thread started for {name1} vs {name2}");
+
+                Thread.Sleep(100);
+
+                while (!matchEnded)
                 {
                     if ((DateTime.Now - lastTick).TotalSeconds >= 1)
                     {
@@ -91,8 +91,16 @@ namespace Gomoku_Server
                             {
                                 clock1--;
                                 string message = $"[TIME1];{clock1}";
-                                ServerUtils.SendMessage(player1.Client, message);
-                                ServerUtils.SendMessage(player2.Client, message);
+
+                                bool p1Sent = ServerUtils.SendMessage(player1.Client, message);
+                                bool p2Sent = ServerUtils.SendMessage(player2.Client, message);
+
+                                if (!p1Sent || !p2Sent)
+                                {
+                                    Console.WriteLine($"[CLOCK] Failed to send time update (P1:{p1Sent}, P2:{p2Sent}), ending match");
+                                    EndMatch();
+                                    break;
+                                }
 
                                 if (clock1 <= 0)
                                 {
@@ -106,8 +114,16 @@ namespace Gomoku_Server
                             {
                                 clock2--;
                                 string message = $"[TIME2];{clock2}";
-                                ServerUtils.SendMessage(player1.Client, message);
-                                ServerUtils.SendMessage(player2.Client, message);
+
+                                bool p1Sent = ServerUtils.SendMessage(player1.Client, message);
+                                bool p2Sent = ServerUtils.SendMessage(player2.Client, message);
+
+                                if (!p1Sent || !p2Sent)
+                                {
+                                    Console.WriteLine($"[CLOCK] Failed to send time update (P1:{p1Sent}, P2:{p2Sent}), ending match");
+                                    EndMatch();
+                                    break;
+                                }
 
                                 if (clock2 <= 0)
                                 {
@@ -122,11 +138,13 @@ namespace Gomoku_Server
 
                     Thread.Sleep(100);
                 }
-                Console.WriteLine($"[LOG]: Clock thread ended : {name1} - {name2}");
+                Console.WriteLine($"[CLOCK] Thread ended: {name1} - {name2}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ERROR]: " + ex.ToString());
+                Console.WriteLine($"[ERROR] StartClock: {ex}");
+                if (!matchEnded)
+                    EndMatch();
             }
         }
 
@@ -169,15 +187,15 @@ namespace Gomoku_Server
 
                     Console.WriteLine($"[RECV] Player1 ({name1}): {message_str}");
 
-                    if (parameter[0] == "[READY]")
-                    {
-                        lock (ready_lock)
-                        {
-                            readyCount++;
-                            Console.WriteLine($"[READY] {name1} ready ({readyCount}/2)");
-                        }
-                        continue;
-                    }
+                    // if (parameter[0] == "[READY]")
+                    // {
+                    //     lock (ready_lock)
+                    //     {
+                    //         readyCount++;
+                    //         Console.WriteLine($"[READY] {name1} ready ({readyCount}/2)");
+                    //     }
+                    //     continue;
+                    // }
 
                     if (parameter[0] == "[CHAT]" && parameter.Length >= 3)
                     {
@@ -305,15 +323,15 @@ namespace Gomoku_Server
 
                     Console.WriteLine($"[RECV] Player2 ({name2}): {message_str}");
 
-                    if (parameter[0] == "[READY]")
-                    {
-                        lock (ready_lock)
-                        {
-                            readyCount++;
-                            Console.WriteLine($"[READY] {name2} ready ({readyCount}/2)");
-                        }
-                        continue;
-                    }
+                    // if (parameter[0] == "[READY]")
+                    // {
+                    //     lock (ready_lock)
+                    //     {
+                    //         readyCount++;
+                    //         Console.WriteLine($"[READY] {name2} ready ({readyCount}/2)");
+                    //     }
+                    //     continue;
+                    // }
 
                     if (parameter[0] == "[CHAT]" && parameter.Length >= 3)
                     {

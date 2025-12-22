@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,15 +22,18 @@ using System.Windows.Threading;
 
 namespace Gomoku_Client.View
 {
-    /// <summary>
-    /// Interaction logic for Matchmaking.xaml
-    /// </summary>
     public partial class Matchmaking : Page
     {
         private MainGameUI _mainWindow;
         private DispatcherTimer _queueTimer;
         private Stopwatch _stopwatch;
         private Storyboard _movingDotStoryboard;
+
+        private TcpClient _tcpClient;
+        private NetworkStream _stream;
+        private Thread _receiveThread;
+        private bool _isConnected = false;
+        private string _username;
 
         public Matchmaking(MainGameUI mainGameUI)
         {
@@ -51,7 +56,8 @@ namespace Gomoku_Client.View
                     throw new InvalidOperationException("User is not authenticated.");
                 }
 
-                tb_PlayerName.Text = user.Info.DisplayName;
+                _username = user.Info.DisplayName;
+                tb_PlayerName.Text = _username;
 
                 _stopwatch.Start();
                 _queueTimer.Start();
@@ -67,6 +73,10 @@ namespace Gomoku_Client.View
                         ? $"{(user_stats.Wins / (double)user_stats.total_match * 100):F1}%"
                         : "0%";
                 }
+
+                await Task.Delay(2000);
+
+                ConnectToServerAndRequestMatch();
             }
             catch (Exception ex)
             {
@@ -79,8 +89,9 @@ namespace Gomoku_Client.View
         {
             _queueTimer.Stop();
             _stopwatch.Reset();
-
             _movingDotStoryboard?.Stop();
+
+            DisconnectFromServer();
         }
 
         private void QueueTimer_Tick(object sender, EventArgs e)
@@ -96,6 +107,8 @@ namespace Gomoku_Client.View
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
         {
+            DisconnectFromServer();
+
             if (NavigationService != null && NavigationService.CanGoBack)
             {
                 var slideOutAnimation = new DoubleAnimation
@@ -115,9 +128,7 @@ namespace Gomoku_Client.View
 
                 slideOutAnimation.Completed += (s, args) =>
                 {
-
                     var navService = NavigationService;
-
                     navService.GoBack();
 
                     Dispatcher.BeginInvoke(new Action(() =>
@@ -150,13 +161,147 @@ namespace Gomoku_Client.View
 
         }
 
-        private async void btn_Simulate_Click(object sender, RoutedEventArgs e)
+        private void ConnectToServerAndRequestMatch()
         {
-            // simulate opponent found (REMOVE LATER)
-            string opponent_name = "CharlieKirkPro";
-            await ShowOpponentFound(opponent_name);
+            try
+            {
+                _tcpClient = new TcpClient();
+                _tcpClient.Connect("127.0.0.1", 9999);
+                _stream = _tcpClient.GetStream();
+                _isConnected = true;
+
+                _receiveThread = new Thread(ReceiveFromServer);
+                _receiveThread.IsBackground = true;
+                _receiveThread.Start();
+
+                SendMatchRequest();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Không thể kết nối đến server: {ex.Message}");
+                BackButton_Checked(null, null);
+            }
         }
-        public async Task ShowOpponentFound(string opponent_name)
+
+        private void SendMatchRequest()
+        {
+            try
+            {
+                string message = $"[MATCH_REQUEST];{_username}";
+                byte[] data = Encoding.UTF8.GetBytes(message);
+                _stream.Write(data, 0, data.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] SendMatchRequest: {ex.Message}");
+            }
+        }
+
+        private void ReceiveFromServer()
+        {
+            byte[] buffer = new byte[1024];
+
+            try
+            {
+                while (_isConnected && _tcpClient.Connected)
+                {
+                    if (!_stream.DataAvailable)
+                    {
+                        Thread.Sleep(10);
+                        continue;
+                    }
+
+                    int bytesRead = _stream.Read(buffer, 0, buffer.Length);
+                    if (bytesRead == 0) break;
+
+                    string message = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+                    ProcessServerMessage(message);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (_isConnected)
+                    Console.WriteLine($"[ERROR] ReceiveFromServer: {ex.Message}");
+            }
+        }
+
+        private void ProcessServerMessage(string message)
+        {
+            string[] parts = message.Split(';');
+            if (parts.Length < 1) return;
+
+            string command = parts[0];
+
+            switch (command)
+            {
+                case "[INIT]":
+                    if (parts.Length >= 4)
+                    {
+                        int clock1 = int.Parse(parts[1]);
+                        int clock2 = int.Parse(parts[2]);
+                        char playerSymbol = parts[3][0];
+                        string opponentName = (playerSymbol == 'X') ? "OPPONENT" : "OPPONENT";
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            ShowOpponentFound(opponentName, playerSymbol);
+                        });
+                    }
+                    break;
+
+                case "[MATCH_FOUND]":
+                    if (parts.Length >= 2)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            Console.WriteLine($"[LOG] Đã tìm thấy đối thủ: {parts[1]}");
+                        });
+                    }
+                    break;
+
+                case "[ALREADY_IN_MATCH]":
+                    Dispatcher.Invoke(() =>
+                    {
+                        MessageBox.Show("Bạn đang trong một trận đấu khác", "Thông báo",
+                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        BackButton_Checked(null, null);
+                    });
+                    break;
+
+                case "[INVALID_REQUEST]":
+                    Dispatcher.Invoke(() =>
+                    {
+                        MessageBox.Show("Yêu cầu không hợp lệ", "Lỗi",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        BackButton_Checked(null, null);
+                    });
+                    break;
+
+                default:
+                    Console.WriteLine($"[UNKNOWN] {message}");
+                    break;
+            }
+        }
+
+        private void DisconnectFromServer()
+        {
+            try
+            {
+                _isConnected = false;
+
+                if (_stream != null)
+                    _stream.Close();
+
+                if (_tcpClient != null)
+                    _tcpClient.Close();
+
+                if (_receiveThread != null && _receiveThread.IsAlive)
+                    _receiveThread.Join(100);
+            }
+            catch { }
+        }
+
+        public async Task ShowOpponentFound(string opponent_name, char playerSymbol)
         {
             try
             {
@@ -178,7 +323,7 @@ namespace Gomoku_Client.View
                 {
                     From = 100,
                     To = 0,
-                    Duration = TimeSpan.FromSeconds(0.4), // Giảm thời gian
+                    Duration = TimeSpan.FromSeconds(0.4),
                     EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
                 translateTransform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
@@ -200,16 +345,54 @@ namespace Gomoku_Client.View
                     tb_OpponentWinRate.Text = "0%";
                 }
 
-                await Task.Delay(5000);
+                await Task.Delay(2000);
 
-                var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.3));
-                fadeOut.Completed += (s, e) =>
+                // Tạo slide animation để chuyển sang GamePlay
+                var slideOut = new DoubleAnimation
                 {
-                    var gamePlayWindow = new GamePlay();
-                    gamePlayWindow.Show();
-                    _mainWindow.Close();
+                    From = 0,
+                    To = -_mainWindow.ActualWidth,
+                    Duration = TimeSpan.FromSeconds(0.5),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
                 };
-                _mainWindow.BeginAnimation(Window.OpacityProperty, fadeOut);
+
+                if (this.RenderTransform == null || !(this.RenderTransform is TranslateTransform))
+                {
+                    this.RenderTransform = new TranslateTransform();
+                }
+
+                var transform = (TranslateTransform)this.RenderTransform;
+
+                slideOut.Completed += (s, args) =>
+                {
+                    // Dừng thread receive từ Matchmaking
+                    _isConnected = false;
+
+                    // Navigation sang GamePlay Page
+                    Dispatcher.Invoke(() =>
+                    {
+                        GamePlay gamePlayPage = new GamePlay(_tcpClient, _username, playerSymbol, opponent_name, _mainWindow);
+
+                        var slideIn = new DoubleAnimation
+                        {
+                            From = _mainWindow.ActualWidth,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+
+                        gamePlayPage.RenderTransform = new TranslateTransform(_mainWindow.ActualWidth, 0);
+                        NavigationService.Navigate(gamePlayPage);
+
+                        Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            var gameTransform = (TranslateTransform)gamePlayPage.RenderTransform;
+                            gameTransform.BeginAnimation(TranslateTransform.XProperty, slideIn);
+                        }), DispatcherPriority.Loaded);
+                    });
+                };
+
+                transform.BeginAnimation(TranslateTransform.XProperty, slideOut);
             }
             catch (Exception ex)
             {

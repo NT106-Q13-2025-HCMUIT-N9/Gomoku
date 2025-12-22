@@ -119,6 +119,12 @@ namespace Gomoku_Server
                         removeChallengesOf(client);
                         client.Close();
                         break;
+                    case "[READY]":
+                        if (parts.Length >= 2)
+                        {
+                            Console.WriteLine($"[LOG]: {parts[1]} đã sẵn sàng");
+                        }
+                        break;
                     default:
                         ServerUtils.SendMessage(client.Client, "[INVALID_REQUEST]");
                         client.Close();

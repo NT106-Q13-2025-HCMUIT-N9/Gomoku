@@ -366,10 +366,7 @@
                     </Border>
                 </Grid>
             </Grid>
-            <!-- match found simulation button -->
-            <Button Grid.Column="1" HorizontalAlignment="Center" Margin="0,618,0,0" VerticalAlignment="Top" Height="46" Width="163" Foreground="Red" Background="White" Click="btn_Simulate_Click">
-                <Button x:Name="btn_Simulate" Content="gia vo nhu anh tim duoc emmmmmmm"/>
-            </Button>
+            
         </Grid>
     </Grid>
 </Page>

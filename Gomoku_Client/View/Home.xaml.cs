@@ -192,6 +192,10 @@ namespace Gomoku_Client
             NavigateWithSlideAnimation(new Lobby(this), (RadioButton)sender);
         }
 
+        public void NavigateToLobby()
+        {
+            MainFrame.Navigate(new Lobby(this));
+        }
         private void HistoryButton_Checked(object sender, RoutedEventArgs e)
         {
             NavigateWithSlideAnimation(new History(this), (RadioButton)sender);

@@ -53,7 +53,7 @@ namespace Gomoku_Client.View
             if (client == null || !client.Connected)
             {
                 MessageBox.Show("Kết nối bị mất. Vui lòng thử lại.");
-                NavigationService?.GoBack();
+                ExitToHome();
                 return;
             }
 
@@ -211,7 +211,8 @@ namespace Gomoku_Client.View
 
             player1Timer?.Stop();
             player2Timer?.Stop();
-            NavigationService?.GoBack();
+            ExitToHome();
+            return;
         }
 
         private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
@@ -488,7 +489,7 @@ namespace Gomoku_Client.View
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    NavigationService?.GoBack();
+                    ExitToHome();
                 }
             });
         }
@@ -521,7 +522,7 @@ namespace Gomoku_Client.View
                 Dispatcher.Invoke(() =>
                 {
                     MessageBox.Show("Mất kết nối với server.", "Lỗi kết nối", MessageBoxButton.OK, MessageBoxImage.Error);
-                    NavigationService?.GoBack();
+                    ExitToHome();
                 });
             }
             catch (Exception ex)
@@ -576,6 +577,32 @@ namespace Gomoku_Client.View
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] SendResignToServer: {ex.Message}");
+            }
+        }
+
+        private void ExitToHome()
+        {
+            try
+            {
+                isGameOver = true;
+                player1Timer?.Stop();
+                player2Timer?.Stop();
+
+                if (isConnected)
+                {
+                    SendMatchEnd();
+                    isConnected = false;
+                }
+                Disconnect();
+
+                Dispatcher.Invoke(() =>
+                {
+                    mainWindow?.NavigateToLobby();
+                });
+            }
+            catch (Exception ex)
+            {
+                Window.GetWindow(this)?.Close();
             }
         }
 
@@ -733,7 +760,7 @@ namespace Gomoku_Client.View
                         {
                             MessageBox.Show("Mất kết nối với server.", "Lỗi kết nối",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
-                            NavigationService?.GoBack();
+                            ExitToHome();
                         });
                     }
                     catch { }
@@ -909,7 +936,7 @@ namespace Gomoku_Client.View
                         player1Timer.Stop();
                         player2Timer.Stop();
                         MessageBox.Show("Trận đấu đã kết thúc", "Thông báo", MessageBoxButton.OK, MessageBoxImage.Information);
-                        NavigationService?.GoBack();
+                        ExitToHome();
                     });
                     break;
 

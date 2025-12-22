@@ -24,6 +24,9 @@ namespace Gomoku_Server
         int clock1;
         int clock2;
         object turn_lock = new object();
+        bool matchEnded = false;
+        int moveCount = 0;
+        const int MAX_MOVES = 15 * 15;
 
         char[,] table = new char[15, 15];
 
@@ -32,7 +35,7 @@ namespace Gomoku_Server
             int count = 0;
             int col = start_col + delta_col;
             int row = start_row + delta_row;
-            while (col >= 0 && row >= 0)
+            while (col >= 0 && row >= 0 && col < 15 && row < 15)
             {
                 if (table[row, col] != player)
                 {
@@ -58,7 +61,10 @@ namespace Gomoku_Server
             int bot_mid = prev_mark_at_dir(start_row, start_col, 1, 0, player);
             int bot_right = prev_mark_at_dir(start_row, start_col, 1, 1, player);
 
-            return (top_left + bot_right + 1 >= 5) || (top_mid + bot_mid + 1 >= 5) || (top_right + bot_left + 1 >= 5) || (mid_left + mid_right + 1 >= 5);
+            return (top_left + bot_right + 1 >= 5) ||
+                   (top_mid + bot_mid + 1 >= 5) ||
+                   (top_right + bot_left + 1 >= 5) ||
+                   (mid_left + mid_right + 1 >= 5);
         }
 
         public void StartClock()
@@ -66,30 +72,52 @@ namespace Gomoku_Server
             try
             {
                 DateTime lastTick = DateTime.Now;
-                while (ServerUtils.StillConnected(player1.Client) && ServerUtils.StillConnected(player2.Client))
+                while (!matchEnded &&
+                       ServerUtils.StillConnected(player1.Client) &&
+                       ServerUtils.StillConnected(player2.Client))
                 {
-                    lock (turn_lock)
+                    if ((DateTime.Now - lastTick).TotalSeconds >= 1)
                     {
-                        if ((DateTime.Now - lastTick).TotalSeconds >= 1)
-                        {
-                            lastTick = DateTime.Now;
+                        lastTick = DateTime.Now;
 
-                            if (current_turn == PlayerTurn.player1)
+                        lock (turn_lock)
+                        {
+                            if (matchEnded) break;
+
+                            if (current_turn == PlayerTurn.player1 && clock1 > 0)
                             {
                                 string message = $"[TIME1];{clock1}";
                                 ServerUtils.SendMessage(player1.Client, message);
                                 ServerUtils.SendMessage(player2.Client, message);
                                 clock1--;
+
+                                if (clock1 <= 0)
+                                {
+                                    ServerUtils.SendMessage(player1.Client, "[TIMEOUT1]");
+                                    ServerUtils.SendMessage(player2.Client, "[TIMEOUT1]");
+                                    EndMatch();
+                                    break;
+                                }
                             }
-                            else if (current_turn == PlayerTurn.player2)
+                            else if (current_turn == PlayerTurn.player2 && clock2 > 0)
                             {
                                 string message = $"[TIME2];{clock2}";
                                 ServerUtils.SendMessage(player1.Client, message);
                                 ServerUtils.SendMessage(player2.Client, message);
                                 clock2--;
+
+                                if (clock2 <= 0)
+                                {
+                                    ServerUtils.SendMessage(player1.Client, "[TIMEOUT2]");
+                                    ServerUtils.SendMessage(player2.Client, "[TIMEOUT2]");
+                                    EndMatch();
+                                    break;
+                                }
                             }
                         }
                     }
+
+                    Thread.Sleep(100); 
                 }
                 Console.WriteLine($"[LOG]: Match ended : {name1} - {name2}");
             }
@@ -120,7 +148,7 @@ namespace Gomoku_Server
 
             try
             {
-                while (ServerUtils.StillConnected(player1.Client))
+                while (!matchEnded && ServerUtils.StillConnected(player1.Client))
                 {
                     if (player1.Client.Available == 0)
                     {
@@ -129,45 +157,85 @@ namespace Gomoku_Server
                     }
 
                     int byte_read = player1.Client.Receive(buffer);
-                    string message_str = Encoding.UTF8.GetString(buffer, 0, byte_read);
+                    string message_str = Encoding.UTF8.GetString(buffer, 0, byte_read).Trim();
                     string[] parameter = message_str.Split(';');
 
-                    lock (turn_lock) {
-                        if(current_turn == PlayerTurn.player1)
+                    lock (turn_lock)
+                    {
+                        if (matchEnded) break;
+
+                        if (parameter[0] == "[SWITCH]" && current_turn == PlayerTurn.player1)
                         {
-                            if (parameter[0] == "[SWITCH]")
-                            {
-                                SwitchPlayer();
-                            }
-                            else if (parameter[0] == "[MOVE]")
-                            {
-                                int row = int.Parse(parameter[1]);
-                                int col = int.Parse(parameter[2]);
+                            SwitchPlayer();
+                        }
+                        else if (parameter[0] == "[MOVE]" && current_turn == PlayerTurn.player1)
+                        {
+                            if (parameter.Length < 3) continue;
 
-                                lock (table)
+                            int row = int.Parse(parameter[1]);
+                            int col = int.Parse(parameter[2]);
+
+                            if (row < 0 || row >= 15 || col < 0 || col >= 15)
+                            {
+                                ServerUtils.SendMessage(player1.Client, "[INVALID_MOVE];Tọa độ không hợp lệ");
+                                continue;
+                            }
+
+                            lock (table)
+                            {
+                                if (table[row, col] == '\0')
                                 {
-                                    if (table[row, col] == '\0')
+                                    table[row, col] = 'X';
+                                    moveCount++;
+
+                                    string moveMessage = $"[MOVE1];{row};{col}";
+                                    ServerUtils.SendMessage(player1.Client, moveMessage);
+                                    ServerUtils.SendMessage(player2.Client, moveMessage);
+
+                                    if (CheckWin(row, col, 'X'))
                                     {
-                                        table[row, col] = 'X';
-                                        player1.Client.Send(Encoding.ASCII.GetBytes($"[MOVE1];{row};{col}"));
-                                        player2.Client.Send(Encoding.ASCII.GetBytes($"[MOVE1];{row};{col}"));
+                                        ServerUtils.SendMessage(player1.Client, "[WIN1]");
+                                        ServerUtils.SendMessage(player2.Client, "[WIN1]");
+                                        Console.WriteLine($"[LOG] {name1} win");
+                                        EndMatch();
+                                        break;
                                     }
-                                }
 
-                                if (CheckWin(row, col, 'X'))
+                                    if (moveCount >= MAX_MOVES)
+                                    {
+                                        ServerUtils.SendMessage(player1.Client, "[DRAW]");
+                                        ServerUtils.SendMessage(player2.Client, "[DRAW]");
+                                        Console.WriteLine($"[LOG] {name1}-{name2} draw");
+                                        EndMatch();
+                                        break;
+                                    }
+
+                                    SwitchPlayer(); 
+                                }
+                                else
                                 {
-                                    player1.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
-                                    player2.Client.Send(Encoding.ASCII.GetBytes("[WIN1]"));
-                                    EndMatch();
+                                    ServerUtils.SendMessage(player1.Client, "[INVALID_MOVE];Ô đã có quân cờ");
                                 }
                             }
+                        }
+                        else if (parameter[0] == "[RESIGN]")
+                        {
+                            ServerUtils.SendMessage(player1.Client, "[RESIGN1]");
+                            ServerUtils.SendMessage(player2.Client, "[RESIGN1]");
+                            EndMatch();
+                            break;
                         }
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine("[ERROR]: " + ex.ToString());
+                Console.WriteLine($"[ERROR] Handle_Player1 ({name1}): {ex.Message}");
+                if (!matchEnded)
+                {
+                    ServerUtils.SendMessage(player2.Client, $"[OPPONENT_DISCONNECTED];{name1}");
+                    EndMatch();
+                }
             }
         }
 
@@ -177,7 +245,7 @@ namespace Gomoku_Server
 
             try
             {
-                while (ServerUtils.StillConnected(player2.Client))
+                while (!matchEnded && ServerUtils.StillConnected(player2.Client))
                 {
                     if (player2.Client.Available == 0)
                     {
@@ -186,46 +254,85 @@ namespace Gomoku_Server
                     }
 
                     int byte_read = player2.Client.Receive(buffer);
-                    string message_str = Encoding.UTF8.GetString(buffer, 0, byte_read);
+                    string message_str = Encoding.UTF8.GetString(buffer, 0, byte_read).Trim();
                     string[] parameter = message_str.Split(';');
 
                     lock (turn_lock)
                     {
-                        if(current_turn == PlayerTurn.player2)
+                        if (matchEnded) break;
+
+                        if (parameter[0] == "[SWITCH]" && current_turn == PlayerTurn.player2)
                         {
-                            if (parameter[0] == "[SWITCH]")
-                            {
-                                SwitchPlayer();
-                            }
-                            else if (parameter[0] == "[MOVE]")
-                            {
-                                int row = int.Parse(parameter[1]);
-                                int col = int.Parse(parameter[2]);
+                            SwitchPlayer();
+                        }
+                        else if (parameter[0] == "[MOVE]" && current_turn == PlayerTurn.player2)
+                        {
+                            if (parameter.Length < 3) continue;
 
-                                lock (table)
+                            int row = int.Parse(parameter[1]);
+                            int col = int.Parse(parameter[2]);
+
+                            if (row < 0 || row >= 15 || col < 0 || col >= 15)
+                            {
+                                ServerUtils.SendMessage(player2.Client, "[INVALID_MOVE];Tọa độ không hợp lệ");
+                                continue;
+                            }
+
+                            lock (table)
+                            {
+                                if (table[row, col] == '\0')
                                 {
-                                    if (table[row, col] == '\0')
+                                    table[row, col] = 'O';
+                                    moveCount++;
+
+                                    string moveMessage = $"[MOVE2];{row};{col}";
+                                    ServerUtils.SendMessage(player1.Client, moveMessage);
+                                    ServerUtils.SendMessage(player2.Client, moveMessage);
+
+                                    if (CheckWin(row, col, 'O'))
                                     {
-                                        table[row, col] = 'O';
-                                        player1.Client.Send(Encoding.ASCII.GetBytes($"[MOVE2];{row};{col}"));
-                                        player2.Client.Send(Encoding.ASCII.GetBytes($"[MOVE2];{row};{col}"));
+                                        ServerUtils.SendMessage(player1.Client, "[WIN2]");
+                                        ServerUtils.SendMessage(player2.Client, "[WIN2]");
+                                        Console.WriteLine($"[LOG] {name2} win");
+                                        EndMatch();
+                                        break;
                                     }
-                                }
 
-                                if (CheckWin(row, col, 'O'))
+                                    if (moveCount >= MAX_MOVES)
+                                    {
+                                        ServerUtils.SendMessage(player1.Client, "[DRAW]");
+                                        ServerUtils.SendMessage(player2.Client, "[DRAW]");
+                                        Console.WriteLine($"[LOG] {name1}-{name2} draw");
+                                        EndMatch();
+                                        break;
+                                    }
+
+                                    SwitchPlayer(); 
+                                }
+                                else
                                 {
-                                    player1.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
-                                    player2.Client.Send(Encoding.ASCII.GetBytes("[WIN2]"));
-                                    EndMatch();
+                                    ServerUtils.SendMessage(player2.Client, "[INVALID_MOVE];Ô đã có quân cờ");
                                 }
                             }
+                        }
+                        else if (parameter[0] == "[RESIGN]")
+                        {
+                            ServerUtils.SendMessage(player1.Client, "[RESIGN2]");
+                            ServerUtils.SendMessage(player2.Client, "[RESIGN2]");
+                            EndMatch();
+                            break;
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ERROR]: " + ex.ToString());
+                Console.WriteLine($"[ERROR] Handle_Player2 ({name2}): {ex.Message}");
+                if (!matchEnded)
+                {
+                    ServerUtils.SendMessage(player1.Client, $"[OPPONENT_DISCONNECTED];{name2}");
+                    EndMatch();
+                }
             }
         }
 
@@ -233,14 +340,31 @@ namespace Gomoku_Server
         {
             try
             {
-                player1.Close();
-                player2.Close();
-                Server.Server.inMatch.TryRemove(name1, out _);
-                Server.Server.inMatch.TryRemove(name2, out _);
-            }
-            catch { }
-        }
+                lock (turn_lock)
+                {
+                    if (matchEnded) return;
+                    matchEnded = true;
+                }
 
+                Console.WriteLine($"[LOG]: Match ended : {name1} - {name2}");
+
+                ServerUtils.SendMessage(player1.Client, "[MATCH_END]");
+                ServerUtils.SendMessage(player2.Client, "[MATCH_END]");
+
+                Thread.Sleep(100);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] EndMatch: {ex.Message}");
+            }
+            finally
+            {
+                try { player1.Close(); } catch { }
+                try { player2.Close(); } catch { }
+                Gomoku_Server.Server.inMatch.TryRemove(name1, out _);
+                Gomoku_Server.Server.inMatch.TryRemove(name2, out _);
+            }
+        }
 
         public MatchHandle(TcpClient player1, TcpClient player2, int clock1, int clock2, string name1, string name2)
         {

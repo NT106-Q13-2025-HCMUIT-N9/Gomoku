@@ -125,18 +125,18 @@
 
             <!-- PLAYER 1 -->
             <Border Background="#1A1A2E" CornerRadius="12" Padding="20"
-                    Margin="0,3,0,1" Grid.Row="1">
+                    Margin="-1,10,1,-6" Grid.Row="1">
 
                 <Border.Effect>
-                    <DropShadowEffect Color="#00D946" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
+                    <DropShadowEffect x:Name="ShadowColorPlayer1" Color="#00D946" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
                 </Border.Effect>
 
                 <StackPanel VerticalAlignment="Center">
-                    <Border Width="110" Height="110" CornerRadius="55"
+                    <Border x:Name="AvatarBorder1" Width="110" Height="110" CornerRadius="55"
                             BorderBrush="#00D946" BorderThickness="4" Margin="0,0,0,15">
 
                         <Border.Effect>
-                            <DropShadowEffect Color="#00D946" BlurRadius="20" ShadowDepth="0" Opacity="0.7"/>
+                            <DropShadowEffect x:Name="AvatarShadow1" Color="#00D946" BlurRadius="20" ShadowDepth="0" Opacity="0.7"/>
                         </Border.Effect>
 
                         <Border.Background>
@@ -145,12 +145,12 @@
                     </Border>
 
                     <TextBlock x:Name="Player1NameText" Text="YOU" FontSize="20" FontWeight="Bold"
-                       Foreground="White" HorizontalAlignment="Center"/>
+                       Foreground="#00D946" HorizontalAlignment="Center"/>
 
-                    <Border Background="#00D946" CornerRadius="4" Padding="12,4"
+                    <Border x:Name="BackgroundTag1" Background="#00D946" CornerRadius="4" Padding="12,4"
                     HorizontalAlignment="Center" Margin="0,12,0,20">
-                        <TextBlock Text="QUÂN ĐEN ●" FontSize="12"
-                           FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="QUÂN ĐEN" FontSize="12"
+                           FontWeight="Bold" Foreground="Black"/>
                     </Border>
 
                     <Border Background="#0F0F1E" CornerRadius="8" Padding="15">
@@ -169,18 +169,18 @@
 
             <!-- PLAYER 2 -->
             <Border Background="#1A1A2E" CornerRadius="12" Padding="20"
-                 Margin="-1,0,1,0">
+                 Margin="-1,-10,1,10">
 
                 <Border.Effect>
-                    <DropShadowEffect Color="#ECECEC" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
+                    <DropShadowEffect x:Name="ShadowColorPlayer2" Color="#ECECEC" BlurRadius="15" ShadowDepth="5" Opacity="0.5"/>
                 </Border.Effect>
 
                 <StackPanel VerticalAlignment="Center">
-                    <Border Width="110" Height="110" CornerRadius="55"
+                    <Border x:Name="AvatarBorder2" Width="110" Height="110" CornerRadius="55"
                             BorderBrush="#ECECEC" BorderThickness="4" Margin="0,0,0,15">
 
                         <Border.Effect>
-                            <DropShadowEffect Color="#ECECEC" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
+                            <DropShadowEffect x:Name="AvatarShadow2" Color="#ECECEC" BlurRadius="20" ShadowDepth="0" Opacity="0.5"/>
                         </Border.Effect>
 
 
@@ -192,9 +192,9 @@
                     <TextBlock x:Name="Player2NameText" Text="OPPONENT" FontSize="20" FontWeight="Bold"
                        Foreground="White" HorizontalAlignment="Center"/>
 
-                    <Border Background="#ECECEC" CornerRadius="4" Padding="12,4"
+                    <Border x:Name="BackgroundTag2" Background="#ECECEC" CornerRadius="4" Padding="12,4"
                     HorizontalAlignment="Center" Margin="0,12,0,20">
-                        <TextBlock Text="QUÂN TRẮNG ○" FontSize="12"
+                        <TextBlock Text="QUÂN TRẮNG" FontSize="12"
                            FontWeight="Bold" Foreground="#1A1A2E"/>
                     </Border>
 

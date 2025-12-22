@@ -73,12 +73,12 @@ namespace Gomoku_Client.View
             SetupTimers();
             UpdateGameStatus();
 
-            Player1NameText.Text = $"{player1Name} ({playerSymbol})";
-            Player2NameText.Text = $"{player2Name} ({GetOpponentSymbol()})";
+            Player1NameText.Text = $"{player1Name}";
+            Player2NameText.Text = $"{player2Name}";
 
             GameStatusText.Text = isPlayerTurn
-                ? $"Lượt của bạn ({playerSymbol})"
-                : $"Lượt của đối thủ ({GetOpponentSymbol()})";
+                ? $"Lượt của bạn "
+                : $"Lượt của {player2Name}";
 
             Console.WriteLine($"[INIT] Player: {username}, Symbol: {symbol}, IsPlayerTurn: {isPlayerTurn}, IsGameOver: {isGameOver}");
 
@@ -241,7 +241,6 @@ namespace Gomoku_Client.View
                 e.Handled = true;
             }
         }
-
 
         private void DisplayChatMessage(string senderName, string message, bool isOwnMessage)
         {
@@ -434,9 +433,10 @@ namespace Gomoku_Client.View
         {
             Dispatcher.Invoke(() =>
             {
+                UpdateTurnUI();
                 string currentPlayer = isPlayerTurn ? player1Name : player2Name;
                 char currentSymbol = isPlayerTurn ? playerSymbol : GetOpponentSymbol();
-                GameStatusText.Text = $"Lượt của {currentPlayer} ({currentSymbol})";
+                GameStatusText.Text = $"Lượt của {currentPlayer}";
             });
         }
 
@@ -549,7 +549,7 @@ namespace Gomoku_Client.View
                     return;
                 }
 
-                string chatMessage = $"[CHAT];{player1Name};{message}\n";  // ← THÊM \n
+                string chatMessage = $"[CHAT];{player1Name};{message}\n"; 
                 byte[] data = Encoding.UTF8.GetBytes(chatMessage);
                 socket.Send(data);
                 Console.WriteLine($"[SEND] {chatMessage.TrimEnd()}");
@@ -604,6 +604,32 @@ namespace Gomoku_Client.View
             {
                 Window.GetWindow(this)?.Close();
             }
+        }
+
+        private void UpdateTurnUI()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                var activeColor = (Color)ColorConverter.ConvertFromString("#00D946");
+                var inactiveColor = (Color)ColorConverter.ConvertFromString("#ECECEC");
+
+                bool p1Active = isPlayerTurn;
+                bool p2Active = !isPlayerTurn;
+
+                AvatarBorder1.BorderBrush = new SolidColorBrush(p1Active ? activeColor : inactiveColor);
+                AvatarShadow1.Color = p1Active ? activeColor : inactiveColor;
+                Player1NameText.Foreground = new SolidColorBrush(p1Active ? activeColor : inactiveColor);
+                Player1TimerText.Foreground = new SolidColorBrush(p1Active ? activeColor : inactiveColor);
+                BackgroundTag1.Background = new SolidColorBrush(p1Active ? activeColor : inactiveColor);
+                ShadowColorPlayer1.Color = p1Active ? activeColor : inactiveColor;
+
+                AvatarBorder2.BorderBrush = new SolidColorBrush(p2Active ? activeColor : inactiveColor);
+                AvatarShadow2.Color = p2Active ? activeColor : inactiveColor;
+                Player2NameText.Foreground = new SolidColorBrush(p2Active ? activeColor : inactiveColor);
+                Player2TimerText.Foreground = new SolidColorBrush(p2Active ? activeColor : inactiveColor);
+                BackgroundTag2.Background = new SolidColorBrush(p2Active ? activeColor : inactiveColor);
+                ShadowColorPlayer2.Color = p2Active ? activeColor : inactiveColor;
+            });
         }
 
         private void SendMatchEnd()
@@ -796,7 +822,6 @@ namespace Gomoku_Client.View
                         {
                             PlaceStone(row, col, true);
 
-                            // ← CHỈ SWITCH TURN, KHÔNG ĐIỀU KHIỂN TIMER
                             if (playerSymbol == 'X')
                             {
                                 isPlayerTurn = false;

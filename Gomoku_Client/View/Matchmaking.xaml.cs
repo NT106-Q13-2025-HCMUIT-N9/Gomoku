@@ -240,7 +240,7 @@ namespace Gomoku_Client.View
                         int clock1 = int.Parse(parts[1]);
                         int clock2 = int.Parse(parts[2]);
                         char playerSymbol = parts[3][0];
-                        string opponentName = (playerSymbol == 'X') ? "OPPONENT" : "OPPONENT";
+                        string opponentName = parts[4];
 
                         Dispatcher.Invoke(() =>
                         {

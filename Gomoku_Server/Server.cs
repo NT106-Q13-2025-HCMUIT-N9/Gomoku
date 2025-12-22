@@ -200,8 +200,8 @@ namespace Gomoku_Server
 
             try
             {
-                ServerUtils.SendMessage(player1.Client, $"[INIT];{clock1};{clock2};X");
-                ServerUtils.SendMessage(player2.Client, $"[INIT];{clock1};{clock2};O");
+                ServerUtils.SendMessage(player1.Client, $"[INIT];{clock1};{clock2};X;{name2}");
+                ServerUtils.SendMessage(player2.Client, $"[INIT];{clock1};{clock2};O;{name1}");
 
                 Console.WriteLine($"[MATCH] Sent [INIT] to both players");
 

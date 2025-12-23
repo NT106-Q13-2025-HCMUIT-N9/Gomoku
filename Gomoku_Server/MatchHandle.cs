@@ -148,22 +148,6 @@ namespace Gomoku_Server
             }
         }
 
-        public void SwitchPlayer()
-        {
-            lock (turn_lock)
-            {
-                if (current_turn == PlayerTurn.player1)
-                {
-                    current_turn = PlayerTurn.player2;
-                    Console.WriteLine($"[SWITCH] Turn is now Player2 ({name2})");
-                }
-                else
-                {
-                    current_turn = PlayerTurn.player1;
-                    Console.WriteLine($"[SWITCH] Turn is now Player1 ({name1})");
-                }
-            }
-        }
 
         public void Handle_Player1()
         {
@@ -277,7 +261,9 @@ namespace Gomoku_Server
                                 break;
                             }
 
-                            SwitchPlayer();
+                            current_turn = PlayerTurn.player2;
+                            ServerUtils.SendMessage(player1.Client, "[TURN];O");
+                            ServerUtils.SendMessage(player2.Client, "[TURN];O");
                         }
                         else if (parameter[0] == "[RESIGN]")
                         {
@@ -413,7 +399,9 @@ namespace Gomoku_Server
                                 break;
                             }
 
-                            SwitchPlayer();
+                            current_turn = PlayerTurn.player1;
+                            ServerUtils.SendMessage(player1.Client, "[TURN];X");
+                            ServerUtils.SendMessage(player2.Client, "[TURN];X");
                         }
                         else if (parameter[0] == "[RESIGN]")
                         {
@@ -478,6 +466,9 @@ namespace Gomoku_Server
 
             Console.WriteLine($"[INIT] Match created: {name1} (X) vs {name2} (O)");
             Console.WriteLine($"[INIT] Starting turn: Player1 ({name1})");
+
+            ServerUtils.SendMessage(player1, "[TURN];X");
+            ServerUtils.SendMessage(player2, "[TURN];X");
         }
     }
 }

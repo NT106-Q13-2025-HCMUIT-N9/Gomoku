@@ -158,6 +158,8 @@ namespace Gomoku_Client.View
 
         private void Disconnect()
         {
+            if (!isConnected) return;
+
             try
             {
                 isConnected = false;
@@ -166,14 +168,16 @@ namespace Gomoku_Client.View
                 player1Timer?.Stop();
                 player2Timer?.Stop();
 
+                SendMatchEnd();
+
                 if (receiveThread != null && receiveThread.IsAlive)
                 {
-                    receiveThread.Join(500);
+                    receiveThread.Join(100);
                 }
 
                 if (tcpClient != null)
                 {
-                    try { tcpClient.Close(); } catch { }
+                    tcpClient.Close();
                     tcpClient = null;
                 }
             }
@@ -279,14 +283,6 @@ namespace Gomoku_Client.View
             MainBGM.Stop();
             mainWindow.MainBGM.Play();
 
-            if (isConnected)
-            {
-                SendMatchEnd();
-                isConnected = false;
-            }
-
-            player1Timer?.Stop();
-            player2Timer?.Stop();
             ExitToHome();
         }
 
@@ -354,7 +350,6 @@ namespace Gomoku_Client.View
         public void InitializeGame()
         {
             board = new int[boardSize, boardSize];
-            isPlayerTurn = true;
             isGameOver = false;
             moveCount = 0;
 
@@ -514,24 +509,6 @@ namespace Gomoku_Client.View
             Canvas.SetTop(stone, y);
 
             BoardCanvas.Children.Add(stone);
-        }
-
-        private void SwitchTurn()
-        {
-            isPlayerTurn = !isPlayerTurn;
-
-            if (isPlayerTurn)
-            {
-                player2Timer.Stop();
-                player1Timer.Start();
-            }
-            else
-            {
-                player1Timer.Stop();
-                player2Timer.Start();
-            }
-
-            UpdateGameStatus();
         }
 
         private void UpdateGameStatus()
@@ -752,17 +729,7 @@ namespace Gomoku_Client.View
         {
             try
             {
-                isGameOver = true;
-                player1Timer?.Stop();
-                player2Timer?.Stop();
-
-                if (isConnected)
-                {
-                    SendMatchEnd();
-                    isConnected = false;
-                }
                 Disconnect();
-
                 Dispatcher.Invoke(() =>
                 {
                     mainWindow?.NavigateToLobby();
@@ -989,20 +956,6 @@ namespace Gomoku_Client.View
                         Dispatcher.Invoke(() =>
                         {
                             PlaceStone(row, col, true);
-
-                            if (playerSymbol == 'X')
-                            {
-                                isPlayerTurn = false;
-                                Console.WriteLine("[PROCESS] My move (X), turn OFF");
-                            }
-                            else
-                            {
-                                isPlayerTurn = true;
-                                Console.WriteLine("[PROCESS] Opponent move (X), turn ON");
-                            }
-
-                            UpdateGameStatus();
-
                             if (CheckWin(row, col, 1))
                             {
                                 string winnerName = (playerSymbol == 'X') ? player1Name : player2Name;
@@ -1026,20 +979,6 @@ namespace Gomoku_Client.View
                         Dispatcher.Invoke(() =>
                         {
                             PlaceStone(row, col, false);
-
-                            if (playerSymbol == 'O')
-                            {
-                                isPlayerTurn = false;
-                                Console.WriteLine("[PROCESS] My move (O), turn OFF");
-                            }
-                            else
-                            {
-                                isPlayerTurn = true;
-                                Console.WriteLine("[PROCESS] Opponent move (O), turn ON");
-                            }
-
-                            UpdateGameStatus();
-
                             if (CheckWin(row, col, 2))
                             {
                                 string winnerName = (playerSymbol == 'O') ? player1Name : player2Name;
@@ -1049,6 +988,28 @@ namespace Gomoku_Client.View
                             {
                                 GameOver(null, "Hòa! Bàn cờ đã đầy!");
                             }
+                        });
+                    }
+                    break;
+
+                case "[TURN]":
+                    if (parts.Length >= 2)
+                    {
+                        char activePlayerSymbol = parts[1][0];
+                        isPlayerTurn = (playerSymbol == activePlayerSymbol);
+
+                        Dispatcher.Invoke(() => {
+                            if (isPlayerTurn)
+                            {
+                                player2Timer.Stop();
+                                player1Timer.Start();
+                            }
+                            else
+                            {
+                                player1Timer.Stop();
+                                player2Timer.Start();
+                            }
+                            UpdateGameStatus();
                         });
                     }
                     break;

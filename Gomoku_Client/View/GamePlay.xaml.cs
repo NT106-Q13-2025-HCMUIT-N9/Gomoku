@@ -119,6 +119,12 @@ namespace Gomoku_Client.View
                 "Keyboard.wav"
             );
 
+            double BGMVolume = mainWindow.MasterVolValue * mainWindow.BGMVolValue;
+            double SFXVolume = mainWindow.MasterVolValue * mainWindow.SFXVolValue;
+
+            MainBGM.Volume = BGMVolume;
+            ButtonClick.Volume = SFXVolume;
+            Keyboard.Volume = SFXVolume;
 
             MainBGM.MediaOpened += (s, e) =>
             {
@@ -262,6 +268,9 @@ namespace Gomoku_Client.View
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Begin(border);
+
+            MainBGM.Stop();
+            mainWindow.MainBGM.Play();
         }
 
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)

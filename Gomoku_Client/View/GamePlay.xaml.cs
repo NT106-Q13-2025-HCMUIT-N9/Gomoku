@@ -93,6 +93,7 @@ namespace Gomoku_Client.View
             receiveThread.IsBackground = true;
             receiveThread.Start();
             Console.WriteLine("[INIT] Receive thread started immediately");
+            StarSound();
         }
 
         private void StarSound()

@@ -124,7 +124,7 @@
                         FontSize="60"
                         Click="MatchMakingButton_Click">
                         <Button.Background>
-                            <ImageBrush ImageSource="/Assets/Matchmaking_Background.png" 
+                            <ImageBrush ImageSource="/Assets/Images/Matchmaking_Background.png" 
                             Stretch="UniformToFill"
                             Opacity="0.7"/>
                         </Button.Background>

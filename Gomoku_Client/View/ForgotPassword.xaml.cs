@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,11 +24,25 @@ namespace Gomoku_Client
     /// </summary>
     public partial class ForgotPasswordUI : Page
     {
+        private MediaPlayer ButtonClick = new MediaPlayer();
         private MainWindow _mainWindow;
         public ForgotPasswordUI(MainWindow mainWindow)
         {
             InitializeComponent();
+            StartSound();
             _mainWindow = mainWindow;
+        }
+
+        void StartSound()
+        {
+            string buttonPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "ButtonHover.wav"
+            );
+
+            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
         }
 
         private void Email_GotFocus(object sender, RoutedEventArgs e)
@@ -105,6 +120,8 @@ namespace Gomoku_Client
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
             _mainWindow.MainBorder.Visibility = Visibility.Visible;
         }
@@ -125,6 +142,8 @@ namespace Gomoku_Client
 
         private async void SendOTP_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             LoadingCircle.Visibility = Visibility.Visible;
             buttonDisable();
             SendOTPButton.Content = "";
@@ -189,6 +208,8 @@ namespace Gomoku_Client
 
         private void Set_Password_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             if (_mainWindow == null)
             {
                 MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -202,6 +223,9 @@ namespace Gomoku_Client
         private bool textChanged = false;
         private async void EmailBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard?.Play();
             textChanged = true;
             if (e.Key == Key.Space) 
             {
@@ -289,12 +313,16 @@ namespace Gomoku_Client
 
         private void ConfirmationButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
             _mainWindow.MainBorder.Visibility = Visibility.Visible;
         }
 
         private void ConfirmationFailedButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
             var border = (Border)((Grid)ConfirmFailedOverlay).Children[0];
             storyboard.Completed += (s, args) =>

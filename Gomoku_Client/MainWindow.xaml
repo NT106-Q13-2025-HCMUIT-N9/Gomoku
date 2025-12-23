@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gomoku_Client"
         xmlns:converters="clr-namespace:Gomoku_Client.Converters"
-        Icon="\Assets\Gomoku.ico"
+        Icon="/Assets/Gomoku.ico"
         mc:Ignorable="d"
         Background="#F0F0F0" 
         Title="Gomoku" Height="720" Width="1280" 
@@ -28,7 +28,7 @@
     <Grid x:Name="RootGrid"
           Width="1280">
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+            <ImageBrush ImageSource="/Assets/Images/Login_Background.png" 
                         Stretch="UniformToFill"
                         Opacity="1"/>
         </Grid.Background>
@@ -258,7 +258,8 @@
                             BorderBrush="#FF4655"
                             BorderThickness="0"
                             Cursor="Hand" 
-                            Margin="0,0,0,0" Click="LoginButton_Click"/>
+                            Margin="0,0,0,0" Click="LoginButton_Click"
+                            MouseEnter="LoginButton_MouseEnter"/>
 
                     <Button x:Name="ExitButton" 
                             Content="Thoát"

@@ -23,6 +23,9 @@
     <Compile Update="View\Lobby.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="View\MatchResult.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="View\Notification.xaml.cs">
       <SubType>Code</SubType>
     </Compile>

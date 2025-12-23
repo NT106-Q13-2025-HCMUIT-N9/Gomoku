@@ -6,8 +6,13 @@ using Google.Cloud.Firestore;
 using Google.Cloud.Firestore.V1;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Media;
+using System.Net;
+using System.Net.Sockets;
+using System.Printing.IndexedProperties;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,8 +22,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+
 
 namespace Gomoku_Client
 {
@@ -28,10 +35,155 @@ namespace Gomoku_Client
     public partial class MainGameUI : Window
     {
         FirestoreChangeListener? listener;
+        public MediaPlayer MainBGM = new MediaPlayer();
+        public MediaPlayer ButtonClick = new MediaPlayer();
+        public MediaPlayer Keyboard = new MediaPlayer();
+
+        public int secretAvatar = 0;
+
+        public static MainGameUI? Instance { get; private set; }
+
+        public class AvatarItem
+        {
+            public string? Image { get; set; }
+            public string? Name { get; set; }
+        }
+
+        public ObservableCollection<AvatarItem>? Avatars { get; set; }
+        public ObservableCollection<AvatarItem>? SecretAvatars { get; set; }
+
+        FirestoreChangeListener? match_listener;
+        List<string> old_match_request = new List<string>();
         public MainGameUI()
         {
             InitializeComponent();
+            Instance = this;
+            UpdateActualBGM();
+            SoundStart();
+
+            Avatars = new ObservableCollection<AvatarItem>
+            {
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1_6sao.jpg", Name="T1|Logo" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1 Faker.jpg", Name="T1|Faker" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1 Gumayusi.jpg", Name="T1|Gumayasi" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1 Keria.jpg", Name="T1|Keria" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1 Oner.jpg", Name="T1|Oner" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1 Zeus.jpg", Name="T1|Zeus" },
+
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/GenG Logo.jpg", Name="GenG|Logo" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/GenG Canyon.jpg", Name="GenG|Canyon" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/GenG Chovy.jpg", Name="GenG|Chovy" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/GenG Kiin.jpg", Name="GenG|Kiin" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/GenG Lehends.jpg", Name="GenG|Lehends" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/GenG Ruler.jpg", Name="GenG|Ruler" },
+
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/KT Logo.jpg", Name="KT|Logo" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/KT Flash.jpg", Name="KT|Flash" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/KT Bdd.jpg", Name="KT|Bdd" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/KT Aiming.jpg", Name="KT|Aiming" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/KT Smeb.jpg", Name="KT|Smeb" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/KT Score.jpg", Name="KT|Score" },
+
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/HLE Logo.jpg", Name="HLE|Logo" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/HLE Kanavi.jpg", Name="HLE|Kanavi" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/HLE Peanut.jpg", Name="HLE|Peanut" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/HLE Viper.jpg", Name="HLE|Viper" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/HLE Zeka.jpg", Name="HLE|Zeka" },
+            new AvatarItem { Image="pack://application:,,,/Assets/Avatar/HLE Zeus.jpg", Name="HLE|Zeus" },
+            };
+
+            SecretAvatars = new ObservableCollection<AvatarItem>
+            {
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tus.jpg", Name="TusMeme" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tuanas.jpg", Name="GeiLord" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Truo.jpg", Name="MasterWibu" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97.jpg", Name="Jack Đồ Tể" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97v2.jpg", Name="Jack Chúa Quỷ" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Baka.jpg", Name="Baka" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Larry.jpg", Name="Larry" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Yippe.jpg", Name="Yippe" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Miku.jpg", Name="Miku" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Teto.jpg", Name="Teto" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Charlie.jpg", Name="Charlie" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DonaldTrump.jpg", Name="Đô Năm Trăm" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random GermanArtist.jpg", Name="Họa sĩ Dức" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Floyd.jpg", Name="George Floyd" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Droid.jpg", Name="George Droid" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Epstein.jpg", Name="Kẻ bí ẩn" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random IShowMeat.jpg", Name="IShowMeat" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random BigChungus.jpg", Name="Big Chungus" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Freddy.jpg", Name="Freddy" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random CoolerFreddy.jpg", Name="CoolerFreddy" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DirtBlock.jpg", Name="Minecraft Dirt" },
+            };
+
+            DataContext = this;
         }
+
+        public double MasterVolValue = 0.5;
+        public double BGMVolValue = 0.15;
+        public double SFXVolValue = 1;
+
+        public void UpdateActualBGM()
+        {
+            MainBGM.Volume = MasterVolValue * BGMVolValue;
+            ButtonClick.Volume = SFXVolValue * MasterVolValue;
+            Keyboard.Volume = SFXVolValue * MasterVolValue;
+        }
+
+        void SoundStart()
+        {
+
+            List<string> BGM = new List<string>();
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "meow.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "frog.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "chess.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "doodle.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Joy.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Matchmakers.mp3"));
+            int BGMNumber = Random.Shared.Next(0, 6);
+
+            string buttonPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "ButtonHover.wav"
+            );
+
+            string keyboardPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "Keyboard.wav"
+            );
+
+
+            MainBGM.MediaOpened += (s, e) =>
+            {
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaEnded += (s, e) =>
+            {
+                BGMNumber = Random.Shared.Next(0, 6);
+                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                //MainBGM.Position = TimeSpan.Zero;
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaFailed += (s, e) =>
+            {
+                MessageBox.Show(e.ErrorException.Message);
+            };
+
+            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+        
+            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+
+            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+        }
+
+        
 
         private void AnimateSlideIn()
         {
@@ -162,6 +314,8 @@ namespace Gomoku_Client
         {
             try
             {
+                ButtonClick.Stop();
+                ButtonClick.Play();
                 FirebaseInfo.AuthClient.SignOut();
 
                 MainWindow main = new MainWindow();
@@ -184,26 +338,40 @@ namespace Gomoku_Client
 
         private void PlayButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new Lobby(this), (RadioButton)sender);
         }
 
+        public void NavigateToLobby()
+        {
+            MainFrame.Navigate(new Lobby(this));
+        }
         private void HistoryButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new History(this), (RadioButton)sender);
         }
 
         private void FriendManagerButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new FriendManager(this), (RadioButton)sender);
         }
 
         private void SettingButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             NavigateWithSlideAnimation(new Setting(this), (RadioButton)sender);
         }
 
         private void ExitButton_Checked(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
 
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
@@ -214,11 +382,15 @@ namespace Gomoku_Client
         }
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             Application.Current.Shutdown();
         }
 
         private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Completed += (s, args) =>
@@ -230,9 +402,9 @@ namespace Gomoku_Client
         }
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            tb_PlayerName.Text = FirebaseInfo.AuthClient.User.Info.DisplayName;
-
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            tb_PlayerName.Text = username;
+
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(username);
 
             listener = doc_ref.Listen(doc_snap => {
@@ -249,6 +421,125 @@ namespace Gomoku_Client
                     });
                 }
             });
+
+            Google.Cloud.Firestore.DocumentReference match_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
+            match_listener = match_ref.Listen(snapshot => {
+                if (snapshot.Exists)
+                {
+                    UserDataModel user_data = snapshot.ConvertTo<UserDataModel>();
+                    if(old_match_request.Count >= 1)
+                    {
+                        List<string> deleted_request = old_match_request.Except(user_data.MatchRequests).ToList();
+                        foreach (string del in deleted_request)
+                        {
+                            old_match_request.Remove(del);
+                        }
+                    }
+
+                    List<string> diff_request = user_data.MatchRequests.Except(old_match_request).ToList();
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        foreach (string request in diff_request)
+                        {
+                            NotificationManager.Instance.ShowNotification(
+                                $"{request} muốn thách đấu bạn",
+                                "Bạn sợ à ?",
+                                Notification.NotificationType.YesNo,
+                                15000,
+                                onAccept: (s, e) =>
+                                {
+                                    respondChallenge("[CHALLENGE_ACCEPT]", request, username);                                  
+                                },
+                                onDecline: (s, e) =>
+                                {
+                                    respondChallenge("[CHALLENGE_DECLINE]", request, username);
+                                }
+                            );
+                        }
+                    });
+                }
+            });
+        }
+
+        private TcpClient client;
+
+        void respondChallenge(string response, string challenger, string me)
+        {
+            client = new TcpClient();
+
+            try
+            {
+                client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+            }
+            catch
+            {
+                NotificationManager.Instance.ShowNotification(
+                        "Lỗi",
+                        "Server có thể đang không hoạt động",
+                        Notification.NotificationType.Info,
+                        5000
+                    );
+                return;
+            }
+
+            if (!client.Connected) return;
+            switch (response)
+            {
+                case "[CHALLENGE_ACCEPT]":
+                    acceptChallenge(client, response, challenger, me);
+                    break;
+
+                case "[CHALLENGE_DECLINE]":
+                    declineChallenge(client, response, challenger, me);
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+
+        void acceptChallenge(TcpClient client, string response, string challenger, string me) 
+        {
+            if ( UserState.currentState == State.InMatch)
+            {
+                NotificationManager.Instance.ShowNotification(
+                    "Chấp nhận thách đấu thất bại",
+                    "Hiện giờ bạn không thể tham gia trận đấu khác",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+                return;
+            }
+            UserState.currentState = State.InMatch;
+            var stream = client.GetStream();
+            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
+            stream.Write(data, 0, data.Length);
+
+            NotificationManager.Instance.ShowNotification(
+                    $"Đã chấp nhận lời thách đấu của {challenger}",
+                    "Chuẩn bị vào trận đấu!",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+        }
+
+        void declineChallenge(TcpClient client, string response, string challenger, string me)
+        {
+            var stream = client.GetStream();
+            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
+            stream.Write(data, 0, data.Length);
+
+            NotificationManager.Instance.ShowNotification(
+                    $"Đã từ chối lời thách đấu của {challenger}",
+                    "Không đủ trình!",
+                    Notification.NotificationType.Info,
+                    5000
+                    );
+            stream.Close();
+            client.Close();
+            client = null;
+            return;
         }
 
         private async void Window_Unloaded(object sender, RoutedEventArgs e)
@@ -258,47 +549,229 @@ namespace Gomoku_Client
                 await listener.StopAsync();
                 listener = null;
             }
+
+            if(match_listener != null)
+            {
+                await match_listener.StopAsync();
+                match_listener = null;
+            }
         }
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             WindowState = WindowState.Minimized;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
 
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Begin(border);
         }
-        private void btn_Test_Click(object sender, RoutedEventArgs e)
+
+        private void EditAvatarButton_Click(object sender, RoutedEventArgs e)
         {
-            NotificationManager.Instance.ShowNotification(
-                "info noti test",
-                "message mesage skibidi",
-                Notification.NotificationType.Info,
-                5000 
-            );
+            ButtonClick.Stop();
+            ButtonClick.Play();
+            ScrollAvatar.ScrollToTop();
+            if (secretAvatar < 2)
+            {
+                AvatarOverlay.Visibility = Visibility.Visible;
+
+                var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+                var border = (Border)((Grid)AvatarOverlay).Children[0];
+                storyboard.Begin(border);
+                secretAvatar++;
+            }
+            else
+            {
+                AvatarSecretOverlay.Visibility = Visibility.Visible;
+
+                var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
+                var border = (Border)((Grid)AvatarSecretOverlay).Children[0];
+                storyboard.Begin(border);
+                secretAvatar = 0;
+            }
+        }
+        private void ColorChangeUI(string color1, string color2)
+        {
+            Color customColor = (Color)ColorConverter.ConvertFromString(color1);
+            Color customColor2 = (Color)ColorConverter.ConvertFromString(color2);
+            Color YellowMain = (Color)ColorConverter.ConvertFromString("#333333");
+
+            var animation = new ColorAnimation
+            {
+                To = customColor,
+                Duration = TimeSpan.FromMilliseconds(400),
+                FillBehavior = FillBehavior.HoldEnd
+            };
+
+            var animation2 = new ColorAnimation
+            {
+                To = customColor2,
+                Duration = TimeSpan.FromMilliseconds(400),
+                FillBehavior = FillBehavior.HoldEnd
+            };
+
+            // Glow
+            GlowEffect.BeginAnimation(DropShadowEffect.ColorProperty, animation);
+
+            // Text RadioButton
+            PlayButton.Foreground.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+
+            // Avatar
+            Avatar.BorderBrush.BeginAnimation(SolidColorBrush.ColorProperty, animation2);
+            AvatarGlow.BeginAnimation(DropShadowEffect.ColorProperty, animation2);
+
+            // Border EditAvatarButton
+            EditAvatarButton.Background.BeginAnimation(SolidColorBrush.ColorProperty, animation2);
+
+            // Label Winrate
+            lb_winrate.Foreground.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+
+            //QuitConfirmOverlay
+            QuitBorder.BorderBrush.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+            QuitBorderGlow.BeginAnimation(DropShadowEffect.ColorProperty, animation);
+            QuitIconGlow.BeginAnimation(DropShadowEffect.ColorProperty, animation);
+
+            ExitDraw.Fill.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+
+            ConfirmQuitButton.Background.BeginAnimation(SolidColorBrush.ColorProperty, animation);
+
+            if (color1 == "#FFD700" || color1 == "#FFFAF0")
+            {
+                if (ConfirmQuitButton.Foreground is SolidColorBrush currentBrush)
+                {
+                    SolidColorBrush animatedBrush = new SolidColorBrush(currentBrush.Color);
+
+                    ConfirmQuitButton.Foreground = animatedBrush;
+
+                    ColorAnimation colorAnim = new ColorAnimation
+                    {
+                        To = (Color)ColorConverter.ConvertFromString("#2C3E50"), 
+                        Duration = TimeSpan.FromMilliseconds(400),
+                        FillBehavior = FillBehavior.HoldEnd
+                    };
+
+                    animatedBrush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
+                }
+            }
+            else
+            {
+                if (ConfirmQuitButton.Foreground is SolidColorBrush currentBrush)
+                {
+                    SolidColorBrush animatedBrush = new SolidColorBrush(currentBrush.Color);
+
+                    ConfirmQuitButton.Foreground = animatedBrush;
+
+                    ColorAnimation colorAnim = new ColorAnimation
+                    {
+                        To = Colors.White,
+                        Duration = TimeSpan.FromMilliseconds(400),
+                        FillBehavior = FillBehavior.HoldEnd
+                    };
+
+                    animatedBrush.BeginAnimation(SolidColorBrush.ColorProperty, colorAnim);
+                }
+            }
+
+            //AvatarChooseGlow
+            AvatarChooseGlow.BeginAnimation(DropShadowEffect.ColorProperty, animation);
+            AvatarSecretChooseGlow.BeginAnimation(DropShadowEffect.ColorProperty, animation);
+
+            var border = ConfirmQuitButton.Template.FindName("ButtonBorder", ConfirmQuitButton) as Border;
+
+            if (border != null && border.Effect is DropShadowEffect shadow)
+            {
+                shadow.BeginAnimation(DropShadowEffect.ColorProperty, animation);
+            }
         }
 
-        private void btn_Test1_Click(object sender, RoutedEventArgs e)
+        private void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            NotificationManager.Instance.ShowNotification(
-                "yesno noti test",
-                "lay bo",
-                Notification.NotificationType.YesNo,
-                4000,
-                onAccept: (s, ev) =>
+            ButtonClick.Stop();
+            ButtonClick.Play();
+
+            secretAvatar = 0;
+
+            var border = sender as Border;
+            if (border?.DataContext is AvatarItem selectedAvatar)
+            {
+                AvatarBrush.ImageSource = new BitmapImage(new Uri(selectedAvatar.Image ?? "", UriKind.RelativeOrAbsolute));
+
+                
+                if (selectedAvatar.Name?.Contains("T1|") == true)
+                    ColorChangeUI("#FF4655", "#FF4655");
+                else if (selectedAvatar.Name?.Contains("GenG|") == true)
+                    ColorChangeUI("#FFD700", "#121212");
+                else if (selectedAvatar.Name?.Contains("KT|") == true)
+                    ColorChangeUI("#FFFAF0", "#121212");
+                else if (selectedAvatar.Name?.Contains("HLE|") == true)
+                    ColorChangeUI("#FFFFA500", "#FFFFA500");
+                else ColorChangeUI("#FF4655", "#FF4655");
+
+                if (AvatarOverlay.Visibility == Visibility.Visible)
                 {
-                    MessageBox.Show("accepted.");
-                },
-                onDecline: (s, ev) =>
-                {
-                    MessageBox.Show("declined.");
+                    var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
+                    var sborder = (Border)((Grid)AvatarOverlay).Children[0];
+                    storyboard.Completed += (s, args) =>
+                    {
+                        AvatarOverlay.Visibility = Visibility.Collapsed;
+                    };
+
+                    storyboard.Begin(sborder);
                 }
-            );
+
+                else if(AvatarSecretOverlay.Visibility == Visibility.Visible)
+                {
+                    var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
+                    var sborder = (Border)((Grid)AvatarSecretOverlay).Children[0];
+                    storyboard.Completed += (s, args) =>
+                    {
+                        AvatarSecretOverlay.Visibility = Visibility.Collapsed;
+                    };
+
+                    storyboard.Begin(sborder);
+                }
+            }
+        }
+
+        private void CloseAvatarOverlay_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonClick.Stop();
+            ButtonClick.Play();
+
+            var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
+            var border = (Border)((Grid)AvatarOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
+            {
+                AvatarOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            storyboard.Begin(border);
+        }
+
+        private void CloseAvatarSecretOverlay_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonClick.Stop();
+            ButtonClick.Play();
+
+            secretAvatar = 0;
+
+            var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
+            var border = (Border)((Grid)AvatarSecretOverlay).Children[0];
+            storyboard.Completed += (s, args) =>
+            {
+                AvatarSecretOverlay.Visibility = Visibility.Collapsed;
+            };
+
+            storyboard.Begin(border);
         }
     }
 }

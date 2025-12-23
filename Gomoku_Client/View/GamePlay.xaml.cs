@@ -269,14 +269,16 @@ namespace Gomoku_Client.View
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Begin(border);
 
-            MainBGM.Stop();
-            mainWindow.MainBGM.Play();
         }
 
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
         {
             ButtonClick.Stop();
             ButtonClick.Play();
+
+            MainBGM.Stop();
+            mainWindow.MainBGM.Play();
+
             if (isConnected)
             {
                 SendMatchEnd();

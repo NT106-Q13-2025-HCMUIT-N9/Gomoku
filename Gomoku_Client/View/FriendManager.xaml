@@ -83,7 +83,8 @@
                                      Background="#0F0F1E" BorderBrush="#FF4655" BorderThickness="2" 
                                      Foreground="White" FontSize="14" 
                                      Padding="15,0" VerticalContentAlignment="Center"
-                                     MaxLength="50">
+                                     MaxLength="50"
+                                     TextChanged="FriendUsernameInput_TextChanged">
                                 <TextBox.Resources>
                                     <Style TargetType="Border">
                                         <Setter Property="CornerRadius" Value="8,0,0,8"/>

@@ -1,0 +1,177 @@
+﻿<Page x:Class="Gomoku_Client.View.MatchResult"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Gomoku_Client.View"
+      mc:Ignorable="d" 
+      d:DesignHeight="720" d:DesignWidth="1280"
+      Title="Result"
+      Loaded="Page_Loaded"
+      Unloaded="Page_Unloaded">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0F1923" Offset="0"/>
+                <GradientStop Color="#152635" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <!-- top bar -->
+        <Border Height="60" VerticalAlignment="Top" Background="Transparent" Panel.ZIndex="1">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="10" ShadowDepth="3" Opacity="0.5"/>
+            </Border.Effect>
+            <Grid>
+                <RadioButton x:Name="BackButton" 
+                         Content="Quay lại" 
+                         Style="{StaticResource BackButton}" 
+                         Checked="BackButton_Checked"/>
+            </Grid>
+        </Border>
+
+        <!-- main area -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- divider -->
+            <Canvas x:Name="canvas_Separator" Grid.ColumnSpan="2" ClipToBounds="False">
+                <Line x:Name="line_Separator" 
+                      X1="700" Y1="0" 
+                      X2="580" Y2="720" 
+                      Stroke="White" 
+                      StrokeThickness="20"
+                      Panel.ZIndex="0" 
+                      Opacity="0.15">
+                    <Line.Effect>
+                        <DropShadowEffect Color="#FFFFFF" BlurRadius="15" ShadowDepth="0" Opacity="0.3"/>
+                    </Line.Effect>
+                    <Line.RenderTransform>
+                        <TranslateTransform x:Name="transform_Separator" X="0" Y="0"/>
+                    </Line.RenderTransform>
+                </Line>
+            </Canvas>
+
+            <!-- left (local player) -->
+            <Grid x:Name="grid_LocalPlayer" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border x:Name="border_LocalPlayer" 
+                        Width="300" Height="350" 
+                        CornerRadius="0" 
+                        BorderBrush="#FF4655" 
+                        BorderThickness="3" 
+                        HorizontalAlignment="Center"
+                        RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="scale_LocalPlayer" ScaleX="1" ScaleY="1"/>
+                            <TranslateTransform x:Name="translate_LocalPlayer" X="0" Y="0"/>
+                        </TransformGroup>
+                    </Border.RenderTransform>
+                    <Border.Effect>
+                        <DropShadowEffect Color="#FF4655" BlurRadius="25" ShadowDepth="0" Opacity="0.6"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Border CornerRadius="0" Background="#2A2E3A">
+                            <Image x:Name="img_PlayerAvatar" Source="/Assets/Images/T1.png" VerticalAlignment="Top"/>
+                        </Border>
+                        <Border VerticalAlignment="Bottom" Height="140" CornerRadius="0">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="Transparent" Offset="0"/>
+                                    <GradientStop Color="#80000000" Offset="0.5"/>
+                                    <GradientStop Color="#DD000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <StackPanel VerticalAlignment="Bottom" Margin="20,0,20,20">
+                                <TextBlock x:Name="tb_PlayerName" Text="PLAYER" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                                    <TextBlock Text="🎮" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFFFFF"/>
+                                    <TextBlock x:Name="lb_matches" Text="0" FontSize="16" FontWeight="SemiBold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    <TextBlock Text="trận" FontSize="16" FontWeight="SemiBold" Foreground="#9FA3A9" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="👑" FontSize="24" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFFFFF"/>
+                                    <TextBlock x:Name="tb_WinRate" Text="0%" FontSize="18" FontWeight="SemiBold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- right (opponent) -->
+            <Grid x:Name="grid_Opponent" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border x:Name="border_Opponent" 
+                        Width="300" Height="350" 
+                        CornerRadius="0" 
+                        BorderBrush="#4CAF50" 
+                        BorderThickness="3" 
+                        HorizontalAlignment="Center"
+                        RenderTransformOrigin="0.5,0.5">
+                    <Border.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform x:Name="scale_Opponent" ScaleX="1" ScaleY="1"/>
+                            <TranslateTransform x:Name="translate_Opponent" X="0" Y="0"/>
+                        </TransformGroup>
+                    </Border.RenderTransform>
+                    <Border.Effect>
+                        <DropShadowEffect Color="#4CAF50" BlurRadius="25" ShadowDepth="0" Opacity="0.6"/>
+                    </Border.Effect>
+                    <Grid>
+                        <Border CornerRadius="0" Background="#2A2E3A">
+                            <Image x:Name="img_OpponentAvatar" Source="/Assets/Images/T1.png" Stretch="UniformToFill" VerticalAlignment="Top"/>
+                        </Border>
+                        <Border VerticalAlignment="Bottom" Height="140" CornerRadius="0">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                    <GradientStop Color="Transparent" Offset="0"/>
+                                    <GradientStop Color="#80000000" Offset="0.5"/>
+                                    <GradientStop Color="#DD000000" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <StackPanel VerticalAlignment="Bottom" Margin="20,0,20,20">
+                                <TextBlock x:Name="tb_OpponentName" Text="OPPONENT" FontSize="20" FontWeight="Bold" Foreground="#FFFFFF" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                                    <TextBlock Text="🎮" FontSize="20" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFFFFF"/>
+                                    <TextBlock x:Name="lb_OpponentMatches" Text="0" FontSize="16" FontWeight="SemiBold" Foreground="#FFFFFF" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    <TextBlock Text="trận" FontSize="16" FontWeight="SemiBold" Foreground="#9FA3A9" VerticalAlignment="Center"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="👑" FontSize="24" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFFFFF"/>
+                                    <TextBlock x:Name="tb_OpponentWinRate" Text="0%" FontSize="18" FontWeight="SemiBold" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- result text overlay -->
+            <Grid Grid.ColumnSpan="2" VerticalAlignment="Top" Margin="0,100,0,0">
+                <TextBlock x:Name="tb_ResultText" 
+                           Text="CHIẾN THẮNG!" 
+                           FontSize="48" 
+                           FontWeight="Bold" 
+                           Foreground="#FFD700" 
+                           HorizontalAlignment="Center"
+                           Opacity="0">
+                    <TextBlock.Effect>
+                        <DropShadowEffect Color="#000000" BlurRadius="20" ShadowDepth="3" Opacity="0.8"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

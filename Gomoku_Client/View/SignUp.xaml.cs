@@ -3,6 +3,7 @@ using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
 using System.Diagnostics;
+using System.Media;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,11 +17,16 @@ namespace Gomoku_Client
     /// </summary>
     public partial class SignUpUserInterface : Page
     {
+        private MediaPlayer ButtonClick = new MediaPlayer();
         private MainWindow _mainWindow;
+        private bool isLoading = false;
         public SignUpUserInterface(MainWindow mainWindow)
         {
+            isLoading = true;
             InitializeComponent();
+            StartSound();
             _mainWindow = mainWindow;
+            isLoading = false;
         }
 
         private void UsernameBox_GotFocus(object sender, RoutedEventArgs e)
@@ -30,6 +36,18 @@ namespace Gomoku_Client
                 UsernameBox.Text = "";
                 UsernameBox.Foreground = Brushes.White;
             }
+        }
+
+        void StartSound()
+        {
+            string buttonPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "ButtonHover.wav"
+            );
+
+            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
         }
 
         bool isWrongUsername = false;
@@ -181,6 +199,8 @@ namespace Gomoku_Client
 
         private void GoBack_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             if (_mainWindow == null)
             {
                 MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -192,6 +212,9 @@ namespace Gomoku_Client
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            if (_isInternalChange) return;
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
             if (PasswordBox.Password.Length > 0)
                 PasswordPlaceholder.Visibility = Visibility.Collapsed;
             else
@@ -200,6 +223,9 @@ namespace Gomoku_Client
 
         private void PasswordConfirmBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
+            if (_isInternalChange) return;
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
             if (PasswordConfirmBox.Password.Length > 0)
                 PasswordConfirmPlaceholder.Visibility = Visibility.Collapsed;
             else
@@ -208,6 +234,8 @@ namespace Gomoku_Client
 
         private void UsernameBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
             char inputChar = e.Text[0];
 
             if (!(char.IsLetterOrDigit(inputChar)))
@@ -240,7 +268,8 @@ namespace Gomoku_Client
         {
             try
             {
-
+                ButtonClick.Stop();
+                ButtonClick?.Play();
 
                 string username = UsernameBox.Text;
                 string password = PasswordBox.Password;
@@ -277,7 +306,8 @@ namespace Gomoku_Client
                     Username = username,
                     Email = email,
                     Friends = new List<string>(),
-                    FriendsRequests = new List<string>()
+                    FriendsRequests = new List<string>(),
+                    MatchRequests = new List<string>()
                 };
 
                 await FireStoreHelper.AddUser(doc);
@@ -448,6 +478,7 @@ namespace Gomoku_Client
 
         private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+
             if (e.Key == Key.Space)
             {
                 e.Handled = true; 
@@ -457,9 +488,14 @@ namespace Gomoku_Client
         }
 
     private bool isShowingPass = false;
-    private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
+        private bool _isInternalChange = false;
+
+        private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
     {
-      if (!isShowingPass)
+            _isInternalChange = true;
+            ButtonClick.Stop();
+            ButtonClick?.Play();
+            if (!isShowingPass)
       {
         // Hiện mật khẩu
         PasswordVisible.Text = PasswordBox.Password;
@@ -477,7 +513,8 @@ namespace Gomoku_Client
       }
 
       isShowingPass = !isShowingPass;
-    }
+            _isInternalChange = false;
+        }
 
     private void PasswordVisible_PreviewKeyDown(object sender, KeyEventArgs e)
         {
@@ -576,6 +613,9 @@ namespace Gomoku_Client
 
         private void PasswordConfirmBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (isLoading) return;
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
             if (e.Key == Key.Space)
             {
                 e.Handled = true;
@@ -584,6 +624,9 @@ namespace Gomoku_Client
 
         private void PasswordConfirmVisible_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (isLoading) return;
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
             if (e.Key == Key.Space)
             {
                 e.Handled = true;
@@ -593,7 +636,10 @@ namespace Gomoku_Client
     bool isShowingConfirmPass = false;
     private void TogglePasswordConfirmBtn_Click(object sender, RoutedEventArgs e)
     {
-      if (!isShowingConfirmPass)
+            _isInternalChange = true;
+            ButtonClick.Stop();
+            ButtonClick?.Play();
+            if (!isShowingConfirmPass)
       {
         // Hiện mật khẩu
         PasswordConfirmVisible.Text = PasswordConfirmBox.Password;
@@ -611,7 +657,8 @@ namespace Gomoku_Client
       }
 
       isShowingConfirmPass = !isShowingConfirmPass;
-    }
+            _isInternalChange = false;
+        }
 
     private void PasswordVisible_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -631,6 +678,9 @@ namespace Gomoku_Client
 
         private void EmailBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            if (isLoading) return;
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
             if (e.Key == Key.Space) e.Handled = true;
             if ((e.Key == Key.Down || e.Key == Key.Enter) && isShowingPass == false) PasswordBox.Focus();
             else PasswordVisible.Focus();
@@ -678,7 +728,8 @@ namespace Gomoku_Client
             };
 
             storyboard.Begin(border);*/
-
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
             _mainWindow.MainBorder.Visibility = Visibility.Visible;
 
@@ -686,6 +737,8 @@ namespace Gomoku_Client
 
         private void ConfirmationFailedButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
             var border = (Border)((Grid)ConfirmFailedOverlay).Children[0];
             storyboard.Completed += (s, args) =>

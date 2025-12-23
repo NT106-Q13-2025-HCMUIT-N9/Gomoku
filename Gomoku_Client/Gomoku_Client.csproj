@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -77,7 +77,6 @@
     <None Remove="Assets\Avatar\T1_6sao.jpg" />
     <None Remove="Assets\delete-friend.png" />
     <None Remove="Assets\firebase_key.json" />
-    <None Remove="Assets\Gomoku.ico" />
     <None Remove="Assets\Login_Background.png" />
     <None Remove="Assets\Main.png" />
     <None Remove="Assets\Matchmaking_Background.png" />
@@ -94,8 +93,6 @@
     <None Remove="Assets\Sounds\Matchmakers.mp3" />
     <None Remove="Assets\Sounds\meow.mp3" />
     <None Remove="Assets\Sounds\RelaxedScene.mp3" />
-    <None Remove="Assets\t1.jpg" />
-    <None Remove="Assets\T1_6sao.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -146,12 +143,17 @@
     <Resource Include="Assets\Avatar\T1 Keria.jpg" />
     <Resource Include="Assets\Avatar\T1 Oner.jpg" />
     <Resource Include="Assets\Avatar\T1 Zeus.jpg" />
-    <Resource Include="Assets\delete-friend.png" />
-    <Resource Include="Assets\Main.png" />
-    <Resource Include="Assets\Matchmaking_Background.png" />
-    <Resource Include="Assets\Riot_Games_Logo.png" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Resource Include="Assets\Images\hle.png" />
+		<Resource Include="Assets\Images\Delete_Friend.png" />
+		<Resource Include="Assets\Images\T1.png" />
+		<Resource Include="Assets\Images\Main.png" />
+		<Resource Include="Assets\Images\Matchmaking_Background.png" />
+		<Resource Include="Assets\Images\Riot_Games_Logo.png" />
+	</ItemGroup>
+	
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="FirebaseAuthentication.net" Version="4.1.0" />
@@ -159,13 +161,17 @@
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Assets\AI_Background.gif" />
-    <Resource Include="Assets\api.env" />
-    <Resource Include="Assets\firebase_key.json" />
-    <Resource Include="Assets\Gomoku.ico" />
-    <Resource Include="Assets\Login_Background.png" />
-    <Resource Include="Assets\ServerBrowser_Background.gif" />
+	<ItemGroup>
+		<Resource Include="Assets\Images\AI_Background.gif" />
+		<Resource Include="Assets\api.env" />
+		<Resource Include="Assets\firebase_key.json" />
+		<Resource Include="Assets\Gomoku.ico" />
+		<Resource Include="Assets\Images\Login_Background.png" />
+		<Resource Include="Assets\Images\ServerBrowser_Background.gif" />
+		<Resource Include="Assets\Images\T1_Card.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
     <Content Include="Assets\Sounds\Awaken.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -203,8 +209,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Assets\Avatar\T1_6sao.jpg" />
-    <Resource Include="Assets\t1.jpg" />
-    <Resource Include="Assets\T1_6sao.jpg" />
   </ItemGroup>
 
 </Project>

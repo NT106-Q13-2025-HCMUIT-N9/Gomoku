@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Gomoku_Client"
         xmlns:converters="clr-namespace:Gomoku_Client.Converters"
-        Icon="\Assets\Gomoku.ico"
+        Icon="/Assets/Gomoku.ico"
         mc:Ignorable="d"
         Background="#F0F0F0" 
         Title="Gomoku" Height="720" Width="1280" 

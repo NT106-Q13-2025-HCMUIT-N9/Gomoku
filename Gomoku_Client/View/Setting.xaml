@@ -268,7 +268,8 @@
                                     Style="{StaticResource ModernSlider}"
                                     Minimum="0"
                                     Maximum="100"
-                                    Value="20"/>
+                                    Value="100"
+                                    ValueChanged="GeneralVolumeSlider_ValueChanged"/>
 
                             <Button x:Name="GeneralIncBtn"
                                     Grid.Column="3"
@@ -315,7 +316,8 @@
                                     Style="{StaticResource ModernSlider}"
                                     Minimum="0"
                                     Maximum="100"
-                                    Value="100"/>
+                                    Value="50"
+                                    ValueChanged="BackgroundVolumeSlider_ValueChanged"/>
 
                             <Button x:Name="BackgroundVolumeIncBtn"
                                     Grid.Column="3"
@@ -362,7 +364,8 @@
                                     Style="{StaticResource ModernSlider}"
                                     Minimum="0"
                                     Maximum="100"
-                                    Value="100"/>
+                                    Value="50"
+                                    ValueChanged="SfxVolumeSlider_ValueChanged"/>
 
                             <Button x:Name="SfxIncBtn"
                                     Grid.Column="3"

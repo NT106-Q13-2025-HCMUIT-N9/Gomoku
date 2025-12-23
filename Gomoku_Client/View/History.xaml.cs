@@ -37,11 +37,14 @@ namespace Gomoku_Client.View
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
         {
+            
             if (_mainWindow == null)
             {
                 MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             _mainWindow.ShowMenuWithAnimation();
         }
 

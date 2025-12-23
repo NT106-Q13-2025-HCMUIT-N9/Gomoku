@@ -36,6 +36,8 @@ namespace Gomoku_Client.View
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             if (_mainWindow == null)
             {
                 MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -46,6 +48,8 @@ namespace Gomoku_Client.View
 
         private async void SendFriendRequest_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
             if (string.IsNullOrEmpty(FriendUsernameInput.Text))
@@ -54,19 +58,19 @@ namespace Gomoku_Client.View
                 return;
             }
 
-            if(!await Validate.IsUsernamExists(FriendUsernameInput.Text))
+            if (!await Validate.IsUsernamExists(FriendUsernameInput.Text))
             {
                 NotificationManager.Instance.ShowNotification("Lỗi", "Username không tồn tại.", Notification.NotificationType.Info);
                 return;
             }
 
-            if(await FireStoreHelper.IsFriendWith(username, FriendUsernameInput.Text))
+            if (await FireStoreHelper.IsFriendWith(username, FriendUsernameInput.Text))
             {
                 NotificationManager.Instance.ShowNotification("Lỗi", "Hai bạn đã là bạn bè", Notification.NotificationType.Info);
                 return;
             }
 
-            if(username == FriendUsernameInput.Text)
+            if (username == FriendUsernameInput.Text)
             {
                 NotificationManager.Instance.ShowNotification("Lỗi", "Bạn cô đơn đến thế sao :)))", Notification.NotificationType.Info);
                 return;
@@ -84,6 +88,8 @@ namespace Gomoku_Client.View
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             var border = (Border)((Grid)UnfriendConfirmationOverlay).Children[0];
             Storyboard fadeOut = (Storyboard)FindResource("PopupFadeOut");
             fadeOut.Begin(border);
@@ -97,6 +103,8 @@ namespace Gomoku_Client.View
 
         private async void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             if (string.IsNullOrEmpty(_pendingUnfriendUsername)) return;
 
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
@@ -123,6 +131,8 @@ namespace Gomoku_Client.View
 
         private async void AcceptButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
@@ -140,6 +150,8 @@ namespace Gomoku_Client.View
 
         private async void RefuseButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
@@ -153,12 +165,15 @@ namespace Gomoku_Client.View
 
         private async void ChallengeButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
+
             Button butt = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
             CancellationTokenSource cts = new CancellationTokenSource();
 
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(butt?.Name);
-            
+
             DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
 
@@ -181,7 +196,7 @@ namespace Gomoku_Client.View
             if (!client.Connected) return;
 
             var stream = client.GetStream();
-            
+
             if (!user_data.MatchRequests.Contains(username))
             {
                 byte[] data = Encoding.UTF8.GetBytes($"[CHALLENGE_REQUEST];{username};{butt?.Name}");
@@ -197,7 +212,7 @@ namespace Gomoku_Client.View
                 user_data.MatchRequests.Add(username);
                 await doc_ref.SetAsync(user_data);
             }
-            
+
             // Nếu đã gửi thách đấu rồi thì lắng nghe phản hồi
 
             FirestoreChangeListener listener = doc_ref.Listen(snapshot =>
@@ -274,6 +289,8 @@ namespace Gomoku_Client.View
 
         private void UnfriendButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             _pendingUnfriendUsername = sender_handle?.Name;
 
@@ -285,6 +302,7 @@ namespace Gomoku_Client.View
 
         private async Task DeleteRequestCard(string name)
         {
+            await Task.Yield();
             var borderToDelete = FriendRequestsPanel.Children
             .OfType<Border>()
             .FirstOrDefault(b => b.Name == name);
@@ -339,6 +357,12 @@ namespace Gomoku_Client.View
                 await listener.StopAsync();
                 listener = null;
             }
+        }
+
+        private void FriendUsernameInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
         }
     }
 }

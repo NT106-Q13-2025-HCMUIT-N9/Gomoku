@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,8 +18,12 @@ using System.Windows.Threading;
 
 namespace Gomoku_Client.View
 {
+    /// <summary>
+    /// Interaction logic for GamePlay.xaml
+    /// </summary>
     public partial class GamePlay : Page
     {
+        // Constants Variables
         private const int boardSize = 15;
         private const double cellSize = 46.5;
 
@@ -44,6 +47,10 @@ namespace Gomoku_Client.View
         private bool isConnected = false;
         private MainGameUI mainWindow;
 
+        //SoundMaker
+        public MediaPlayer MainBGM = new MediaPlayer();
+        public MediaPlayer ButtonClick = new MediaPlayer();
+        public MediaPlayer Keyboard = new MediaPlayer();
         public GamePlay(TcpClient client, string username, char symbol, string opponent, MainGameUI window)
         {
             InitializeComponent();
@@ -87,11 +94,55 @@ namespace Gomoku_Client.View
             receiveThread.Start();
             Console.WriteLine("[INIT] Receive thread started immediately");
         }
-        private char GetOpponentSymbol()
-        {
-            return playerSymbol == 'X' ? 'O' : 'X';
-        }
 
+        private void StarSound()
+        {
+            List<string> BGM = new List<string>();
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "LOLTheme.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Awaken.mp3"));
+            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "LegendsNeverDie.mp3"));
+
+            int BGMNumber = Random.Shared.Next(0, 3);
+
+            string buttonPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "ButtonHover.wav"
+            );
+
+            string keyboardPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "Keyboard.wav"
+            );
+
+
+            MainBGM.MediaOpened += (s, e) =>
+            {
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaEnded += (s, e) =>
+            {
+                BGMNumber = Random.Shared.Next(0, 3);
+                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                //MainBGM.Position = TimeSpan.Zero;
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaFailed += (s, e) =>
+            {
+                MessageBox.Show(e.ErrorException.Message);
+            };
+
+            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+
+            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+
+            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+        }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -163,13 +214,18 @@ namespace Gomoku_Client.View
             Console.WriteLine($"[CLICK] Valid move, sending to server");
             SendMoveToServer(row, col);
         }
+
         private void SendMessage_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             SendChatMessage();
         }
 
         private void SurrenderButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             SurrenderConfirmationOverlay.Visibility = Visibility.Visible;
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
             var border = (Border)((Grid)SurrenderConfirmationOverlay).Children[0];
@@ -178,12 +234,16 @@ namespace Gomoku_Client.View
 
         private void ConfirmSurrenderButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             SendResignToServer();
             SurrenderConfirmationOverlay.Visibility = Visibility.Collapsed;
         }
 
         private void CancelSurrenderButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
             var border = (Border)((Grid)SurrenderConfirmationOverlay).Children[0];
             storyboard.Completed += (s, args) =>
@@ -195,6 +255,8 @@ namespace Gomoku_Client.View
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
             var storyboard = (Storyboard)this.Resources["FadeInStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
@@ -203,6 +265,8 @@ namespace Gomoku_Client.View
 
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             if (isConnected)
             {
                 SendMatchEnd();
@@ -212,11 +276,12 @@ namespace Gomoku_Client.View
             player1Timer?.Stop();
             player2Timer?.Stop();
             ExitToHome();
-            return;
         }
 
         private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick.Play();
             var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Completed += (s, args) =>
@@ -232,14 +297,19 @@ namespace Gomoku_Client.View
             if (e.Key == Key.Enter)
             {
                 SendMessage_Click(sender, e);
+
                 e.Handled = true;
+                return;
             }
 
-            if (e.Key == Key.Escape)
+            if ( e.Key == Key.Escape)
             {
                 tb_Message.Clear();
                 e.Handled = true;
+                return;
             }
+            Keyboard.Stop();
+            Keyboard.Play();
         }
 
         private void DisplayChatMessage(string senderName, string message, bool isOwnMessage)
@@ -265,13 +335,14 @@ namespace Gomoku_Client.View
                 messageBorder.Child = messageText;
                 ChatMessagesPanel.Children.Add(messageBorder);
 
-                
+
             });
         }
 
         public void InitializeGame()
         {
             board = new int[boardSize, boardSize];
+            isPlayerTurn = true;
             isGameOver = false;
             moveCount = 0;
 
@@ -287,7 +358,8 @@ namespace Gomoku_Client.View
             double startY = cellSize / 2.0;
             double endPos = cellSize * boardSize - cellSize / 2.0;
 
-            for (int i = 0; i < boardSize; i++)
+            // Vẽ các đường ngang
+            for ( int i = 0; i < boardSize; i++ )
             {
                 Line line = new Line
                 {
@@ -300,7 +372,7 @@ namespace Gomoku_Client.View
                 };
                 BoardCanvas.Children.Add(line);
             }
-
+            // Vẽ các đường dọc
             for (int i = 0; i < boardSize; i++)
             {
                 Line line = new Line
@@ -315,6 +387,7 @@ namespace Gomoku_Client.View
                 BoardCanvas.Children.Add(line);
             }
 
+            // Vẽ các điểm đánh dấu (star points)
             DrawStarPoint(3, 3);
             DrawStarPoint(3, 11);
             DrawStarPoint(7, 7);
@@ -339,6 +412,8 @@ namespace Gomoku_Client.View
             BoardCanvas.Children.Add(dot);
         }
 
+
+
         private void SetupTimers()
         {
             player1Timer = new DispatcherTimer();
@@ -357,6 +432,7 @@ namespace Gomoku_Client.View
         private void UpdatePlayer1TimerDisplay()
         {
             Player1TimerText.Text = player1TimeLeft.ToString(@"mm\:ss");
+            // Đổi màu cảnh báo khi còn < 30 giây
             if (player1TimeLeft.TotalSeconds <= 30)
             {
                 Player1TimerText.Foreground = new SolidColorBrush(Colors.Red);
@@ -370,6 +446,7 @@ namespace Gomoku_Client.View
         private void UpdatePlayer2TimerDisplay()
         {
             Player2TimerText.Text = player2TimeLeft.ToString(@"mm\:ss");
+            // Đổi màu cảnh báo khi còn < 30 giây
             if (player2TimeLeft.TotalSeconds <= 30)
             {
                 Player2TimerText.Foreground = new SolidColorBrush(Colors.Red);
@@ -400,6 +477,7 @@ namespace Gomoku_Client.View
             }
         }
 
+
         private void PlaceStone(int row, int col, bool isBlack)
         {
             board[row, col] = isBlack ? 1 : 2;
@@ -410,32 +488,44 @@ namespace Gomoku_Client.View
 
         private void DrawStone(int row, int col, bool isBlack)
         {
-            Dispatcher.Invoke(() =>
+            Ellipse stone = new Ellipse();
+
+            if (isBlack)
+                stone.Style = (Style)FindResource("BlackStone");
+            else
+                stone.Style = (Style)FindResource("WhiteStone");
+
+            double x = cellSize / 2.0 + col * cellSize - stone.Width / 2;
+            double y = cellSize / 2.0 + row * cellSize - stone.Height / 2;
+
+            Canvas.SetLeft(stone, x);
+            Canvas.SetTop(stone, y);
+
+            BoardCanvas.Children.Add(stone);
+        }
+
+        private void SwitchTurn()
+        {
+            isPlayerTurn = !isPlayerTurn;
+
+            if (isPlayerTurn)
             {
-                Ellipse stone = new Ellipse();
+                player2Timer.Stop();
+                player1Timer.Start();
+            }
+            else
+            {
+                player1Timer.Stop();
+                player2Timer.Start();
+            }
 
-                if (isBlack)
-                    stone.Style = (Style)FindResource("BlackStone");
-                else
-                    stone.Style = (Style)FindResource("WhiteStone");
-
-                double x = cellSize / 2.0 + col * cellSize - stone.Width / 2;
-                double y = cellSize / 2.0 + row * cellSize - stone.Height / 2;
-
-                Canvas.SetLeft(stone, x);
-                Canvas.SetTop(stone, y);
-
-                BoardCanvas.Children.Add(stone);
-            });
+            UpdateGameStatus();
         }
 
         private void UpdateGameStatus()
         {
-            Dispatcher.Invoke(() =>
-            {
-                UpdateTurnUI();
-                GameStatusText.Text = isPlayerTurn ? "Lượt của bạn" : $"Lượt của {player2Name}";
-            });
+            string currentPlayer = isPlayerTurn ? player1Name : player2Name;
+            GameStatusText.Text = $"Lượt của {currentPlayer}";
         }
 
         private bool CheckWin(int row, int col, int player)
@@ -448,9 +538,14 @@ namespace Gomoku_Client.View
 
         private bool CheckDirection(int row, int col, int dRow, int dCol, int player)
         {
-            int count = 1;
+            int count = 1; 
+
+            // Đếm về phía trước
             count += CountStones(row, col, dRow, dCol, player);
+
+            // Đếm về phía sau
             count += CountStones(row, col, -dRow, -dCol, player);
+
             return count >= 5;
         }
 
@@ -552,7 +647,6 @@ namespace Gomoku_Client.View
             });
         }
 
-
         private void SendMoveToServer(int row, int col)
         {
             try
@@ -608,7 +702,7 @@ namespace Gomoku_Client.View
                     return;
                 }
 
-                string chatMessage = $"[CHAT];{player1Name};{message}\n"; 
+                string chatMessage = $"[CHAT];{player1Name};{message}\n";
                 byte[] data = Encoding.UTF8.GetBytes(chatMessage);
                 socket.Send(data);
                 Console.WriteLine($"[SEND] {chatMessage.TrimEnd()}");

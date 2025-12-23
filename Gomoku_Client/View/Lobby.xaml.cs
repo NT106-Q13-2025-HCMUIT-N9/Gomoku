@@ -32,7 +32,9 @@ namespace Gomoku_Client.View
 
     private void BackButton_Checked(object sender, RoutedEventArgs e)
     {
-      if (_mainWindow == null)
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
+            if (_mainWindow == null)
       {
         MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
         return;
@@ -42,7 +44,9 @@ namespace Gomoku_Client.View
 
     private void MatchMakingButton_Click(object sender, RoutedEventArgs e)
     {
-      if (NavigationService != null)
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
+            if (NavigationService != null)
       {
         var matchmakingPage = new Matchmaking(_mainWindow);
 
@@ -93,15 +97,19 @@ namespace Gomoku_Client.View
 
     private void AIButton_Click(object sender, RoutedEventArgs e)
     {
-
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
     }
     private void ServerBrowserButton_Click(object sender, RoutedEventArgs e)
     {
+        _mainWindow.ButtonClick.Stop();
+        _mainWindow.ButtonClick.Play();
+
         NotificationManager.Instance.ShowNotification("KHÔNG KHẢ DỤNG", "Chức năng này đang được phát triển, quay lại sau nhé.", Notification.NotificationType.Info);
     }
     private void RankedButton_Click(object sender, RoutedEventArgs e)
     {
-
+        _mainWindow.ButtonClick.Stop();
+        _mainWindow.ButtonClick.Play();
     }
-  }
 }

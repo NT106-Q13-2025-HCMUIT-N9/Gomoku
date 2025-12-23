@@ -99,16 +99,17 @@ namespace Gomoku_Client.View
     {
             _mainWindow.ButtonClick.Stop();
             _mainWindow.ButtonClick.Play();
-        }
+    }
     private void ServerBrowserButton_Click(object sender, RoutedEventArgs e)
     {
-            _mainWindow.ButtonClick.Stop();
-            _mainWindow.ButtonClick.Play();
-        }
+        _mainWindow.ButtonClick.Stop();
+        _mainWindow.ButtonClick.Play();
+
+        NotificationManager.Instance.ShowNotification("KHÔNG KHẢ DỤNG", "Chức năng này đang được phát triển, quay lại sau nhé.", Notification.NotificationType.Info);
+    }
     private void RankedButton_Click(object sender, RoutedEventArgs e)
     {
-            _mainWindow.ButtonClick.Stop();
-            _mainWindow.ButtonClick.Play();
-        }
-  }
+        _mainWindow.ButtonClick.Stop();
+        _mainWindow.ButtonClick.Play();
+    }
 }

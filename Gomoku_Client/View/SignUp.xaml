@@ -19,7 +19,7 @@
 
     <Grid Width="1280" Height="720">
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Login_Background.png" 
+            <ImageBrush ImageSource="/Assets/Images/Login_Background.png" 
                 Stretch="UniformToFill"
                 Opacity="1"/>
         </Grid.Background>

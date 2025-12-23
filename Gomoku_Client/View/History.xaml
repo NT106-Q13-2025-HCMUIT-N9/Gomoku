@@ -4,6 +4,7 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Gomoku_Client.View"
+      xmlns:ctrls="clr-namespace:Gomoku_Client.View"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="History"
@@ -216,6 +217,5 @@
 
             </Grid>
         </Border>
-
     </Grid>
 </Page>

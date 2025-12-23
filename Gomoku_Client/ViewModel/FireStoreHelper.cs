@@ -58,6 +58,22 @@ namespace Gomoku_Client.ViewModel
             }
         }
 
+        public static async Task<bool> IsFriendWith(string user, string friend)
+        {
+            try
+            {
+                DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(user);
+                DocumentSnapshot user_doc_snap = await doc_ref.GetSnapshotAsync();
+                UserDataModel user_data = user_doc_snap.ConvertTo<UserDataModel>();
+
+                return user_data.Friends.Contains(friend);
+            }
+            catch (Exception)
+            {
+                return true;
+            }
+        }
+
         public static async Task<bool> AcceptFriendRequest(string user1, string user2)
         {
             try

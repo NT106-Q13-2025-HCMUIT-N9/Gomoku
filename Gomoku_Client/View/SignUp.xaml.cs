@@ -306,7 +306,8 @@ namespace Gomoku_Client
                     Username = username,
                     Email = email,
                     Friends = new List<string>(),
-                    FriendsRequests = new List<string>()
+                    FriendsRequests = new List<string>(),
+                    MatchRequests = new List<string>()
                 };
 
                 await FireStoreHelper.AddUser(doc);

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
@@ -205,10 +205,6 @@
     <Resource Include="Assets\Avatar\T1_6sao.jpg" />
     <Resource Include="Assets\t1.jpg" />
     <Resource Include="Assets\T1_6sao.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Assets\Images\" />
   </ItemGroup>
 
 </Project>

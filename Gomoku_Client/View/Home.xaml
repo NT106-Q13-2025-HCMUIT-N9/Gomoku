@@ -1,4 +1,4 @@
-﻿<Window x:Class="Gomoku_Client.MainGameUI"
+<Window x:Class="Gomoku_Client.MainGameUI"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -18,7 +18,7 @@
     <WindowChrome.WindowChrome>
         <WindowChrome GlassFrameThickness="0" CornerRadius="0" CaptionHeight="0" UseAeroCaptionButtons="False" ResizeBorderThickness="7"/>
     </WindowChrome.WindowChrome>
-    
+
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -63,7 +63,7 @@
                 </DoubleAnimation>
             </Storyboard>
 
-            
+
             <!-- fade out anim -->
             <Storyboard x:Key="FadeOutStoryboard">
                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
@@ -121,7 +121,7 @@
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Main.png" 
+            <ImageBrush ImageSource="/Assets/Images/Main.png" 
                         Stretch="UniformToFill" 
                         Opacity="0.4"/>
         </Grid.Background>
@@ -280,8 +280,8 @@
             <RadioButton x:Name="SettingButton" Content="CÀI ĐẶT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="SettingButton_Checked"/>
             <RadioButton x:Name="ExitButton" Content="THOÁT" Style="{StaticResource ValorantMenuItem}" GroupName="Menu" Checked="ExitButton_Checked"/>
         </StackPanel>
-        
-        
+
+
         <Grid>
 
             <!-- Main Content Grid -->
@@ -343,7 +343,7 @@
                                           Width="14"
                                           Height="14"
                                           Stretch="Uniform"
-                                          Data="M12 5H14L15.5 7H18C18.55 7 19 7.45 19 8V18C19 18.55 18.55 19 18 19H6C5.45 19 5 18.55 5 18V8C5 7.45 5.45 7 6 7H9L10.5 5H12ZM12 9A4 4 0 1 0 12 17A4 4 0 0 0 12 9Z"/>      
+                                          Data="M12 5H14L15.5 7H18C18.55 7 19 7.45 19 8V18C19 18.55 18.55 19 18 19H6C5.45 19 5 18.55 5 18V8C5 7.45 5.45 7 6 7H9L10.5 5H12ZM12 9A4 4 0 1 0 12 17A4 4 0 0 0 12 9Z"/>
 
                                 </Button>
 
@@ -404,8 +404,8 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        
-        
+
+
         <Frame x:Name="MainFrame"
                NavigationUIVisibility="Hidden"
                Visibility="Collapsed">
@@ -789,7 +789,7 @@
                                     FontSize="15"
                                     FontWeight="Bold"
                                     Cursor="Hand">
-                                
+
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
                                         <Border x:Name="ButtonBorder" 
@@ -839,6 +839,27 @@
                 </Border>
             </Border>
         </Grid>
+        <!-- noti -->
+        <ItemsControl ItemsSource="{Binding Source={x:Static ctrls:NotificationManager.Instance}, Path=Notifications}"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              Margin="0,0,20,20"
+              Panel.ZIndex="9999">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ctrls:Notification x:Name="NotificationControl"
+                              Title="{Binding Title}"
+                              Message="{Binding Message}"
+                              Type="{Binding Type}"
+                              AutoCloseDuration="{Binding AutoCloseDuration}"
+                              Margin="0,0,0,5"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
-
 </Window>

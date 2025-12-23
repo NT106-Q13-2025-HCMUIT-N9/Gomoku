@@ -427,6 +427,8 @@ namespace Gomoku_Client.View
                 };
 
                 transform.BeginAnimation(TranslateTransform.XProperty, slideOut);
+
+                _mainWindow.MainBGM.Stop();
             }
             catch (Exception ex)
             {

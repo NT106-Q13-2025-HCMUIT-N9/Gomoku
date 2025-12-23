@@ -636,6 +636,9 @@ namespace Gomoku_Client.View
                             MessageBox.Show(message);
                             ExitToHome();
                         }
+
+                        MainBGM.Stop();
+                        mainWindow.MainBGM.Play();
                     }
                     else
                     {

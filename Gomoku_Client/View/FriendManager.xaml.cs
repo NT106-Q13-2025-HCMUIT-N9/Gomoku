@@ -2,10 +2,14 @@
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Forms.VisualStyles;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using static Google.Rpc.Context.AttributeContext.Types;
@@ -32,6 +36,8 @@ namespace Gomoku_Client.View
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             if (_mainWindow == null)
             {
                 MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -42,26 +48,48 @@ namespace Gomoku_Client.View
 
         private async void SendFriendRequest_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+
             if (string.IsNullOrEmpty(FriendUsernameInput.Text))
             {
                 NotificationManager.Instance.ShowNotification("Lỗi", "Vui lòng nhập tên người dùng.", Notification.NotificationType.Info);
                 return;
             }
 
-            if(!await Validate.IsUsernamExists(FriendUsernameInput.Text))
+            if (!await Validate.IsUsernamExists(FriendUsernameInput.Text))
             {
                 NotificationManager.Instance.ShowNotification("Lỗi", "Username không tồn tại.", Notification.NotificationType.Info);
                 return;
             }
 
-            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            if (await FireStoreHelper.IsFriendWith(username, FriendUsernameInput.Text))
+            {
+                NotificationManager.Instance.ShowNotification("Lỗi", "Hai bạn đã là bạn bè", Notification.NotificationType.Info);
+                return;
+            }
+
+            if (username == FriendUsernameInput.Text)
+            {
+                NotificationManager.Instance.ShowNotification("Lỗi", "Bạn cô đơn đến thế sao :)))", Notification.NotificationType.Info);
+                return;
+            }
+
             await FireStoreHelper.SendFriendRequest(username, FriendUsernameInput.Text);
-            MessageBox.Show("Thanks i sent it");
+            NotificationManager.Instance.ShowNotification(
+                "Success",
+                $"Friend request has been sent to {FriendUsernameInput.Text}",
+                Notification.NotificationType.Info,
+                3000
+            );
         }
 
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             var border = (Border)((Grid)UnfriendConfirmationOverlay).Children[0];
             Storyboard fadeOut = (Storyboard)FindResource("PopupFadeOut");
             fadeOut.Begin(border);
@@ -75,6 +103,8 @@ namespace Gomoku_Client.View
 
         private async void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             if (string.IsNullOrEmpty(_pendingUnfriendUsername)) return;
 
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
@@ -101,15 +131,17 @@ namespace Gomoku_Client.View
 
         private async void AcceptButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
             if (sender_handle != null)
             {
+                await DeleteRequestCard(sender_handle.Name);
                 bool successed = await FireStoreHelper.AcceptFriendRequest(username, sender_handle.Name);
                 if (successed)
                 {
-                    await DeleteRequestCard(sender_handle.Name);
                     await FireStoreHelper.DeleteFriendRequest(username, sender_handle.Name);
                     curr_friend_request.Remove(sender_handle.Name);
                 }
@@ -118,6 +150,8 @@ namespace Gomoku_Client.View
 
         private async void RefuseButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
 
@@ -131,18 +165,58 @@ namespace Gomoku_Client.View
 
         private async void ChallengeButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
+
             Button butt = sender as Button;
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
             CancellationTokenSource cts = new CancellationTokenSource();
 
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(butt?.Name);
-            
+
             DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
-            user_data.MatchRequests.Add(username);
-            await doc_ref.SetAsync(user_data);
 
-            FirestoreChangeListener listener = doc_ref.Listen(snapshot => {
+            TcpClient client = new TcpClient();
+            try
+            {
+                client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+            }
+            catch
+            {
+                NotificationManager.Instance.ShowNotification(
+                        "Lỗi",
+                        "Server có thể đang không hoạt động",
+                        Notification.NotificationType.Info,
+                        5000
+                    );
+                return;
+            }
+
+            if (!client.Connected) return;
+
+            var stream = client.GetStream();
+
+            if (!user_data.MatchRequests.Contains(username))
+            {
+                byte[] data = Encoding.UTF8.GetBytes($"[CHALLENGE_REQUEST];{username};{butt?.Name}");
+                stream.Write(data, 0, data.Length);
+
+                NotificationManager.Instance.ShowNotification(
+                        "Thách đấu thành công",
+                        $"Đã gửi thách đấu tới {butt?.Name}",
+                        Notification.NotificationType.Info,
+                        5000
+                    );
+
+                user_data.MatchRequests.Add(username);
+                await doc_ref.SetAsync(user_data);
+            }
+
+            // Nếu đã gửi thách đấu rồi thì lắng nghe phản hồi
+
+            FirestoreChangeListener listener = doc_ref.Listen(snapshot =>
+            {
                 if (snapshot.Exists)
                 {
                     UserDataModel user_date = doc_snap.ConvertTo<UserDataModel>();
@@ -159,11 +233,51 @@ namespace Gomoku_Client.View
                 await Task.Delay(15000, cts.Token);
 
                 await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(username));
-                MessageBox.Show("Timed out: Request revoked.");
+                NotificationManager.Instance.ShowNotification(
+                    $"{butt?.Name} không phản hồi thách đấu",
+                    $"Chắc con vợ này rén rồi",
+                    Notification.NotificationType.Info,
+                    5000
+                );
             }
             catch (TaskCanceledException)
             {
                 // Handle người chơi chấp nhận hay từ chối thông qua tcp
+                byte[] buffer = new byte[1024];
+                int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                if (bytesRead == 0) return;
+
+                string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                string[] parts = message.Split(';');
+
+                if (parts.Length < 3) return;
+
+                string response = parts[0];
+
+                switch (response)
+                {
+                    case "[CHALLENGE_ACCEPT]":
+                        NotificationManager.Instance.ShowNotification(
+                            $"{butt?.Name} đã chấp nhận thách đấu",
+                            "Chuẩn bị vào trận đấu!",
+                            Notification.NotificationType.Info,
+                            5000
+                            );
+                        break;
+
+                    case "[CHALLENGE_DECLINE]":
+                        NotificationManager.Instance.ShowNotification(
+                            $"{butt?.Name} đã từ chối thách đấu",
+                            "Chắc con vợ này rén rồi",
+                            Notification.NotificationType.Info,
+                            5000
+                            );
+                        break;
+
+                    default:
+                        break;
+                }
+
                 MessageBox.Show("Opponent accepted or declined!");
             }
             finally
@@ -175,6 +289,8 @@ namespace Gomoku_Client.View
 
         private void UnfriendButton_Click(object sender, RoutedEventArgs e)
         {
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             Button? sender_handle = sender as Button;
             _pendingUnfriendUsername = sender_handle?.Name;
 
@@ -186,6 +302,7 @@ namespace Gomoku_Client.View
 
         private async Task DeleteRequestCard(string name)
         {
+            await Task.Yield();
             var borderToDelete = FriendRequestsPanel.Children
             .OfType<Border>()
             .FirstOrDefault(b => b.Name == name);
@@ -240,6 +357,12 @@ namespace Gomoku_Client.View
                 await listener.StopAsync();
                 listener = null;
             }
+        }
+
+        private void FriendUsernameInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            _mainWindow.Keyboard.Stop();
+            _mainWindow.Keyboard.Play();
         }
     }
 }

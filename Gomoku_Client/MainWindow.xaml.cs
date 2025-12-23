@@ -3,6 +3,7 @@ using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
 using System.Diagnostics;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,11 +24,63 @@ namespace Gomoku_Client
     /// </summary>
     public partial class MainWindow : Window
     {
+        public MediaPlayer ButtonClick = new MediaPlayer();
+        public MediaPlayer Keyboard = new MediaPlayer();
+        public MediaPlayer MainBGM = new MediaPlayer();
         public MainWindow()
         {
             InitializeComponent();
+            StartSound();
         }
 
+        void StartSound()
+        {
+            string buttonPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "ButtonHover.wav"
+            );
+
+            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+
+            string keyboardPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "Keyboard.wav"
+            );
+
+            string BGMPath = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "Assets",
+                "Sounds",
+                "RelaxedScene.mp3"
+            );
+
+            MainBGM.MediaOpened += (s, e) =>
+            {
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaEnded += (s, e) =>
+            {
+                MainBGM.Open(new Uri(BGMPath, UriKind.Absolute));
+                //MainBGM.Position = TimeSpan.Zero;
+                MainBGM.Play();
+            };
+
+            MainBGM.MediaFailed += (s, e) =>
+            {
+                MessageBox.Show(e.ErrorException.Message);
+            };
+
+            MainBGM.Open(new Uri(BGMPath, UriKind.Absolute));
+            MainBGM.Volume = 0.2;
+
+            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+            Keyboard.Volume = 0.1;
+        }
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
@@ -153,6 +206,8 @@ namespace Gomoku_Client
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             MainFrame.Navigate(new ForgotPasswordUI(this));
 
             MainBorder.Visibility = Visibility.Collapsed;
@@ -199,6 +254,8 @@ namespace Gomoku_Client
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
             buttonDisable();
@@ -245,6 +302,7 @@ namespace Gomoku_Client
 
                 var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
 
+                MainBGM.Stop();
                 MainGameUI mainGame = new MainGameUI();
                 mainGame.Left = this.Left;
                 mainGame.Top = this.Top;
@@ -284,6 +342,8 @@ namespace Gomoku_Client
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
 
             var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
@@ -293,7 +353,8 @@ namespace Gomoku_Client
 
         private void SignUp_Click(object sender, RoutedEventArgs e)
         {
-
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             MainFrame.Navigate(new SignUpUserInterface(this));
 
             MainBorder.Visibility = Visibility.Collapsed;
@@ -304,7 +365,9 @@ namespace Gomoku_Client
         private bool isShowing = false;
         private void TogglePasswordBtn_Click(object sender, RoutedEventArgs e)
         {
-          if (!isShowing)
+            ButtonClick.Stop();
+            ButtonClick?.Play();
+            if (!isShowing)
           {
             // Hiện mật khẩu
             PasswordVisible.Text = PasswordBox.Password;
@@ -326,6 +389,8 @@ namespace Gomoku_Client
 
         private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            Keyboard.Stop();
+            Keyboard.Play();
             if (e.Key == Key.Space)
             {
                 e.Handled = true; // chặn phím Space
@@ -338,6 +403,8 @@ namespace Gomoku_Client
 
         private void PasswordVisible_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            Keyboard.Stop();
+            Keyboard.Play();
             if (e.Key == Key.Space)
             {
                 e.Handled = true;
@@ -373,6 +440,7 @@ namespace Gomoku_Client
 
         private void EmailBox_KeyDown(object sender, KeyEventArgs e)
         {
+
             if (e.Key == Key.Down || e.Key == Key.Enter)
             {
                 PasswordBox.Focus();
@@ -381,6 +449,8 @@ namespace Gomoku_Client
 
         private void EmailBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
+            Keyboard.Stop();
+            Keyboard.Play();
             if (e.Key == Key.Space)
             {
                 e.Handled = true;
@@ -405,6 +475,8 @@ namespace Gomoku_Client
 
         private void CancelQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             var storyboard = (Storyboard)this.Resources["PopupFadeOut"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Completed += (s, args) =>
@@ -417,21 +489,32 @@ namespace Gomoku_Client
 
         private void ConfirmQuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             Application.Current.Shutdown();
         }
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             WindowState = WindowState.Minimized;
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            ButtonClick.Stop();
+            ButtonClick?.Play();
             QuitConfirmationOverlay.Visibility = Visibility.Visible;
 
             var storyboard = (Storyboard)this.Resources["PopupFadeIn"];
             var border = (Border)((Grid)QuitConfirmationOverlay).Children[0];
             storyboard.Begin(border);
+        }
+
+        private void LoginButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            //ButtonClick?.Play();
         }
     }
 }

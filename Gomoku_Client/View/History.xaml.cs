@@ -37,11 +37,14 @@ namespace Gomoku_Client.View
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
         {
+            
             if (_mainWindow == null)
             {
                 MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
             _mainWindow.ShowMenuWithAnimation();
         }
 
@@ -50,7 +53,8 @@ namespace Gomoku_Client.View
             MatchListPanel.Children.Clear();
 
             CollectionReference match_info_ref = FirebaseInfo.DB.Collection("MatchInfo");
-            listener = match_info_ref.Listen(snapshot => { 
+            Query query = match_info_ref.WhereArrayContains("Players", FirebaseInfo.AuthClient.User.Info.DisplayName);
+            listener = query.Listen(snapshot => { 
                 foreach(DocumentChange change in snapshot.Changes)
                 {
                     DocumentSnapshot doc = change.Document;

@@ -12,7 +12,12 @@ namespace Gomoku_Client.View
     {
       InitializeComponent();
 
-      AddSliderHoverEffects(GeneralSliderContainer, GeneralDecBtn, GeneralIncBtn);
+
+            GeneralVolumeSlider.Value = mainGameUI.MasterVolValue * 100;
+            BackgroundVolumeSlider.Value = mainGameUI.BGMVolValue * 100;
+            SfxVolumeSlider.Value = mainGameUI.SFXVolValue * 100;
+
+            AddSliderHoverEffects(GeneralSliderContainer, GeneralDecBtn, GeneralIncBtn);
       AddSliderHoverEffects(BackgroundVolumeSliderContainer, BackgroundVolumeDecBtn, BackgroundVolumeIncBtn);
       AddSliderHoverEffects(SfxSliderContainer, SfxDecBtn, SfxIncBtn);
 
@@ -102,7 +107,7 @@ namespace Gomoku_Client.View
       };
     }
 
-    private Track GetTrackFromSlider(Slider slider)
+    private Track? GetTrackFromSlider(Slider slider)
     {
       var template = slider.Template;
       if (template != null)
@@ -114,7 +119,9 @@ namespace Gomoku_Client.View
 
     private void DecreaseVolume_Click(object sender, RoutedEventArgs e)
     {
-      if (sender is Button button && button.Tag is string sliderName)
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
+            if (sender is Button button && button.Tag is string sliderName)
       {
         var slider = FindName(sliderName) as Slider;
         if (slider != null)
@@ -126,7 +133,9 @@ namespace Gomoku_Client.View
 
     private void IncreaseVolume_Click(object sender, RoutedEventArgs e)
     {
-      if (sender is Button button && button.Tag is string sliderName)
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
+            if (sender is Button button && button.Tag is string sliderName)
       {
         var slider = FindName(sliderName) as Slider;
         if (slider != null)
@@ -143,7 +152,39 @@ namespace Gomoku_Client.View
         MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
         return;
       }
+            _mainWindow.ButtonClick.Stop();
+            _mainWindow.ButtonClick.Play();
       _mainWindow.ShowMenuWithAnimation();
     }
-  }
+
+        private void BackgroundVolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_mainWindow != null && BackgroundVolumeSlider != null)
+            {
+                _mainWindow.BGMVolValue = e.NewValue / 100.0;
+
+                _mainWindow.UpdateActualBGM();
+            }
+        }
+
+        private void GeneralVolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_mainWindow != null && GeneralVolumeSlider != null)
+            {
+                _mainWindow.MasterVolValue = e.NewValue / 100.0;
+
+                _mainWindow.UpdateActualBGM();
+            }
+        }
+
+        private void SfxVolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (_mainWindow != null && SfxVolumeSlider != null)
+            {
+                _mainWindow.SFXVolValue = e.NewValue / 100.0;
+
+                _mainWindow.UpdateActualBGM();
+            }
+        }
+    }
 }

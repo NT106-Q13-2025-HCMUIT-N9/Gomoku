@@ -53,7 +53,8 @@ namespace Gomoku_Client.View
             MatchListPanel.Children.Clear();
 
             CollectionReference match_info_ref = FirebaseInfo.DB.Collection("MatchInfo");
-            listener = match_info_ref.Listen(snapshot => { 
+            Query query = match_info_ref.WhereArrayContains("Players", FirebaseInfo.AuthClient.User.Info.DisplayName);
+            listener = query.Listen(snapshot => { 
                 foreach(DocumentChange change in snapshot.Changes)
                 {
                     DocumentSnapshot doc = change.Document;

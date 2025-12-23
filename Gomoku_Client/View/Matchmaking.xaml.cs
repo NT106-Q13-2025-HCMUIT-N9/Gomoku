@@ -156,11 +156,6 @@ namespace Gomoku_Client.View
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void ConnectToServerAndRequestMatch()
         {
             try
@@ -323,10 +318,6 @@ namespace Gomoku_Client.View
         {
             try
             {
-                _queueTimer.Stop();
-                _stopwatch.Reset();
-                _movingDotStoryboard?.Stop();
-
                 Console.WriteLine("[MATCHMAKING] Stopping receive thread before navigation");
                 _isConnected = false;
 
@@ -336,24 +327,8 @@ namespace Gomoku_Client.View
                     Console.WriteLine("[MATCHMAKING] Receive thread stopped");
                 }
 
-                sp_FindingOpponent.Visibility = Visibility.Collapsed;
-                BackButton.Visibility = Visibility.Collapsed;
+                grid_OpponentFound.Opacity = 0;
                 grid_OpponentFound.Visibility = Visibility.Visible;
-
-                if (!(grid_OpponentFound.RenderTransform is TranslateTransform))
-                {
-                    grid_OpponentFound.RenderTransform = new TranslateTransform();
-                }
-                var translateTransform = (TranslateTransform)grid_OpponentFound.RenderTransform;
-
-                var slideInAnimation = new DoubleAnimation
-                {
-                    From = 100,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(0.4),
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-                };
-                translateTransform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
 
                 UserStatsModel? opponent_stats = await FireStoreHelper.GetUserStats(opponent_name);
 
@@ -372,7 +347,40 @@ namespace Gomoku_Client.View
                     tb_OpponentWinRate.Text = "0%";
                 }
 
-                await Task.Delay(2000);
+                _queueTimer.Stop();
+                _stopwatch.Reset();
+                _movingDotStoryboard?.Stop();
+
+                sp_FindingOpponent.Visibility = Visibility.Collapsed;
+                BackButton.Visibility = Visibility.Collapsed;
+
+                var fadeIn = new DoubleAnimation
+                {
+                    From = 0,
+                    To = 1,
+                    Duration = TimeSpan.FromSeconds(0.3),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                grid_OpponentFound.BeginAnimation(OpacityProperty, fadeIn);
+
+                await Task.Delay(100);
+
+                if (!(grid_OpponentFound.RenderTransform is TranslateTransform))
+                {
+                    grid_OpponentFound.RenderTransform = new TranslateTransform();
+                }
+                var translateTransform = (TranslateTransform)grid_OpponentFound.RenderTransform;
+
+                var slideInAnimation = new DoubleAnimation
+                {
+                    From = 100,
+                    To = 0,
+                    Duration = TimeSpan.FromSeconds(0.4),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                translateTransform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
+
+                await Task.Delay(3000);
 
                 var slideOut = new DoubleAnimation
                 {

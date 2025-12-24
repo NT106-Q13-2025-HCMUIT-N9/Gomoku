@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Gomoku_Client.Model
+namespace Gomoku_Server.Model
 {
     [FirestoreData]
     public class UserStatsModel

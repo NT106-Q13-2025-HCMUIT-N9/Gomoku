@@ -5,3 +5,5 @@ Gomoku_Client/obj/
 Gomoku_Client/bin/
 Gomoku_Server/obj/
 Gomoku_Server/bin/
+Gomoku_Server/Assets/api.env
+Gomoku_Server/Assets/firebase_key.json

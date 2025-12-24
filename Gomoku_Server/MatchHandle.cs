@@ -28,6 +28,7 @@ namespace Gomoku_Server
         bool matchEnded = false;
         int moveCount = 0;
         const int MAX_MOVES = 15 * 15;
+        int total_duration = 0;
 
         char[,] table = new char[15, 15];
 
@@ -82,6 +83,7 @@ namespace Gomoku_Server
                     if ((DateTime.Now - lastTick).TotalSeconds >= 1)
                     {
                         lastTick = DateTime.Now;
+                        total_duration += 1;
 
                         lock (turn_lock)
                         {
@@ -265,6 +267,8 @@ namespace Gomoku_Server
                                 ServerUtils.SendMessage(player1.Client, "[WIN1]");
                                 ServerUtils.SendMessage(player2.Client, "[WIN1]");
                                 EndMatch();
+
+                                FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name1);
                                 break;
                             }
 
@@ -274,6 +278,8 @@ namespace Gomoku_Server
                                 ServerUtils.SendMessage(player1.Client, "[DRAW]");
                                 ServerUtils.SendMessage(player2.Client, "[DRAW]");
                                 EndMatch();
+
+                                FirestoreHelper.AddMatchInfo(true, new List<string> { name1, name2 }, total_duration);
                                 break;
                             }
 
@@ -285,6 +291,8 @@ namespace Gomoku_Server
                             ServerUtils.SendMessage(player1.Client, "[RESIGN1]");
                             ServerUtils.SendMessage(player2.Client, "[RESIGN1]");
                             EndMatch();
+
+                            FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name2);
                             break;
                         }
                     }
@@ -401,6 +409,8 @@ namespace Gomoku_Server
                                 ServerUtils.SendMessage(player1.Client, "[WIN2]");
                                 ServerUtils.SendMessage(player2.Client, "[WIN2]");
                                 EndMatch();
+
+                                FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name2);
                                 break;
                             }
 
@@ -410,6 +420,8 @@ namespace Gomoku_Server
                                 ServerUtils.SendMessage(player1.Client, "[DRAW]");
                                 ServerUtils.SendMessage(player2.Client, "[DRAW]");
                                 EndMatch();
+
+                                FirestoreHelper.AddMatchInfo(true, new List<string> { name1, name2 }, total_duration);
                                 break;
                             }
 
@@ -421,6 +433,8 @@ namespace Gomoku_Server
                             ServerUtils.SendMessage(player1.Client, "[RESIGN2]");
                             ServerUtils.SendMessage(player2.Client, "[RESIGN2]");
                             EndMatch();
+
+                            FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name1);
                             break;
                         }
                     }

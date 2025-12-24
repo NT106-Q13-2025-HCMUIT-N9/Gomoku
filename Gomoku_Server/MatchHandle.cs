@@ -269,6 +269,8 @@ namespace Gomoku_Server
                                 EndMatch();
 
                                 FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name1);
+                                FirestoreHelper.IncWinUser(name1);
+                                FirestoreHelper.IncLoseUser(name2);
                                 break;
                             }
 
@@ -280,6 +282,8 @@ namespace Gomoku_Server
                                 EndMatch();
 
                                 FirestoreHelper.AddMatchInfo(true, new List<string> { name1, name2 }, total_duration);
+                                FirestoreHelper.IncDrawUser(name1);
+                                FirestoreHelper.IncDrawUser(name2);
                                 break;
                             }
 
@@ -293,6 +297,8 @@ namespace Gomoku_Server
                             EndMatch();
 
                             FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name2);
+                            FirestoreHelper.IncWinUser(name2);
+                            FirestoreHelper.IncLoseUser(name1);
                             break;
                         }
                     }
@@ -305,6 +311,9 @@ namespace Gomoku_Server
                 {
                     ServerUtils.SendMessage(player2.Client, $"[OPPONENT_DISCONNECTED];{name1}");
                     EndMatch();
+
+                    FirestoreHelper.IncWinUser(name2);
+                    FirestoreHelper.IncLoseUser(name1);
                 }
             }
         }
@@ -411,6 +420,8 @@ namespace Gomoku_Server
                                 EndMatch();
 
                                 FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name2);
+                                FirestoreHelper.IncWinUser(name2);
+                                FirestoreHelper.IncLoseUser(name1);
                                 break;
                             }
 
@@ -422,6 +433,8 @@ namespace Gomoku_Server
                                 EndMatch();
 
                                 FirestoreHelper.AddMatchInfo(true, new List<string> { name1, name2 }, total_duration);
+                                FirestoreHelper.IncDrawUser(name1);
+                                FirestoreHelper.IncDrawUser(name2);
                                 break;
                             }
 
@@ -435,6 +448,8 @@ namespace Gomoku_Server
                             EndMatch();
 
                             FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name1);
+                            FirestoreHelper.IncWinUser(name2);
+                            FirestoreHelper.IncLoseUser(name1);
                             break;
                         }
                     }
@@ -447,6 +462,9 @@ namespace Gomoku_Server
                 {
                     ServerUtils.SendMessage(player1.Client, $"[OPPONENT_DISCONNECTED];{name2}");
                     EndMatch();
+
+                    FirestoreHelper.IncWinUser(name1);
+                    FirestoreHelper.IncLoseUser(name2);
                 }
             }
         }

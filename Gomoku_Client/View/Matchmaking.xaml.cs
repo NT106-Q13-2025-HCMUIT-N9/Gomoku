@@ -74,8 +74,9 @@ namespace Gomoku_Client.View
                         : "0%";
                 }
 
-                await Task.Delay(2000);
-
+                await Task.Delay(4000);
+                BackButton.Visibility = Visibility.Hidden;
+                await Task.Delay(1000);
                 ConnectToServerAndRequestMatch();
             }
             catch (Exception ex)

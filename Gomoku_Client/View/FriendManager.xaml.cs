@@ -180,7 +180,7 @@ namespace Gomoku_Client.View
             TcpClient client = new TcpClient();
             try
             {
-                client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+                client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
             }
             catch
             {

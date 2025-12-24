@@ -814,7 +814,13 @@ namespace Gomoku_Client.View
                             {
                                 Dispatcher.BeginInvoke(() =>
                                 {
-                                    GameOver(null, "Mất kết nối với server do timeout!");
+                                    NotificationManager.Instance.ShowNotification(
+                                        "Lỗi đường truyền",
+                                        "Hết thời gian chờ! Bạn đã bị mất kết nối với server.",
+                                        Notification.NotificationType.Info,
+                                        5000
+                                    );
+                                    mainWindow?.NavigateToLobby();
                                 });
                             }
                             catch { }
@@ -954,16 +960,6 @@ namespace Gomoku_Client.View
                             }
 
                             UpdateGameStatus();
-
-                            if (CheckWin(row, col, 1))
-                            {
-                                string winnerName = (playerSymbol == 'X') ? player1Name : player2Name;
-                                GameOver(playerSymbol == 'X', $"{winnerName} thắng!");
-                            }
-                            else if (moveCount >= boardSize * boardSize)
-                            {
-                                GameOver(null, "Hòa! Bàn cờ đã đầy!");
-                            }
                         });
                     }
                     break;
@@ -991,16 +987,6 @@ namespace Gomoku_Client.View
                             }
 
                             UpdateGameStatus();
-
-                            if (CheckWin(row, col, 2))
-                            {
-                                string winnerName = (playerSymbol == 'O') ? player1Name : player2Name;
-                                GameOver(playerSymbol == 'O', $"{winnerName} thắng!");
-                            }
-                            else if (moveCount >= boardSize * boardSize)
-                            {
-                                GameOver(null, "Hòa! Bàn cờ đã đầy!");
-                            }
                         });
                     }
                     break;

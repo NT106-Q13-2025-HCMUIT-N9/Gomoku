@@ -119,7 +119,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid>
+    <Grid x:Name="MainGrid">
         <Grid.Background>
             <ImageBrush ImageSource="/Assets/Images/Main.png" 
                         Stretch="UniformToFill" 
@@ -168,7 +168,7 @@
             </StackPanel>
         </Border>
 
-        <Grid>
+        <Grid x:Name="BackgroundGrid">
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
                     <GradientStop Color="#0F1923" Offset="0.0"/>

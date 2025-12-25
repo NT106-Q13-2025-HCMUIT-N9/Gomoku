@@ -64,7 +64,7 @@ namespace Gomoku_Client
             Instance = this;
             UpdateActualBGM();
             SoundStart();
-
+            this.Loaded += MainGameUI_Loaded;
             Avatars = new ObservableCollection<AvatarItem>
             {
             new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1_6sao.jpg", Name="T1|Logo" },
@@ -122,6 +122,12 @@ namespace Gomoku_Client
             };
 
             DataContext = this;
+        }
+
+        private void MainGameUI_Loaded(object sender, RoutedEventArgs e)
+        {
+            BackgroundGrid.Visibility = Visibility.Visible;
+            StackPanelMenu.Visibility = Visibility.Visible;
         }
 
         public double MasterVolValue = 0.5;
@@ -416,7 +422,7 @@ namespace Gomoku_Client
                 {
                     UserStatsModel user_stats = doc_snap.ConvertTo<UserStatsModel>();
 
-                    App.Current.Dispatcher.Invoke(() =>
+                    Dispatcher.Invoke(() =>
                     {
                         lb_matches.Text = user_stats.total_match.ToString();
                         lb_winrate.Text = user_stats.total_match > 0
@@ -521,78 +527,114 @@ namespace Gomoku_Client
         {
             if (UserState.currentState == State.InMatch)
             {
-                NotificationManager.Instance.ShowNotification(
-                    "Chấp nhận thách đấu thất bại",
-                    "Hiện giờ bạn không thể tham gia trận đấu khác",
-                    Notification.NotificationType.Info,
-                    5000
-                    );
-                client.Close();
+                NotificationManager.Instance.ShowNotification("Lỗi", "Bạn đang trong trận đấu khác!", Notification.NotificationType.Info, 3000);
                 return;
             }
+
             UserState.currentState = State.InMatch;
-            NetworkStream stream = client.GetStream();
-            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
-            stream.Write(data, 0, data.Length);
 
-            NotificationManager.Instance.ShowNotification(
-                    $"Đã chấp nhận lời thách đấu của {challenger}",
-                    "Chuẩn bị vào trận đấu!",
-                    Notification.NotificationType.Info,
-                    5000
-                    );
-
-            Task.Run(() =>
+            try
             {
-                try
+                NetworkStream stream = client.GetStream();
+                byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}\n");
+                stream.Write(data, 0, data.Length);
+
+                NotificationManager.Instance.ShowNotification("Thách đấu", $"Đã chấp nhận {challenger}. Đang vào trận...", Notification.NotificationType.Info, 3000);
+
+                Task.Run(() =>
                 {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bytesRead > 0)
+                    try
                     {
-                        string serverResponse = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
-                        Console.WriteLine($"[DEBUG] Server response: {serverResponse}");
-
-                        if (serverResponse.StartsWith("[INIT]"))
+                        byte[] buffer = new byte[2048];
+                        while (client != null && client.Connected)
                         {
-                            string[] parts = serverResponse.Split(';');
-                            if (parts.Length >= 4)
-                            {
-                                
-                                int clock1 = int.Parse(parts[1]);
-                                int clock2 = int.Parse(parts[2]);
-                                char playerSymbol = parts[3][0];
-                                string opponentName = parts[4];
-                                Console.WriteLine($"[DEBUG] Received Match Init, Player 1 clock: {clock1}, Player 2 clock: {clock2}, LocalPlayer symbol: {playerSymbol}, Opponent: {opponentName}");
-                                Dispatcher.Invoke(() =>
-                                {
-                                    Console.WriteLine("[CHALLENGE] Navigating to GamePlay");
-                                    Console.WriteLine($"[CHALLENGE] TcpClient.Connected: {client?.Connected}");
-                                    Console.WriteLine($"[CHALLENGE] Stream.CanRead: {stream?.CanRead}");
+                            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                            if (bytesRead == 0) break;
 
-                                    GamePlay gamePlayPage = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, this);
-                                    this.NavigateWithAnimation(gamePlayPage);
-                                });
+                            string serverResponse = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+                            Console.WriteLine($"[DEBUG] RECEIVED: {serverResponse} in Home");
+                            string[] messages = serverResponse.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            foreach (var msg in messages)
+                            {
+                                if (msg.StartsWith("[INIT]"))
+                                {
+                                    string[] parts = msg.Split(';');
+                                    if (parts.Length >= 5)
+                                    {
+                                        char playerSymbol = parts[3][0];
+                                        string opponentName = parts[4];
+
+                                        Console.WriteLine($"[DEBUG] Parsed INIT: Symbol={playerSymbol}, Opponent={opponentName}");
+
+                                        Dispatcher.Invoke(() =>
+                                        {
+                                            try
+                                            {
+                                                Console.WriteLine("[DEBUG] Start Navigation Logic...");
+
+                                                if (StackPanelMenu != null) StackPanelMenu.Visibility = Visibility.Collapsed;
+                                                if (BackgroundGrid != null) BackgroundGrid.Visibility = Visibility.Collapsed;
+
+                                                MainGrid.Visibility = Visibility.Visible;
+
+
+                                                MainFrame.Visibility = Visibility.Visible;
+                                                Panel.SetZIndex(MainFrame, 999);
+                                                MainFrame.UpdateLayout();
+
+                                                MainGameUI parentWindow = this;
+                                                GamePlay gamePlayPage = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, parentWindow);
+
+                                                TranslateTransform trans = new TranslateTransform(parentWindow.ActualWidth, 0);
+                                                gamePlayPage.RenderTransform = trans;
+
+                                                MainFrame.Navigate(gamePlayPage);
+                                                Console.WriteLine("[DEBUG] MainFrame.Navigate called.");
+
+                                                Dispatcher.BeginInvoke(new Action(() =>
+                                                {
+                                                    DoubleAnimation slideIn = new DoubleAnimation
+                                                    {
+                                                        From = parentWindow.ActualWidth,
+                                                        To = 0,
+                                                        Duration = TimeSpan.FromSeconds(0.5),
+                                                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                                                    };
+                                                    trans.BeginAnimation(TranslateTransform.XProperty, slideIn);
+                                                    Console.WriteLine("[DEBUG] Animation Started.");
+                                                }), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                                            }
+                                            catch (Exception navEx)
+                                            {
+                                                Console.WriteLine($"[ERROR] Navigation Failed: {navEx}");
+                                                MessageBox.Show($"Lỗi hiển thị trận đấu: {navEx.Message}");
+
+                                                if (StackPanelMenu != null) StackPanelMenu.Visibility = Visibility.Visible;
+                                                UserState.currentState = State.Ready;
+                                            }
+                                        });
+
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"[ERROR] Invalid INIT packet length: {parts.Length}");
+                                    }
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[ERROR] Failed to receive match start: {ex.Message}");
-                    App.Current.Dispatcher.Invoke(() =>
+                    catch (Exception ex)
                     {
-                        NotificationManager.Instance.ShowNotification(
-                            "Lỗi kết nối",
-                            "Không thể bắt đầu trận đấu",
-                            Notification.NotificationType.Info,
-                            5000
-                        );
-                        UserState.currentState = State.Ready;
-                        client.Close();
-                    });
-                }
-            });
+                        Console.WriteLine($"[ERROR] Accept Loop Error: {ex}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Setup Accept Error: {ex.Message}");
+            }
         }
 
         void declineChallenge(TcpClient client, string response, string challenger, string me)

@@ -55,14 +55,6 @@ namespace Gomoku_Client.View
 
             this.mainWindow = window;
 
-            if (client == null || !client.Connected)
-            {
-                MessageBox.Show("Kết nối bị mất. Vui lòng thử lại.");
-                ExitToHome();
-                return;
-            }
-
-            this.isConnected = true;
             this.tcpClient = client;
 
             this.player1Name = username;
@@ -70,9 +62,27 @@ namespace Gomoku_Client.View
             this.opponentName = opponent;
             this.player2Name = opponent;
 
-            this.isPlayerTurn = (symbol == 'X');
+            this.Loaded += GamePlay_Loaded;
+        }
+
+        private void GamePlay_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (tcpClient == null || !tcpClient.Connected)
+            {
+                MessageBox.Show("Kết nối bị mất. Vui lòng thử lại.");
+                ExitToHome();
+                return;
+            }
+
+            this.isConnected = true;
+            this.isPlayerTurn = (playerSymbol == 'X');
             this.isGameOver = false;
 
+<<<<<<< Updated upstream
+=======
+            SetAvatar(player1Name, opponentName);
+
+>>>>>>> Stashed changes
             InitializeGame();
             DrawBoard();
             SetupTimers();
@@ -85,13 +95,29 @@ namespace Gomoku_Client.View
                 ? $"Lượt của bạn "
                 : $"Lượt của {player2Name}";
 
-            Console.WriteLine($"[INIT] Player: {username}, Symbol: {symbol}, IsPlayerTurn: {isPlayerTurn}, IsGameOver: {isGameOver}");
+            if (receiveThread == null || !receiveThread.IsAlive)
+            {
+                receiveThread = new Thread(ReceiveFromServer);
+                receiveThread.IsBackground = true;
+                receiveThread.Start();
+            }
 
+<<<<<<< Updated upstream
             receiveThread = new Thread(ReceiveFromServer);
             receiveThread.IsBackground = true;
             receiveThread.Start();
             Console.WriteLine("[INIT] Receive thread started immediately");
             StarSound();
+=======
+            try
+            {
+                StartSound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi âm thanh: " + ex.Message);
+            }
+>>>>>>> Stashed changes
         }
 
         private void StarSound()

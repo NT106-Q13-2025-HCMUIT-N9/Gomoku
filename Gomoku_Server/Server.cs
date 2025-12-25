@@ -47,6 +47,9 @@ namespace Gomoku_Server
         public static ConcurrentDictionary<string, bool> inMatch = new ConcurrentDictionary<string, bool>();
         public static Queue<TcpClient> waiting_queue = new Queue<TcpClient>();
 
+        public static List<string> ActiveMatchList = new List<string>();
+        public static object MatchListLock = new object();
+
         TcpListener TcpListener;
 
         public Server()
@@ -56,11 +59,7 @@ namespace Gomoku_Server
 
         public async Task Start(int port)
         {
-            try
-            {
-                TcpListener?.Stop();
-            }
-            catch { }
+            try { TcpListener?.Stop(); } catch { }
 
             TcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             TcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
@@ -69,8 +68,9 @@ namespace Gomoku_Server
             listenThread.IsBackground = false;
             listenThread.Start();
 
-            await CheckPlayersInQueue();
+            Logger.UpdateDashboard(0, new List<string>());
 
+            await CheckPlayersInQueue();
         }
 
         public void Stop()
@@ -78,11 +78,11 @@ namespace Gomoku_Server
             try
             {
                 TcpListener?.Stop();
-                Console.WriteLine("[LOG]: Server stopped");
+                Logger.Log("[LOG]: Server stopped");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] Stop: {ex.Message}");
+                Logger.Log($"[ERROR] Stop: {ex.Message}");
             }
         }
 
@@ -91,41 +91,55 @@ namespace Gomoku_Server
             try
             {
                 TcpListener.Start();
-                Console.WriteLine($"[LOG]: Server started successfully");
+                Logger.Log($"[LOG]: Server started successfully on port");
 
                 while (true)
                 {
                     TcpClient client = TcpListener.AcceptTcpClient();
-                    Thread t = new Thread(() =>
-                    {
-                        HandleClient(client);
-                    });
+                    Thread t = new Thread(() => HandleClient(client));
                     t.IsBackground = true;
                     t.Start();
                 }
             }
-            catch (SocketException ex)
-            {
-                Console.WriteLine($"[ERROR] ListenForClients: {ex.Message}");
-                Console.WriteLine("[INFO] Port may already be in use. Try a different port or close other instances.");
-            }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] ListenForClients: {ex.Message}");
+                Logger.Log($"[ERROR] ListenForClients: {ex.Message}");
             }
         }
 
         public async Task CheckPlayersInQueue()
         {
+            int lastCount = -1;
+            string lastActiveSnapshot = "";
+
             while (true)
             {
-                Console.WriteLine("=============QUEUE STATS=============");
-                Console.WriteLine($"Queue size: {waiting_queue.Count}");
-                foreach (var item in waiting_queue)
+                int currentCount;
+                List<string> activeSnapshot;
+
+                // read queue count and active match list in a thread-safe manner
+                lock (waiting_queue)
                 {
-                    Console.WriteLine(item.ToString());
+                    currentCount = waiting_queue.Count;
                 }
-                Console.WriteLine("=====================================");
+
+                lock (MatchListLock)
+                {
+                    // create a copy to avoid sharing the internal list reference
+                    activeSnapshot = new List<string>(ActiveMatchList);
+                }
+
+                // create a simple snapshot string to detect changes
+                string activeJoined = string.Join("|", activeSnapshot);
+
+                if (currentCount != lastCount || activeJoined != lastActiveSnapshot)
+                {
+                    // update logger with latest values
+                    Logger.UpdateDashboard(currentCount, activeSnapshot);
+                    lastCount = currentCount;
+                    lastActiveSnapshot = activeJoined;
+                }
+
                 await Task.Delay(5000);
             }
         }
@@ -137,12 +151,11 @@ namespace Gomoku_Server
                 Socket socket = client.Client;
                 byte[] buffer = new byte[1024];
 
-                Console.WriteLine($"[HANDLE_CLIENT] Waiting for initial message...");
+                Logger.Log($"[HANDLE_CLIENT] New connection received");
 
                 int byteRead = socket.Receive(buffer);
                 if (byteRead == 0)
                 {
-                    Console.WriteLine($"[HANDLE_CLIENT] Connection closed (0 bytes)");
                     client.Close();
                     return;
                 }
@@ -150,7 +163,7 @@ namespace Gomoku_Server
                 string message = Encoding.UTF8.GetString(buffer, 0, byteRead).Trim();
                 string[] parts = message.Split(';');
 
-                Console.WriteLine($"[HANDLE_CLIENT] Received: {message}");
+                Logger.Log($"[HANDLE_CLIENT] Received: {message}");
 
                 if (parts.Length < 2)
                 {
@@ -165,43 +178,52 @@ namespace Gomoku_Server
                 {
                     case "[MATCH_REQUEST]":
                         HandleRandomMatchRequest(client, parts);
-                        Console.WriteLine($"[HANDLE_CLIENT] Exiting for {parts[1]} - match threads will handle connection");
                         break;
 
                     case "[CHALLENGE_REQUEST]":
                     case "[CHALLENGE_ACCEPT]":
                     case "[CHALLENGE_DECLINE]":
                         HandleChallenge(client, parts);
-                        Console.WriteLine($"[HANDLE_CLIENT] Exiting for challenge - match threads will handle connection");
                         break;
 
                     case "[MATCH_END]":
-                        if (parts.Length >= 2)
-                        {
-                            inMatch.TryRemove(parts[1], out _);
-                        }
+                        if (parts.Length >= 2) inMatch.TryRemove(parts[1], out _);
                         removeChallengesOf(client);
                         client.Close();
-                        Console.WriteLine($"[HANDLE_CLIENT] Match ended, connection closed");
                         break;
 
                     default:
-                        Console.WriteLine($"[HANDLE_CLIENT] Invalid command: {command}");
                         ServerUtils.SendMessage(socket, "[INVALID_REQUEST]");
                         client.Close();
                         break;
                 }
-
-                Console.WriteLine($"[HANDLE_CLIENT] Thread exiting");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] HandleClient: {ex.Message}");
+                Logger.Log($"[ERROR] HandleClient: {ex.Message}");
                 try { client?.Close(); } catch { }
             }
         }
 
+        public static void AddActiveMatchDisplay(string name1, string name2)
+        {
+            lock (MatchListLock)
+            {
+                ActiveMatchList.Add($"{name1} VS {name2}");
+                Logger.UpdateDashboard(waiting_queue.Count, ActiveMatchList);
+            }
+        }
 
+        public static void RemoveActiveMatchDisplay(string name1, string name2)
+        {
+            lock (MatchListLock)
+            {
+                ActiveMatchList.Remove($"{name1} VS {name2}");
+                // Handle trường hợp đảo ngược tên nếu cần
+                ActiveMatchList.Remove($"{name2} VS {name1}");
+                Logger.UpdateDashboard(waiting_queue.Count, ActiveMatchList);
+            }
+        }
 
         private void StartMatch(TcpClient player1, TcpClient player2, string name1, string name2)
         {
@@ -209,7 +231,10 @@ namespace Gomoku_Server
             removeChallengesOf(player2);
             inMatch.TryAdd(name1, true);
             inMatch.TryAdd(name2, true);
-            Console.WriteLine($"[MATCH] Starting: {name1} vs {name2}");
+
+            Logger.Log($"[MATCH] Starting: {name1} vs {name2}");
+
+            AddActiveMatchDisplay(name1, name2);
 
             int clock1 = 300;
             int clock2 = 300;
@@ -220,13 +245,6 @@ namespace Gomoku_Server
             {
                 ServerUtils.SendMessage(player1.Client, $"[INIT];{clock1};{clock2};X;{name2}");
                 ServerUtils.SendMessage(player2.Client, $"[INIT];{clock1};{clock2};O;{name1}");
-
-                Console.WriteLine($"[MATCH] Sent [INIT] to both players");
-
-                Console.WriteLine($"[MATCH] Waiting for HandleClient threads to exit...");
-                Thread.Sleep(500);
-
-                Console.WriteLine($"[MATCH] Starting match threads...");
 
                 Thread clockThread = new Thread(matchHandle.StartClock);
                 Thread p1Thread = new Thread(matchHandle.Handle_Player1);
@@ -239,12 +257,11 @@ namespace Gomoku_Server
                 clockThread.Start();
                 p1Thread.Start();
                 p2Thread.Start();
-
-                Console.WriteLine($"[MATCH] All threads started for {name1} vs {name2}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[MATCH ERROR]: {ex}");
+                Logger.Log($"[MATCH ERROR]: {ex}");
+                RemoveActiveMatchDisplay(name1, name2);
             }
         }
 
@@ -264,7 +281,7 @@ namespace Gomoku_Server
                     }
 
                     names.TryAdd(client, parts[1]);
-                    Console.WriteLine($"[LOG]: Random match request from {parts[1]}");
+                    Logger.Log($"[LOG]: Random match request from {parts[1]}");
 
                     if (waiting_queue.Count >= 2)
                     {
@@ -307,7 +324,7 @@ namespace Gomoku_Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[ERROR] HandleRandomMatchRequest: {ex.Message}");
+                Logger.Log($"[ERROR] HandleRandomMatchRequest: {ex.Message}");
                 try { client?.Close(); } catch { }
             }
         }
@@ -330,7 +347,7 @@ namespace Gomoku_Server
                 switch (command)
                 {
                     case "[CHALLENGE_REQUEST]":
-                        Console.WriteLine($"[LOG]: {parts[1]} is challenging {parts[2]}");
+                        Logger.Log($"[LOG]: {parts[1]} is challenging {parts[2]}");
                         challenges.TryAdd(room, client);
                         names.TryAdd(client, parts[1]);
                         new Thread(() =>
@@ -355,17 +372,17 @@ namespace Gomoku_Server
 
                         if (isChallengerInMatch)
                         {
-                            Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge, but {parts[1]} is in another match");
+                            Logger.Log($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge, but {parts[1]} is in another match");
                             ServerUtils.SendMessage(client.Client, $"[CHALLENGE_CANCELED];{room}");
                         }
                         else if (!isChallengerConnected)
                         {
-                            Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge but {parts[1]} disconnected");
+                            Logger.Log($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge but {parts[1]} disconnected");
                             ServerUtils.SendMessage(client.Client, $"[CHALLENGE_CANCELED];{room}");
                         }
                         else
                         {
-                            Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
+                            Logger.Log($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
                             challenges.TryRemove(room, out _);
                             names.TryAdd(client, parts[2]);
                             names.TryAdd(challenger, parts[1]);
@@ -378,7 +395,20 @@ namespace Gomoku_Server
 
 
                     case "[CHALLENGE_DECLINE]":
-                        Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
+                        Logger.Log($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
+
+                        TcpClient? waitingChallenger;
+                        if (challenges.TryGetValue(room, out waitingChallenger))
+                        {
+                            try
+                            {
+                                ServerUtils.SendMessage(waitingChallenger.Client, $"[CHALLENGE_DECLINE];{parts[1]};{parts[2]}");
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Log($"[ERROR] Failed to send decline to challenger: {ex.Message}");
+                            }
+                        }
                         challenges.TryRemove(room, out _);
                         names.TryRemove(client, out _);
                         break;
@@ -390,7 +420,7 @@ namespace Gomoku_Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[ERROR]: " + ex.ToString());
+                Logger.Log("[ERROR]: " + ex.ToString());
             }
         }
 
@@ -409,7 +439,7 @@ namespace Gomoku_Server
             foreach (var key in keysToRemove)
             {
                 challenges.TryRemove(key, out _);
-                Console.WriteLine($"[LOG]: Deleted challenge request for room: {key}");
+                Logger.Log($"[LOG]: Deleted challenge request for room: {key}");
             }
 
             if (!string.IsNullOrEmpty(username))
@@ -428,7 +458,7 @@ namespace Gomoku_Server
 
                 if (!stillConnected)
                 {
-                    Console.WriteLine($"[LOG]: Challenger disconnected for room: {room}");
+                    Logger.Log($"[LOG]: Challenger disconnected for room: {room}");
                     challenges.TryRemove(room, out _);
                     client.Close();
                     return;
@@ -436,14 +466,14 @@ namespace Gomoku_Server
 
                 if (!challenges.TryGetValue(room, out _))
                 {
-                    Console.WriteLine($"[LOG]: Challenge request for room: {room} was deleted");
+                    Logger.Log($"[LOG]: Challenge request for room: {room} was deleted");
                     return;
                 }
 
                 Thread.Sleep(1000);
             }
 
-            Console.WriteLine($"[LOG]: Challenge request timeout for room: {room}");
+            Logger.Log($"[LOG]: Challenge request timeout for room: {room}");
             ServerUtils.SendMessage(client.Client, $"[CHALLENGE_TIMEOUT];{room}");
             challenges.TryRemove(room, out _);
             client.Close();
@@ -452,7 +482,7 @@ namespace Gomoku_Server
         public static void Log(string message)
         {
             string time = DateTime.Now.ToString("HH:mm:ss");
-            Console.WriteLine($"[{time}] [LOG] {message}");
+            Logger.Log($"[{time}] [LOG] {message}");
         }
 
     }

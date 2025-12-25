@@ -1,4 +1,6 @@
+using Gomoku_Client.Helpers;
 using Gomoku_Client.Model;
+using Gomoku_Client.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +19,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
 namespace Gomoku_Client.View
 {
     public partial class GamePlay : Page
@@ -65,6 +66,14 @@ namespace Gomoku_Client.View
             this.Loaded += GamePlay_Loaded;
         }
 
+        private async void SetAvatar(string username, string opponent)
+        {
+            UserDataModel? player1data = await FireStoreHelper.GetUserInfo(username);
+            Avatar1.ImageSource = BitmapFrame.Create(new Uri(player1data.ImagePath));
+            UserDataModel? player2data = await FireStoreHelper.GetUserInfo(opponent);
+            Avatar2.ImageSource = BitmapFrame.Create(new Uri(player2data.ImagePath));
+        }
+
         private void GamePlay_Loaded(object sender, RoutedEventArgs e)
         {
             if (tcpClient == null || !tcpClient.Connected)
@@ -78,11 +87,8 @@ namespace Gomoku_Client.View
             this.isPlayerTurn = (playerSymbol == 'X');
             this.isGameOver = false;
 
-<<<<<<< Updated upstream
-=======
             SetAvatar(player1Name, opponentName);
 
->>>>>>> Stashed changes
             InitializeGame();
             DrawBoard();
             SetupTimers();
@@ -102,13 +108,7 @@ namespace Gomoku_Client.View
                 receiveThread.Start();
             }
 
-<<<<<<< Updated upstream
-            receiveThread = new Thread(ReceiveFromServer);
-            receiveThread.IsBackground = true;
-            receiveThread.Start();
-            Console.WriteLine("[INIT] Receive thread started immediately");
-            StarSound();
-=======
+
             try
             {
                 StartSound();
@@ -117,73 +117,68 @@ namespace Gomoku_Client.View
             {
                 Console.WriteLine("Lỗi âm thanh: " + ex.Message);
             }
->>>>>>> Stashed changes
         }
 
-        private void StarSound()
+        private void StartSound()
         {
-            List<string> BGM = new List<string>();
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "LOLTheme.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Awaken.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "LegendsNeverDie.mp3"));
-
-            int BGMNumber = Random.Shared.Next(0, 3);
-
-            string buttonPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "ButtonHover.wav"
-            );
-
-            string keyboardPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "Keyboard.wav"
-            );
-
-            double BGMVolume = mainWindow.MasterVolValue * mainWindow.BGMVolValue;
-            double SFXVolume = mainWindow.MasterVolValue * mainWindow.SFXVolValue;
-
-            MainBGM.Volume = BGMVolume;
-            ButtonClick.Volume = SFXVolume;
-            Keyboard.Volume = SFXVolume;
-
-            MainBGM.MediaOpened += (s, e) =>
+            try
             {
-                MainBGM.Play();
-            };
+                List<string> BGM = new List<string>();
+                string[] bgmFiles = { "LOLTheme.mp3", "Awaken.mp3", "LegendsNeverDie.mp3" };
 
-            MainBGM.MediaEnded += (s, e) =>
+                foreach (var file in bgmFiles)
+                {
+                    string path = AudioHelper.ExtractResourceToTemp($"Assets/Sounds/{file}");
+                    if (!string.IsNullOrEmpty(path)) BGM.Add(path);
+                }
+
+                string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
+                string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
+
+                double BGMVolume = mainWindow.MasterVolValue * mainWindow.BGMVolValue;
+                double SFXVolume = mainWindow.MasterVolValue * mainWindow.SFXVolValue;
+
+                MainBGM.Volume = BGMVolume;
+                ButtonClick.Volume = SFXVolume;
+                Keyboard.Volume = SFXVolume;
+
+                if (BGM.Count > 0)
+                {
+                    int BGMNumber = Random.Shared.Next(0, BGM.Count);
+
+                    MainBGM.MediaOpened += (s, e) => MainBGM.Play();
+
+                    MainBGM.MediaEnded += (s, e) =>
+                    {
+                        BGMNumber = Random.Shared.Next(0, BGM.Count);
+                        MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                        MainBGM.Play();
+                    };
+
+                    MainBGM.MediaFailed += (s, e) =>
+                    {
+                        Console.WriteLine($"[AUDIO ERROR] {e.ErrorException.Message}");
+                    };
+
+                    MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                }
+
+                if (!string.IsNullOrEmpty(buttonPath))
+                    ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+
+                if (!string.IsNullOrEmpty(keyboardPath))
+                    Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+            }
+            catch (Exception ex)
             {
-                BGMNumber = Random.Shared.Next(0, 3);
-                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-                //MainBGM.Position = TimeSpan.Zero;
-                MainBGM.Play();
-            };
-
-            MainBGM.MediaFailed += (s, e) =>
-            {
-                MessageBox.Show(e.ErrorException.Message);
-            };
-
-            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-
-            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
-
-            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
-        }
-
-        private char GetOpponentSymbol()
-        {
-            return playerSymbol == 'X' ? 'O' : 'X';
+                Console.WriteLine($"[AUDIO CRITICAL] Lỗi khởi tạo âm thanh GamePlay: {ex.Message}");
+            }
         }
 
 
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        private async void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            Disconnect();
+            await Disconnect();
         }
 
         private async Task Disconnect()

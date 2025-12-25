@@ -16,12 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-<<<<<<< Updated upstream
-    <Resource Include="Assets\api.env" />
-    <Resource Include="Assets\firebase_key.json" />
-=======
     <EmbeddedResource Include="Assets\firebase_key.json" />
->>>>>>> Stashed changes
   </ItemGroup>
 
 </Project>

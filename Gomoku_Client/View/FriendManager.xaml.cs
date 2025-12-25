@@ -28,8 +28,6 @@ namespace Gomoku_Client.View
         private List<string> curr_friend_list = new List<string>();
         private string? _pendingUnfriendUsername;
 
-        private TcpClient _senderClient;
-
         FirestoreChangeListener? listener;
 
         public FriendManager(MainGameUI mainWindow)
@@ -184,23 +182,7 @@ namespace Gomoku_Client.View
             DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
 
-<<<<<<< Updated upstream
-            TcpClient client = new TcpClient();
-            try
-            {
-                client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
-            }
-            catch
-            {
-                NotificationManager.Instance.ShowNotification(
-                        "Lỗi",
-                        "Server có thể đang không hoạt động",
-                        Notification.NotificationType.Info,
-                        5000
-                    );
-                return;
-            }
-=======
+
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
             await Task.Run(async () =>
             {
@@ -208,7 +190,6 @@ namespace Gomoku_Client.View
                 {
                     client.Connect("34.68.212.10", 9999);
                     NetworkStream stream = client.GetStream();
->>>>>>> Stashed changes
 
                     Console.WriteLine("[DEBUG] Đã kết nối tới Server.");
 

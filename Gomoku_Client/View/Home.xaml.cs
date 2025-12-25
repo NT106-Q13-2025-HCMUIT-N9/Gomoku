@@ -29,7 +29,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
+using Gomoku_Client.Helpers;
 
 namespace Gomoku_Client
 {
@@ -64,7 +64,7 @@ namespace Gomoku_Client
             Instance = this;
             UpdateActualBGM();
             SoundStart();
-            this.Loaded += MainGameUI_Loaded;
+
             Avatars = new ObservableCollection<AvatarItem>
             {
             new AvatarItem { Image="pack://application:,,,/Assets/Avatar/T1_6sao.jpg", Name="T1|Logo" },
@@ -124,12 +124,6 @@ namespace Gomoku_Client
             DataContext = this;
         }
 
-        private void MainGameUI_Loaded(object sender, RoutedEventArgs e)
-        {
-            BackgroundGrid.Visibility = Visibility.Visible;
-            StackPanelMenu.Visibility = Visibility.Visible;
-        }
-
         public double MasterVolValue = 0.5;
         public double BGMVolValue = 0.15;
         public double SFXVolValue = 1;
@@ -143,54 +137,62 @@ namespace Gomoku_Client
 
         void SoundStart()
         {
-
-            List<string> BGM = new List<string>();
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "meow.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "frog.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "chess.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "doodle.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Joy.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Matchmakers.mp3"));
-            int BGMNumber = Random.Shared.Next(0, 6);
-
-            string buttonPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "ButtonHover.wav"
-            );
-
-            string keyboardPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "Keyboard.wav"
-            );
-
-
-            MainBGM.MediaOpened += (s, e) =>
+            try
             {
-                MainBGM.Play();
-            };
+                List<string> BGM = new List<string>();
 
-            MainBGM.MediaEnded += (s, e) =>
+                string[] bgmFiles = {
+                    "meow.mp3", "frog.mp3", "chess.mp3",
+                    "doodle.mp3", "Joy.mp3", "Matchmakers.mp3"
+                };
+
+                foreach (var file in bgmFiles)
+                {
+                    string path = AudioHelper.ExtractResourceToTemp($"Assets/Sounds/{file}");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        BGM.Add(path);
+                    }
+                }
+
+                string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
+                string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
+
+                if (BGM.Count > 0)
+                {
+                    int BGMNumber = Random.Shared.Next(0, BGM.Count);
+
+                    MainBGM.MediaOpened += (s, e) => MainBGM.Play();
+
+                    MainBGM.MediaEnded += (s, e) =>
+                    {
+                        BGMNumber = Random.Shared.Next(0, BGM.Count);
+                        MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                        MainBGM.Play();
+                    };
+
+                    MainBGM.MediaFailed += (s, e) =>
+                    {
+                        Debug.WriteLine($"Lỗi phát nhạc: {e.ErrorException.Message}");
+                    };
+
+                    MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                }
+
+                if (!string.IsNullOrEmpty(buttonPath))
+                {
+                    ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+                }
+
+                if (!string.IsNullOrEmpty(keyboardPath))
+                {
+                    Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+                }
+            }
+            catch (Exception ex)
             {
-                BGMNumber = Random.Shared.Next(0, 6);
-                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-                //MainBGM.Position = TimeSpan.Zero;
-                MainBGM.Play();
-            };
-
-            MainBGM.MediaFailed += (s, e) =>
-            {
-                MessageBox.Show(e.ErrorException.Message);
-            };
-
-            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-
-            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
-
-            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+                Debug.WriteLine($"Lỗi khởi tạo âm thanh MainGameUI: {ex.Message}");
+            }
         }
 
 
@@ -483,7 +485,7 @@ namespace Gomoku_Client
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
             try
             {
-                client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
+                client.Connect(IPAddress.Parse("34.68.212.10"), 9999);
             }
             catch
             {
@@ -536,6 +538,7 @@ namespace Gomoku_Client
             try
             {
                 NetworkStream stream = client.GetStream();
+                // Gửi xác nhận
                 byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}\n");
                 stream.Write(data, 0, data.Length);
 
@@ -552,7 +555,8 @@ namespace Gomoku_Client
                             if (bytesRead == 0) break;
 
                             string serverResponse = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
-                            Console.WriteLine($"[DEBUG] RECEIVED: {serverResponse} in Home");
+                            Console.WriteLine($"[DEBUG] Home Recv: {serverResponse}");
+
                             string[] messages = serverResponse.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
                             foreach (var msg in messages)
@@ -560,6 +564,7 @@ namespace Gomoku_Client
                                 if (msg.StartsWith("[INIT]"))
                                 {
                                     string[] parts = msg.Split(';');
+
                                     if (parts.Length >= 5)
                                     {
                                         char playerSymbol = parts[3][0];
@@ -577,7 +582,6 @@ namespace Gomoku_Client
                                                 if (BackgroundGrid != null) BackgroundGrid.Visibility = Visibility.Collapsed;
 
                                                 MainGrid.Visibility = Visibility.Visible;
-
 
                                                 MainFrame.Visibility = Visibility.Visible;
                                                 Panel.SetZIndex(MainFrame, 999);
@@ -614,7 +618,6 @@ namespace Gomoku_Client
                                                 UserState.currentState = State.Ready;
                                             }
                                         });
-
                                         return;
                                     }
                                     else

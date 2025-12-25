@@ -16,6 +16,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Gomoku_Client.Helpers;
 
 namespace Gomoku_Client
 {
@@ -35,51 +36,39 @@ namespace Gomoku_Client
 
         void StartSound()
         {
-            string buttonPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "ButtonHover.wav"
-            );
-
-            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
-
-            string keyboardPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "Keyboard.wav"
-            );
-
-            string BGMPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "RelaxedScene.mp3"
-            );
-
-            MainBGM.MediaOpened += (s, e) =>
+            try
             {
-                MainBGM.Play();
-            };
+                string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
+                string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
+                string bgmPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/RelaxedScene.mp3");
 
-            MainBGM.MediaEnded += (s, e) =>
+                if (buttonPath != null)
+                    ButtonClick.Open(new Uri(buttonPath));
+
+                if (keyboardPath != null)
+                {
+                    Keyboard.Open(new Uri(keyboardPath));
+                    Keyboard.Volume = 0.1;
+                }
+
+                if (bgmPath != null)
+                {
+                    MainBGM.Open(new Uri(bgmPath));
+                    MainBGM.Volume = 0.2;
+
+                    MainBGM.MediaOpened += (s, e) => MainBGM.Play();
+
+                    MainBGM.MediaEnded += (s, e) =>
+                    {
+                        //MainBGM.Position = TimeSpan.Zero;
+                        MainBGM.Play();
+                    };
+                }
+            }
+            catch (Exception ex)
             {
-                MainBGM.Open(new Uri(BGMPath, UriKind.Absolute));
-                //MainBGM.Position = TimeSpan.Zero;
-                MainBGM.Play();
-            };
-
-            MainBGM.MediaFailed += (s, e) =>
-            {
-                MessageBox.Show(e.ErrorException.Message);
-            };
-
-            MainBGM.Open(new Uri(BGMPath, UriKind.Absolute));
-            MainBGM.Volume = 0.2;
-
-            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
-            Keyboard.Volume = 0.1;
+                Debug.WriteLine($"Lỗi StartSound: {ex.Message}");
+            }
         }
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
@@ -122,7 +111,7 @@ namespace Gomoku_Client
                     (Color)ColorConverter.ConvertFromString("#2A2A2A")
                 );
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
-                if(isWrongEmail == true)
+                if (isWrongEmail == true)
                 {
                     MainBorder.Height -= 15;
                     isWrongEmail = false;
@@ -137,7 +126,7 @@ namespace Gomoku_Client
                     (Color)ColorConverter.ConvertFromString("#FF4655")
                 );
                 EmailNotFoundText.Visibility = Visibility.Visible;
-                if(isWrongEmail == false) MainBorder.Height += 15;
+                if (isWrongEmail == false) MainBorder.Height += 15;
                 // Email không tồn tại → viền đỏ
                 EmailBorder.BorderBrush = new SolidColorBrush(
                     (Color)ColorConverter.ConvertFromString("#FF4655")
@@ -175,7 +164,8 @@ namespace Gomoku_Client
                         }
                         return;
                     }
-                }catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -190,7 +180,7 @@ namespace Gomoku_Client
 
                     isWrongEmail = true;
                 }
-                
+
             }
         }
 
@@ -202,7 +192,7 @@ namespace Gomoku_Client
                 PasswordPlaceholder.Visibility = Visibility.Visible;
         }
 
-        
+
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
@@ -259,7 +249,7 @@ namespace Gomoku_Client
             string password = PasswordBox.Password;
             string email = EmailBox.Text;
             buttonDisable();
-            
+
 
             if (failedLogin)
             {
@@ -309,7 +299,7 @@ namespace Gomoku_Client
                 mainGame.Width = this.Width;
                 mainGame.Height = this.Height;
                 mainGame.WindowState = this.WindowState;
-                
+
                 this.Hide();
                 mainGame.Show();
                 this.Close();
@@ -322,7 +312,7 @@ namespace Gomoku_Client
                 }
                 catch (AuthException auth_ex)
                 {
-                    if(auth_ex.Message == "INVALID_LOGIN_CREDENTIALS")
+                    if (auth_ex.Message == "INVALID_LOGIN_CREDENTIALS")
                     {
                         EmailNotFoundText.Text = "Email hoặc mật khẩu không chính xác";
                         EmailNotFoundText.Visibility = Visibility.Visible;
@@ -368,23 +358,23 @@ namespace Gomoku_Client
             ButtonClick.Stop();
             ButtonClick?.Play();
             if (!isShowing)
-          {
-            // Hiện mật khẩu
-            PasswordVisible.Text = PasswordBox.Password;
-            PasswordVisible.Visibility = Visibility.Visible;
-            PasswordBox.Visibility = Visibility.Collapsed;
-            TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
-          }
-          else
-          {
-            // Ẩn mật khẩu
-            PasswordBox.Password = PasswordVisible.Text;
-            PasswordBox.Visibility = Visibility.Visible;
-            PasswordVisible.Visibility = Visibility.Collapsed;
-            TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
-          }
+            {
+                // Hiện mật khẩu
+                PasswordVisible.Text = PasswordBox.Password;
+                PasswordVisible.Visibility = Visibility.Visible;
+                PasswordBox.Visibility = Visibility.Collapsed;
+                TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
+            }
+            else
+            {
+                // Ẩn mật khẩu
+                PasswordBox.Password = PasswordVisible.Text;
+                PasswordBox.Visibility = Visibility.Visible;
+                PasswordVisible.Visibility = Visibility.Collapsed;
+                TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
+            }
 
-          isShowing = !isShowing;
+            isShowing = !isShowing;
         }
 
         private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -427,7 +417,7 @@ namespace Gomoku_Client
                 }
             }
 
-            if(string.IsNullOrEmpty(PasswordBox.Password))
+            if (string.IsNullOrEmpty(PasswordBox.Password))
             {
                 PasswordPlaceholder.Visibility = Visibility.Visible;
             }
@@ -459,7 +449,7 @@ namespace Gomoku_Client
 
         private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if(PasswordPlaceholder.Visibility == Visibility.Visible)
+            if (PasswordPlaceholder.Visibility == Visibility.Visible)
             {
                 PasswordPlaceholder.Visibility = Visibility.Collapsed;
             }

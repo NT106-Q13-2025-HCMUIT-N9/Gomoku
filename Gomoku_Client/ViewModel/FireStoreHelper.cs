@@ -222,7 +222,8 @@ namespace Gomoku_Client.ViewModel
         {
             DocumentReference new_doc_ref = FirebaseInfo.DB.Collection("MatchInfo").Document();
 
-            MatchInfoModel matchInfoModel = new MatchInfoModel() { 
+            MatchInfoModel matchInfoModel = new MatchInfoModel()
+            {
                 isDraw = isDraw,
                 Players = Players,
                 Duration = duration

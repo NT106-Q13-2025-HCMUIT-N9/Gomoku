@@ -54,7 +54,7 @@ namespace Gomoku_Server
 
         }
 
-        public void Start(int port)
+        public async Task Start(int port)
         {
             try
             {
@@ -68,6 +68,9 @@ namespace Gomoku_Server
             Thread listenThread = new Thread(ListenForClients);
             listenThread.IsBackground = false;
             listenThread.Start();
+
+            await CheckPlayersInQueue();
+
         }
 
         public void Stop()
@@ -109,6 +112,21 @@ namespace Gomoku_Server
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] ListenForClients: {ex.Message}");
+            }
+        }
+
+        public async Task CheckPlayersInQueue()
+        {
+            while (true)
+            {
+                Console.WriteLine("=============QUEUE STATS=============");
+                Console.WriteLine($"Queue size: {waiting_queue.Count}");
+                foreach (var item in waiting_queue)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+                Console.WriteLine("=====================================");
+                await Task.Delay(5000);
             }
         }
 
@@ -308,7 +326,7 @@ namespace Gomoku_Server
 
                 string command = parts[0];
                 room = parts[1] + ";" + parts[2];
-                TcpClient challenger = null;
+
                 switch (command)
                 {
                     case "[CHALLENGE_REQUEST]":
@@ -323,7 +341,10 @@ namespace Gomoku_Server
 
 
                     case "[CHALLENGE_ACCEPT]":
-                        if (!challenges.TryGetValue(room, out challenger) || challenger == null)
+                        TcpClient? challenger;
+                        bool hasChallenger = challenges.TryGetValue(room, out challenger);
+
+                        if (!hasChallenger || challenger == null)
                         {
                             ServerUtils.SendMessage(client.Client, $"[CHALLENGE_CANCELED];{room}");
                             break;
@@ -345,7 +366,6 @@ namespace Gomoku_Server
                         else
                         {
                             Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
-                            ServerUtils.SendMessage(challenger.Client, $"[CHALLENGE_ACCEPT];{room}");
                             challenges.TryRemove(room, out _);
                             names.TryAdd(client, parts[2]);
                             names.TryAdd(challenger, parts[1]);
@@ -358,15 +378,7 @@ namespace Gomoku_Server
 
 
                     case "[CHALLENGE_DECLINE]":
-                        if (challenges.TryGetValue(room, out challenger) && challenger != null)
-                        {
-                            ServerUtils.SendMessage(challenger.Client, $"[CHALLENGE_DECLINE];{room}");
-                            Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"[LOG]: Declined but challenger not found for room {room}");
-                        }
+                        Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
                         challenges.TryRemove(room, out _);
                         names.TryRemove(client, out _);
                         break;

@@ -561,14 +561,36 @@ namespace Gomoku_Client
                                 char playerSymbol = parts[3][0];
                                 string opponentName = parts[4];
                                 Console.WriteLine($"[DEBUG] Received Match Init, Player 1 clock: {clock1}, Player 2 clock: {clock2}, LocalPlayer symbol: {playerSymbol}, Opponent: {opponentName}");
-                                Dispatcher.Invoke(() =>
+                                App.Current.Dispatcher.Invoke(() =>
                                 {
                                     Console.WriteLine("[CHALLENGE] Navigating to GamePlay");
-                                    Console.WriteLine($"[CHALLENGE] TcpClient.Connected: {client?.Connected}");
-                                    Console.WriteLine($"[CHALLENGE] Stream.CanRead: {stream?.CanRead}");
 
-                                    GamePlay gamePlayPage = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, this);
-                                    this.NavigateWithAnimation(gamePlayPage);
+                                    try
+                                    {
+                                        GamePlay gamePlayPage = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, this);
+                                        if (MainFrame.Visibility != Visibility.Visible)
+                                        {
+                                            MainFrame.Visibility = Visibility.Visible;
+                                        }
+                                        if (StackPanelMenu.Visibility != Visibility.Collapsed)
+                                        {
+                                            StackPanelMenu.Visibility = Visibility.Collapsed;
+                                        }
+                                        MainFrame.RenderTransform = new TranslateTransform(0, 0);
+
+                                        while (MainFrame.NavigationService.CanGoBack)
+                                        {
+                                            MainFrame.NavigationService.RemoveBackEntry();
+                                        }
+
+                                        MainFrame.Navigate(gamePlayPage);
+
+                                        Console.WriteLine("[CHALLENGE] GamePlay navigated successfully!");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        MessageBox.Show($"Lỗi khi chuyển trang: {ex.Message}");
+                                    }
                                 });
                             }
                         }

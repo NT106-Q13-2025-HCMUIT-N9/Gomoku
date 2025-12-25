@@ -13,6 +13,18 @@ namespace Server
     {
         static void Main(string[] args)
         {
+            try
+            {
+                FirebaseInfo.AppInit();
+                Console.WriteLine("[LOG]: Server Init Firebase successfully");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[CRASH]: Server cannot connect to Firebase please for the love of god turn on your wifi or somthing");
+                Console.WriteLine($"[CRASH]: {e.Message}");
+                return;
+            }
+
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
             Gomoku_Server.Server server = new Gomoku_Server.Server();
@@ -22,6 +34,4 @@ namespace Server
             Thread.Sleep(Timeout.Infinite);
         }
     }
-
-
 }

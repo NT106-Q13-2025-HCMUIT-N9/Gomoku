@@ -15,7 +15,9 @@ namespace Gomoku_Server
             {
                 if (socket == null) return false;
 
-                return socket.Connected;
+                socket.Send(new byte[1], 0, SocketFlags.None);
+
+                return true;
             }
             catch (ObjectDisposedException)
             {

@@ -140,7 +140,7 @@
                         </Border.Effect>
 
                         <Border.Background>
-                            <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                            <ImageBrush x:Name="Avatar1" ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
                         </Border.Background>
                     </Border>
 
@@ -185,7 +185,7 @@
 
 
                         <Border.Background>
-                            <ImageBrush ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
+                            <ImageBrush x:Name="Avatar2" ImageSource="/Assets/Gomoku.ico" Stretch="UniformToFill"/>
                         </Border.Background>
                     </Border>
 

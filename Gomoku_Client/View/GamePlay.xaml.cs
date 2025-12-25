@@ -170,6 +170,21 @@ namespace Gomoku_Client.View
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                MainBGM.Stop();
+                MainBGM.Close();
+
+                ButtonClick.Stop();
+                ButtonClick.Close();
+
+                Keyboard.Stop();
+                Keyboard.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AUDIO CLEANUP ERROR] {ex.Message}");
+            }
             Disconnect();
         }
 

@@ -74,6 +74,7 @@ namespace Gomoku_Server
             try
             {
                 DateTime lastTick = DateTime.Now;
+                DateTime lastUpdatedTick;
                 Console.WriteLine($"[CLOCK] Thread started for {name1} vs {name2}");
 
                 Thread.Sleep(100);
@@ -89,25 +90,19 @@ namespace Gomoku_Server
                         {
                             if (matchEnded) break;
 
+                            string message = "";
+
                             if (current_turn == PlayerTurn.player1 && clock1 > 0)
                             {
                                 clock1--;
-                                string message = $"[TIME1];{clock1}";
-
-                                bool p1Sent = ServerUtils.SendMessage(player1.Client, message);
-                                bool p2Sent = ServerUtils.SendMessage(player2.Client, message);
-
-                                if (!p1Sent || !p2Sent)
-                                {
-                                    Console.WriteLine($"[CLOCK] Failed to send time update (P1:{p1Sent}, P2:{p2Sent}), ending match");
-                                    EndMatch();
-                                    break;
-                                }
-
+                                message = $"[TIME1];{clock1}";
                                 if (clock1 <= 0)
                                 {
                                     ServerUtils.SendMessage(player1.Client, "[TIMEOUT1]");
                                     ServerUtils.SendMessage(player2.Client, "[TIMEOUT1]");
+                                    FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name2);
+                                    FirestoreHelper.IncWinUser(name2);
+                                    FirestoreHelper.IncLoseUser(name1);
                                     EndMatch();
                                     break;
                                 }
@@ -115,25 +110,49 @@ namespace Gomoku_Server
                             else if (current_turn == PlayerTurn.player2 && clock2 > 0)
                             {
                                 clock2--;
-                                string message = $"[TIME2];{clock2}";
-
-                                bool p1Sent = ServerUtils.SendMessage(player1.Client, message);
-                                bool p2Sent = ServerUtils.SendMessage(player2.Client, message);
-
-                                if (!p1Sent || !p2Sent)
-                                {
-                                    Console.WriteLine($"[CLOCK] Failed to send time update (P1:{p1Sent}, P2:{p2Sent}), ending match");
-                                    EndMatch();
-                                    break;
-                                }
-
+                                message = $"[TIME2];{clock2}";
                                 if (clock2 <= 0)
                                 {
                                     ServerUtils.SendMessage(player1.Client, "[TIMEOUT2]");
                                     ServerUtils.SendMessage(player2.Client, "[TIMEOUT2]");
+                                    FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name1);
+                                    FirestoreHelper.IncWinUser(name1);
+                                    FirestoreHelper.IncLoseUser(name2);
                                     EndMatch();
                                     break;
                                 }
+                            }
+
+
+                            bool p1Sent = ServerUtils.SendMessage(player1.Client, message);
+                            bool p2Sent = ServerUtils.SendMessage(player2.Client, message);
+
+                            if (!p1Sent)
+                            {
+                                Console.WriteLine($"[DISCONNECT] Player 1 ({name1}) lost connection.");
+
+                                if (p2Sent) ServerUtils.SendMessage(player2.Client, $"[OPPONENT_DISCONNECTED];{name2}");
+
+                                FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name2);
+                                FirestoreHelper.IncWinUser(name2);
+                                FirestoreHelper.IncLoseUser(name1);
+
+                                EndMatch();
+                                break;
+                            }
+
+                            if (!p2Sent)
+                            {
+                                Console.WriteLine($"[DISCONNECT] Player 2 ({name2}) lost connection.");
+
+                                if (p1Sent) ServerUtils.SendMessage(player1.Client, $"[OPPONENT_DISCONNECTED];{name2}");
+
+                                FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name1);
+                                FirestoreHelper.IncWinUser(name1);
+                                FirestoreHelper.IncLoseUser(name2);
+
+                                EndMatch();
+                                break;
                             }
                         }
                     }

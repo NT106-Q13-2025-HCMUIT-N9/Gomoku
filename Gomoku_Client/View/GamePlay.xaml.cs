@@ -1,3 +1,4 @@
+using Gomoku_Client.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -159,8 +160,9 @@ namespace Gomoku_Client.View
             Disconnect();
         }
 
-        private void Disconnect()
+        private async Task Disconnect()
         {
+            UserState.currentState = State.Ready;
             try
             {
                 isConnected = false;
@@ -171,7 +173,9 @@ namespace Gomoku_Client.View
 
                 if (receiveThread != null && receiveThread.IsAlive)
                 {
-                    receiveThread.Join(500);
+                    receiveThread.Join(300);
+                    await Task.Delay(300);
+                    Console.WriteLine($"[DEBUG] Receive thread status: {receiveThread != null} and IsAlive: {receiveThread.IsAlive}");
                 }
 
                 if (tcpClient != null)
@@ -266,7 +270,7 @@ namespace Gomoku_Client.View
         {
             if (isConnected)
             {
-                SendMatchEnd();
+                SendResignToServer();
                 isConnected = false;
             }
 
@@ -775,7 +779,7 @@ namespace Gomoku_Client.View
             byte[] buffer = new byte[4096];
             StringBuilder messageBuffer = new StringBuilder();
             DateTime lastMessageTime = DateTime.Now;
-            const int TIMEOUT_SECONDS = 30;
+            const int TIMEOUT_SECONDS = 15;
 
             Console.WriteLine("[RECEIVE] Thread started");
 
@@ -786,6 +790,7 @@ namespace Gomoku_Client.View
 
                 while (isConnected && tcpClient != null)
                 {
+                    if (!isConnected || isGameOver) break;
                     try
                     {
                         Socket socket = tcpClient.Client;
@@ -805,15 +810,24 @@ namespace Gomoku_Client.View
                             }
                         }
 
+
+
                         TimeSpan timeSinceLastMessage = DateTime.Now - lastMessageTime;
                         if (timeSinceLastMessage.TotalSeconds > TIMEOUT_SECONDS)
                         {
+                            if (!isConnected || isGameOver)
+                            {
+                                Console.WriteLine("[TIMEOUT] Ignored because user is exiting.");
+                                break;
+                            }
                             Console.WriteLine($"[TIMEOUT] No message for {TIMEOUT_SECONDS}s");
 
                             try
                             {
                                 Dispatcher.BeginInvoke(() =>
                                 {
+                                    if (!isConnected || isGameOver) return;
+
                                     NotificationManager.Instance.ShowNotification(
                                         "Lỗi đường truyền",
                                         "Hết thời gian chờ! Bạn đã bị mất kết nối với server.",

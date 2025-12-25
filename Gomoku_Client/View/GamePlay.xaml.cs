@@ -1,4 +1,5 @@
 using Gomoku_Client.Model;
+using Gomoku_Client.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,10 +70,12 @@ namespace Gomoku_Client.View
             this.playerSymbol = symbol;
             this.opponentName = opponent;
             this.player2Name = opponent;
+            
 
             this.isPlayerTurn = (symbol == 'X');
             this.isGameOver = false;
 
+            SetAvatar(username, opponent);
             InitializeGame();
             DrawBoard();
             SetupTimers();
@@ -92,6 +95,14 @@ namespace Gomoku_Client.View
             receiveThread.Start();
             Console.WriteLine("[INIT] Receive thread started immediately");
             StarSound();
+        }
+
+        private async void SetAvatar(string username, string opponent)
+        {
+            UserDataModel? player1data = await FireStoreHelper.GetUserInfo(username);
+            Avatar1.ImageSource = BitmapFrame.Create(new Uri(player1data.ImagePath));
+            UserDataModel? player2data = await FireStoreHelper.GetUserInfo(opponent);
+            Avatar2.ImageSource = BitmapFrame.Create(new Uri(player2data.ImagePath));
         }
 
         private void StarSound()

@@ -74,8 +74,9 @@ namespace Gomoku_Client.View
                         : "0%";
                 }
 
-                await Task.Delay(2000);
-
+                await Task.Delay(4000);
+                BackButton.Visibility = Visibility.Hidden;
+                await Task.Delay(1000);
                 ConnectToServerAndRequestMatch();
             }
             catch (Exception ex)
@@ -160,16 +161,23 @@ namespace Gomoku_Client.View
         {
             try
             {
-                _tcpClient = new TcpClient();
-                _tcpClient.Connect("127.0.0.1", 9999);
-                _stream = _tcpClient.GetStream();
-                _isConnected = true;
+                if (this.IsLoaded)
+                {
+                    _tcpClient = new TcpClient();
+                    _tcpClient.Connect("127.0.0.1", 9999);
+                    _stream = _tcpClient.GetStream();
+                    _isConnected = true;
 
-                _receiveThread = new Thread(ReceiveFromServer);
-                _receiveThread.IsBackground = true;
-                _receiveThread.Start();
+                    _receiveThread = new Thread(ReceiveFromServer);
+                    _receiveThread.IsBackground = true;
+                    _receiveThread.Start();
 
-                SendMatchRequest();
+                    SendMatchRequest();
+                }
+                else
+                {
+                    Console.WriteLine("[DEBUG] Matchmaking page not loaded, not connecting to the server!");
+                }
             }
             catch (Exception ex)
             {

@@ -8,9 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Printing.IndexedProperties;
 using System.Text;
@@ -24,7 +26,9 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 
 namespace Gomoku_Client
@@ -177,13 +181,13 @@ namespace Gomoku_Client
             };
 
             MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-        
+
             ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
 
             Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
         }
 
-        
+
 
         private void AnimateSlideIn()
         {
@@ -427,7 +431,7 @@ namespace Gomoku_Client
                 if (snapshot.Exists)
                 {
                     UserDataModel user_data = snapshot.ConvertTo<UserDataModel>();
-                    if(old_match_request.Count >= 1)
+                    if (old_match_request.Count >= 1)
                     {
                         List<string> deleted_request = old_match_request.Except(user_data.MatchRequests).ToList();
                         foreach (string del in deleted_request)
@@ -451,7 +455,7 @@ namespace Gomoku_Client
                                 15000,
                                 onAccept: (s, e) =>
                                 {
-                                    respondChallenge("[CHALLENGE_ACCEPT]", request, username);                                  
+                                    respondChallenge("[CHALLENGE_ACCEPT]", request, username);
                                 },
                                 onDecline: (s, e) =>
                                 {
@@ -466,13 +470,14 @@ namespace Gomoku_Client
 
         private TcpClient client;
 
-        void respondChallenge(string response, string challenger, string me)
+        async void respondChallenge(string response, string challenger, string me)
         {
             client = new TcpClient();
-
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
             try
             {
-                client.Connect(IPAddress.Parse("127.0.0.1"), 8888);
+                client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
             }
             catch
             {
@@ -485,26 +490,36 @@ namespace Gomoku_Client
                 return;
             }
 
-            if (!client.Connected) return;
+            if (!client.Connected) {
+                NotificationManager.Instance.ShowNotification(
+                    "Lỗi",
+                    "Bạn chưa được kết nối đến server",
+                    Notification.NotificationType.Info,
+                    5000
+                );
+                return;
+            } 
             switch (response)
             {
                 case "[CHALLENGE_ACCEPT]":
+                    await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(challenger));
                     acceptChallenge(client, response, challenger, me);
                     break;
 
                 case "[CHALLENGE_DECLINE]":
+                    await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(challenger));
                     declineChallenge(client, response, challenger, me);
                     break;
-
                 default:
                     break;
             }
 
         }
 
-        void acceptChallenge(TcpClient client, string response, string challenger, string me) 
+
+        void acceptChallenge(TcpClient client, string response, string challenger, string me)
         {
-            if ( UserState.currentState == State.InMatch)
+            if (UserState.currentState == State.InMatch)
             {
                 NotificationManager.Instance.ShowNotification(
                     "Chấp nhận thách đấu thất bại",
@@ -512,10 +527,11 @@ namespace Gomoku_Client
                     Notification.NotificationType.Info,
                     5000
                     );
+                client.Close();
                 return;
             }
             UserState.currentState = State.InMatch;
-            var stream = client.GetStream();
+            NetworkStream stream = client.GetStream();
             byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
             stream.Write(data, 0, data.Length);
 
@@ -525,6 +541,58 @@ namespace Gomoku_Client
                     Notification.NotificationType.Info,
                     5000
                     );
+
+            Task.Run(() =>
+            {
+                try
+                {
+                    byte[] buffer = new byte[1024];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    if (bytesRead > 0)
+                    {
+                        string serverResponse = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+                        Console.WriteLine($"[DEBUG] Server response: {serverResponse}");
+
+                        if (serverResponse.StartsWith("[INIT]"))
+                        {
+                            string[] parts = serverResponse.Split(';');
+                            if (parts.Length >= 4)
+                            {
+                                
+                                int clock1 = int.Parse(parts[1]);
+                                int clock2 = int.Parse(parts[2]);
+                                char playerSymbol = parts[3][0];
+                                string opponentName = parts[4];
+                                Console.WriteLine($"[DEBUG] Received Match Init, Player 1 clock: {clock1}, Player 2 clock: {clock2}, LocalPlayer symbol: {playerSymbol}, Opponent: {opponentName}");
+                                Dispatcher.Invoke(() =>
+                                {
+                                    Console.WriteLine("[CHALLENGE] Navigating to GamePlay");
+                                    Console.WriteLine($"[CHALLENGE] TcpClient.Connected: {client?.Connected}");
+                                    Console.WriteLine($"[CHALLENGE] Stream.CanRead: {stream?.CanRead}");
+
+                                    GamePlay gamePlayPage = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, this);
+                                    this.NavigateWithAnimation(gamePlayPage);
+                                });
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] Failed to receive match start: {ex.Message}");
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        NotificationManager.Instance.ShowNotification(
+                            "Lỗi kết nối",
+                            "Không thể bắt đầu trận đấu",
+                            Notification.NotificationType.Info,
+                            5000
+                        );
+                        UserState.currentState = State.Ready;
+                        client.Close();
+                    });
+                }
+            });
         }
 
         void declineChallenge(TcpClient client, string response, string challenger, string me)
@@ -553,7 +621,7 @@ namespace Gomoku_Client
                 listener = null;
             }
 
-            if(match_listener != null)
+            if (match_listener != null)
             {
                 await match_listener.StopAsync();
                 match_listener = null;
@@ -657,7 +725,7 @@ namespace Gomoku_Client
 
                     ColorAnimation colorAnim = new ColorAnimation
                     {
-                        To = (Color)ColorConverter.ConvertFromString("#2C3E50"), 
+                        To = (Color)ColorConverter.ConvertFromString("#2C3E50"),
                         Duration = TimeSpan.FromMilliseconds(400),
                         FillBehavior = FillBehavior.HoldEnd
                     };
@@ -732,17 +800,7 @@ namespace Gomoku_Client
                 await FireStoreHelper.SetUserAvatar(FirebaseInfo.AuthClient.User.Info.DisplayName, AvatarBrush.ImageSource.ToString());
 
                 ColorChangeBaseOnTeam(AvatarBrush.ImageSource.ToString());
-
-                //if (selectedAvatar.Name?.Contains("T1|") == true)
-                //    ColorChangeUI("#FF4655", "#FF4655");
-                //else if (selectedAvatar.Name?.Contains("GenG|") == true)
-                //    ColorChangeUI("#FFD700", "#121212");
-                //else if (selectedAvatar.Name?.Contains("KT|") == true)
-                //    ColorChangeUI("#FFFAF0", "#121212");
-                //else if (selectedAvatar.Name?.Contains("HLE|") == true)
-                //    ColorChangeUI("#FFFFA500", "#FFFFA500");
-                //else ColorChangeUI("#FF4655", "#FF4655");
-
+                
                 if (AvatarOverlay.Visibility == Visibility.Visible)
                 {
                     var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
@@ -755,7 +813,7 @@ namespace Gomoku_Client
                     storyboard.Begin(sborder);
                 }
 
-                else if(AvatarSecretOverlay.Visibility == Visibility.Visible)
+                else if (AvatarSecretOverlay.Visibility == Visibility.Visible)
                 {
                     var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];
                     var sborder = (Border)((Grid)AvatarSecretOverlay).Children[0];

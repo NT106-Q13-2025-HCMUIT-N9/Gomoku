@@ -56,6 +56,7 @@
     <None Remove="Assets\Avatar\Random Charlie.jpg" />
     <None Remove="Assets\Avatar\Random CoolerFreddy.jpg" />
     <None Remove="Assets\Avatar\Random DonaldTrump.jpg" />
+    <None Remove="Assets\Avatar\Random DreamyBull.jpg" />
     <None Remove="Assets\Avatar\Random Epstein.jpg" />
     <None Remove="Assets\Avatar\Random Freddy.jpg" />
     <None Remove="Assets\Avatar\Random George Droid.jpg" />
@@ -68,6 +69,7 @@
     <None Remove="Assets\Avatar\Random Michael.jpg" />
     <None Remove="Assets\Avatar\Random Miku.jpg" />
     <None Remove="Assets\Avatar\Random Teto.jpg" />
+    <None Remove="Assets\Avatar\Random TheKing.jpg" />
     <None Remove="Assets\Avatar\Random Truo.jpg" />
     <None Remove="Assets\Avatar\Random Tuanas.jpg" />
     <None Remove="Assets\Avatar\Random Tus.jpg" />
@@ -124,6 +126,7 @@
     <Resource Include="Assets\Avatar\Random Charlie.jpg" />
     <Resource Include="Assets\Avatar\Random CoolerFreddy.jpg" />
     <Resource Include="Assets\Avatar\Random DonaldTrump.jpg" />
+    <Resource Include="Assets\Avatar\Random DreamyBull.jpg" />
     <Resource Include="Assets\Avatar\Random Epstein.jpg" />
     <Resource Include="Assets\Avatar\Random Freddy.jpg" />
     <Resource Include="Assets\Avatar\Random George Droid.jpg" />
@@ -136,6 +139,7 @@
     <Resource Include="Assets\Avatar\Random Michael.jpg" />
     <Resource Include="Assets\Avatar\Random Miku.jpg" />
     <Resource Include="Assets\Avatar\Random Teto.jpg" />
+    <Resource Include="Assets\Avatar\Random TheKing.jpg" />
     <Resource Include="Assets\Avatar\Random Truo.jpg" />
     <Resource Include="Assets\Avatar\Random Tuanas.jpg" />
     <Resource Include="Assets\Avatar\Random Tus.jpg" />

@@ -99,7 +99,7 @@ namespace Gomoku_Client
             SecretAvatars = new ObservableCollection<AvatarItem>
             {
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tus.jpg", Name="TusMeme" },
-                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tuanas.jpg", Name="GeiLord" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tuanas.jpg", Name="TuanKiller" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Truo.jpg", Name="MasterWibu" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97.jpg", Name="Jack Đồ Tể" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97v2.jpg", Name="Jack Chúa Quỷ" },
@@ -110,7 +110,9 @@ namespace Gomoku_Client
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Teto.jpg", Name="Teto" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Charlie.jpg", Name="Charlie" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DonaldTrump.jpg", Name="Đô Năm Trăm" },
-                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random GermanArtist.jpg", Name="Họa sĩ Dức" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random GermanArtist.jpg", Name="Họa sĩ Đức" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random TheKing.jpg", Name="The GOAT" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DreamyBull.jpg", Name="Trâu Mộng Mơ" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Floyd.jpg", Name="George Floyd" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Droid.jpg", Name="George Droid" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Epstein.jpg", Name="Kẻ bí ẩn" },

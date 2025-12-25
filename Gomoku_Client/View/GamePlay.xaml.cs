@@ -172,14 +172,7 @@ namespace Gomoku_Client.View
         {
             try
             {
-                MainBGM.Stop();
-                MainBGM.Close();
-
-                ButtonClick.Stop();
-                ButtonClick.Close();
-
-                Keyboard.Stop();
-                Keyboard.Close();
+                
             }
             catch (Exception ex)
             {
@@ -565,6 +558,9 @@ namespace Gomoku_Client.View
 
         private void GameOver(bool? player1Wins, string message)
         {
+            MainBGM.Stop();
+            mainWindow.MainBGM.Play();
+
             isGameOver = true;
             player1Timer.Stop();
             player2Timer.Stop();

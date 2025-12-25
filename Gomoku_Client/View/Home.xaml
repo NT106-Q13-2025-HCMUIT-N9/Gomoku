@@ -325,8 +325,7 @@
                                     </Border.Effect>
                                     <Border.Background>
                                         <ImageBrush x:Name="AvatarBrush"
-                                                        ImageSource="/Assets/Avatar/T1_6sao.jpg"
-                                                        Stretch="UniformToFill"/>
+                                                    Stretch="UniformToFill"/>
                                     </Border.Background>
                                 </Border>
 

@@ -443,6 +443,9 @@ namespace Gomoku_Client
                     List<string> diff_request = user_data.MatchRequests.Except(old_match_request).ToList();
                     App.Current.Dispatcher.Invoke(() =>
                     {
+                        AvatarBrush.ImageSource = BitmapFrame.Create(new Uri(user_data.ImagePath));
+                        ColorChangeBaseOnTeam(AvatarBrush.ImageSource.ToString());
+
                         foreach (string request in diff_request)
                         {
                             NotificationManager.Instance.ShowNotification(
@@ -761,7 +764,29 @@ namespace Gomoku_Client
             }
         }
 
-        private void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void ColorChangeBaseOnTeam(string path)
+        {
+            if (path.Contains("T1") == true)
+            {
+                ColorChangeUI("#FF4655", "#FF4655");
+            }
+            else if (path.Contains("GenG") == true)
+            {
+                ColorChangeUI("#FFD700", "#121212");
+            }else if (path.Contains("KT") == true)
+            {
+                ColorChangeUI("#FFFAF0", "#121212");
+            }else if (path.Contains("HLE") == true)
+            {
+                ColorChangeUI("#FFFFA500", "#FFFFA500");
+            }
+            else
+            {
+                ColorChangeUI("#FF4655", "#FF4655");
+            }
+        }
+
+        private async void Border_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ButtonClick.Stop();
             ButtonClick.Play();
@@ -771,19 +796,11 @@ namespace Gomoku_Client
             var border = sender as Border;
             if (border?.DataContext is AvatarItem selectedAvatar)
             {
-                AvatarBrush.ImageSource = new BitmapImage(new Uri(selectedAvatar.Image ?? "", UriKind.RelativeOrAbsolute));
+                AvatarBrush.ImageSource = BitmapFrame.Create(new Uri(selectedAvatar.Image ?? "", UriKind.RelativeOrAbsolute));
+                await FireStoreHelper.SetUserAvatar(FirebaseInfo.AuthClient.User.Info.DisplayName, AvatarBrush.ImageSource.ToString());
 
-
-                if (selectedAvatar.Name?.Contains("T1|") == true)
-                    ColorChangeUI("#FF4655", "#FF4655");
-                else if (selectedAvatar.Name?.Contains("GenG|") == true)
-                    ColorChangeUI("#FFD700", "#121212");
-                else if (selectedAvatar.Name?.Contains("KT|") == true)
-                    ColorChangeUI("#FFFAF0", "#121212");
-                else if (selectedAvatar.Name?.Contains("HLE|") == true)
-                    ColorChangeUI("#FFFFA500", "#FFFFA500");
-                else ColorChangeUI("#FF4655", "#FF4655");
-
+                ColorChangeBaseOnTeam(AvatarBrush.ImageSource.ToString());
+                
                 if (AvatarOverlay.Visibility == Visibility.Visible)
                 {
                     var storyboard = (Storyboard)this.Resources["FadeOutStoryboard"];

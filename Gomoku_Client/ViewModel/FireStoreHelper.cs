@@ -22,6 +22,8 @@ namespace Gomoku_Client.ViewModel
                 total_match = 0
             };
 
+            user_data.ImagePath = "pack://application:,,,/Assets/Gomoku.ico";
+
             DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserStats").Document(user_data.Username);
             await doc_ref.SetAsync(userStatsModel);
 
@@ -43,6 +45,12 @@ namespace Gomoku_Client.ViewModel
             {
                 return null;
             }
+        }
+
+        public static async Task SetUserAvatar(string username, string path)
+        {
+            DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
+            await doc_ref.UpdateAsync("ImagePath", path);
         }
 
         public static async Task SendFriendRequest(string sender, string receiver)

@@ -166,8 +166,8 @@ namespace Gomoku_Client.View
             {
                 if (this.IsLoaded)
                 {
-                    _tcpClient = new TcpClient();
-                    _tcpClient.Connect("127.0.0.1", 9999);
+                    _tcpClient = new TcpClient(AddressFamily.InterNetwork);
+                    _tcpClient.Connect("34.68.212.10", 9999);
                     _stream = _tcpClient.GetStream();
                     _isConnected = true;
 

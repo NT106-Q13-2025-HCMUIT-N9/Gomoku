@@ -472,12 +472,12 @@ namespace Gomoku_Client
 
         async void respondChallenge(string response, string challenger, string me)
         {
-            client = new TcpClient();
+            client = new TcpClient(AddressFamily.InterNetwork);
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
             try
             {
-                client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
+                client.Connect(IPAddress.Parse("34.68.212.10"), 9999);
             }
             catch
             {

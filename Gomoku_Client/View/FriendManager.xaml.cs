@@ -177,10 +177,10 @@ namespace Gomoku_Client.View
             DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
 
-            TcpClient client = new TcpClient();
+            TcpClient client = new TcpClient(AddressFamily.InterNetwork);
             try
             {
-                client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
+                client.Connect(IPAddress.Parse("34.68.212.10"), 9999);
             }
             catch
             {

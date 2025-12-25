@@ -193,7 +193,10 @@ namespace Gomoku_Client.View
                 return;
             }
 
-            if (!client.Connected) return;
+            if (!client.Connected) { 
+                Console.WriteLine("Không thể kết nối tới server TCP.");
+                return; 
+            }
 
             var stream = client.GetStream();
 
@@ -219,10 +222,11 @@ namespace Gomoku_Client.View
             {
                 if (snapshot.Exists)
                 {
-                    UserDataModel user_date = doc_snap.ConvertTo<UserDataModel>();
+                    UserDataModel user_data = snapshot.ConvertTo<UserDataModel>();
 
-                    if (!user_data.MatchRequests.Contains(username))
+                    if ((!user_data.MatchRequests.Contains(username) || user_data.MatchRequests == null) && !cts.IsCancellationRequested)
                     {
+                        Console.WriteLine("[DEBUG] Challenge response received, cancelling timeout.");
                         cts.Cancel();
                     }
                 }
@@ -242,14 +246,13 @@ namespace Gomoku_Client.View
             }
             catch (TaskCanceledException)
             {
-                // Handle người chơi chấp nhận hay từ chối thông qua tcp
                 byte[] buffer = new byte[1024];
                 int bytesRead = stream.Read(buffer, 0, buffer.Length);
                 if (bytesRead == 0) return;
 
                 string message = Encoding.UTF8.GetString(buffer, 0, bytesRead);
                 string[] parts = message.Split(';');
-
+                Console.WriteLine($"[DEBUG] Message from server: {message}");
                 if (parts.Length < 3) return;
 
                 string response = parts[0];
@@ -277,8 +280,6 @@ namespace Gomoku_Client.View
                     default:
                         break;
                 }
-
-                MessageBox.Show("Opponent accepted or declined!");
             }
             finally
             {

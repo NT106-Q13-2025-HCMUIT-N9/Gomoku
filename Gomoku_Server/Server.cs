@@ -308,7 +308,7 @@ namespace Gomoku_Server
 
                 string command = parts[0];
                 room = parts[1] + ";" + parts[2];
-
+                TcpClient challenger = null;
                 switch (command)
                 {
                     case "[CHALLENGE_REQUEST]":
@@ -323,10 +323,7 @@ namespace Gomoku_Server
 
 
                     case "[CHALLENGE_ACCEPT]":
-                        TcpClient? challenger;
-                        bool hasChallenger = challenges.TryGetValue(room, out challenger);
-
-                        if (!hasChallenger || challenger == null)
+                        if (!challenges.TryGetValue(room, out challenger) || challenger == null)
                         {
                             ServerUtils.SendMessage(client.Client, $"[CHALLENGE_CANCELED];{room}");
                             break;
@@ -348,6 +345,7 @@ namespace Gomoku_Server
                         else
                         {
                             Console.WriteLine($"[LOG]: {parts[2]} accepted {parts[1]}'s challenge");
+                            ServerUtils.SendMessage(challenger.Client, $"[CHALLENGE_ACCEPT];{room}");
                             challenges.TryRemove(room, out _);
                             names.TryAdd(client, parts[2]);
                             names.TryAdd(challenger, parts[1]);
@@ -360,7 +358,15 @@ namespace Gomoku_Server
 
 
                     case "[CHALLENGE_DECLINE]":
-                        Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
+                        if (challenges.TryGetValue(room, out challenger) && challenger != null)
+                        {
+                            ServerUtils.SendMessage(challenger.Client, $"[CHALLENGE_DECLINE];{room}");
+                            Console.WriteLine($"[LOG]: {parts[2]} declined {parts[1]}'s challenge");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[LOG]: Declined but challenger not found for room {room}");
+                        }
                         challenges.TryRemove(room, out _);
                         names.TryRemove(client, out _);
                         break;

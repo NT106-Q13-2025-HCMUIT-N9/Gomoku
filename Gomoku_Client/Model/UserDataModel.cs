@@ -43,6 +43,9 @@ namespace Gomoku_Client.Model
 
         [FirestoreProperty]
         public List<string> MatchRequests { get; set; }
+
+        [FirestoreProperty]
+        public string ImagePath { get; set; }
     }
 
     [FirestoreData]

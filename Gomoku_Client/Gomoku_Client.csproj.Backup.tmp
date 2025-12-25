@@ -175,19 +175,43 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="Assets\Sounds\Awaken.mp3" />
-		<Resource Include="Assets\Sounds\ButtonHover.wav" />
-		<Resource Include="Assets\Sounds\chess.mp3" />
-		<Resource Include="Assets\Sounds\doodle.mp3" />
-		<Resource Include="Assets\Sounds\frog.mp3" />
-		<Resource Include="Assets\Sounds\Joy.mp3" />
-		<Resource Include="Assets\Sounds\Keyboard.wav" />
-		<Resource Include="Assets\Sounds\LegendsNeverDie.mp3" />
-		<Resource Include="Assets\Sounds\LOLTheme.mp3" />
-		<Resource Include="Assets\Sounds\Matchmakers.mp3" />
-		<Resource Include="Assets\Sounds\meow.mp3" />
-		<Resource Include="Assets\Sounds\RelaxedScene.mp3" />
-		<Resource Include="Assets\Avatar\T1_6sao.jpg" />
-	</ItemGroup>
+    <Resource Include="Assets\Sounds\Awaken.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\ButtonHover.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\chess.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\doodle.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\frog.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\Joy.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\Keyboard.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\LegendsNeverDie.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\LOLTheme.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\Matchmakers.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\meow.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Sounds\RelaxedScene.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\Avatar\T1_6sao.jpg" />
+  </ItemGroup>
 
 </Project>

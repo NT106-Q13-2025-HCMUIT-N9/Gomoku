@@ -29,7 +29,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
+using Gomoku_Client.Helpers;
 
 namespace Gomoku_Client
 {
@@ -137,54 +137,62 @@ namespace Gomoku_Client
 
         void SoundStart()
         {
-
-            List<string> BGM = new List<string>();
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "meow.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "frog.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "chess.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "doodle.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Joy.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Matchmakers.mp3"));
-            int BGMNumber = Random.Shared.Next(0, 6);
-
-            string buttonPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "ButtonHover.wav"
-            );
-
-            string keyboardPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "Keyboard.wav"
-            );
-
-
-            MainBGM.MediaOpened += (s, e) =>
+            try
             {
-                MainBGM.Play();
-            };
+                List<string> BGM = new List<string>();
 
-            MainBGM.MediaEnded += (s, e) =>
+                string[] bgmFiles = {
+                    "meow.mp3", "frog.mp3", "chess.mp3",
+                    "doodle.mp3", "Joy.mp3", "Matchmakers.mp3"
+                };
+
+                foreach (var file in bgmFiles)
+                {
+                    string path = AudioHelper.ExtractResourceToTemp($"Assets/Sounds/{file}");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        BGM.Add(path);
+                    }
+                }
+
+                string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
+                string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
+
+                if (BGM.Count > 0)
+                {
+                    int BGMNumber = Random.Shared.Next(0, BGM.Count);
+
+                    MainBGM.MediaOpened += (s, e) => MainBGM.Play();
+
+                    MainBGM.MediaEnded += (s, e) =>
+                    {
+                        BGMNumber = Random.Shared.Next(0, BGM.Count);
+                        MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                        MainBGM.Play();
+                    };
+
+                    MainBGM.MediaFailed += (s, e) =>
+                    {
+                        Debug.WriteLine($"Lỗi phát nhạc: {e.ErrorException.Message}");
+                    };
+
+                    MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                }
+
+                if (!string.IsNullOrEmpty(buttonPath))
+                {
+                    ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+                }
+
+                if (!string.IsNullOrEmpty(keyboardPath))
+                {
+                    Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+                }
+            }
+            catch (Exception ex)
             {
-                BGMNumber = Random.Shared.Next(0, 6);
-                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-                //MainBGM.Position = TimeSpan.Zero;
-                MainBGM.Play();
-            };
-
-            MainBGM.MediaFailed += (s, e) =>
-            {
-                MessageBox.Show(e.ErrorException.Message);
-            };
-
-            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-
-            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
-
-            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+                Debug.WriteLine($"Lỗi khởi tạo âm thanh MainGameUI: {ex.Message}");
+            }
         }
 
 

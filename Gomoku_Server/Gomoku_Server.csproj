@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\api.env" />
-    <Resource Include="Assets\firebase_key.json" />
+    <EmbeddedResource Include="Assets\api.env" />
+    <EmbeddedResource Include="Assets\firebase_key.json" />
   </ItemGroup>
 
 </Project>

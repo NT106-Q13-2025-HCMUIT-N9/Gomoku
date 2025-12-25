@@ -467,10 +467,11 @@ namespace Gomoku_Client
 
         private TcpClient client;
 
-        void respondChallenge(string response, string challenger, string me)
+        async void respondChallenge(string response, string challenger, string me)
         {
             client = new TcpClient();
-
+            string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
             try
             {
                 client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
@@ -498,13 +499,14 @@ namespace Gomoku_Client
             switch (response)
             {
                 case "[CHALLENGE_ACCEPT]":
+                    await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(challenger));
                     acceptChallenge(client, response, challenger, me);
                     break;
 
                 case "[CHALLENGE_DECLINE]":
+                    await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(challenger));
                     declineChallenge(client, response, challenger, me);
                     break;
-
                 default:
                     break;
             }
@@ -566,23 +568,7 @@ namespace Gomoku_Client
                                     Console.WriteLine($"[CHALLENGE] Stream.CanRead: {stream?.CanRead}");
 
                                     GamePlay gamePlayPage = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, this);
-
-                                    var slideIn = new DoubleAnimation
-                                    {
-                                        From = this.ActualWidth,
-                                        To = 0,
-                                        Duration = TimeSpan.FromSeconds(0.5),
-                                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                                    };
-
-                                    gamePlayPage.RenderTransform = new TranslateTransform(this.ActualWidth, 0);
-                                    MainFrame.Navigate(gamePlayPage);
-
-                                    Dispatcher.BeginInvoke(new Action(() =>
-                                    {
-                                        var gameTransform = (TranslateTransform)gamePlayPage.RenderTransform;
-                                        gameTransform.BeginAnimation(TranslateTransform.XProperty, slideIn);
-                                    }), DispatcherPriority.Loaded);
+                                    this.NavigateWithAnimation(gamePlayPage);
                                 });
                             }
                         }

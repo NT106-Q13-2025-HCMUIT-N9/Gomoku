@@ -448,8 +448,8 @@ namespace Gomoku_Server
                             EndMatch();
 
                             FirestoreHelper.AddMatchInfo(false, new List<string> { name1, name2 }, total_duration, name1);
-                            FirestoreHelper.IncWinUser(name2);
-                            FirestoreHelper.IncLoseUser(name1);
+                            FirestoreHelper.IncWinUser(name1);
+                            FirestoreHelper.IncLoseUser(name2);
                             break;
                         }
                     }

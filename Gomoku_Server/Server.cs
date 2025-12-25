@@ -54,7 +54,7 @@ namespace Gomoku_Server
 
         }
 
-        public void Start(int port)
+        public async Task Start(int port)
         {
             try
             {
@@ -68,6 +68,9 @@ namespace Gomoku_Server
             Thread listenThread = new Thread(ListenForClients);
             listenThread.IsBackground = false;
             listenThread.Start();
+
+            await CheckPlayersInQueue();
+
         }
 
         public void Stop()
@@ -109,6 +112,21 @@ namespace Gomoku_Server
             catch (Exception ex)
             {
                 Console.WriteLine($"[ERROR] ListenForClients: {ex.Message}");
+            }
+        }
+
+        public async Task CheckPlayersInQueue()
+        {
+            while (true)
+            {
+                Console.WriteLine("=============QUEUE STATS=============");
+                Console.WriteLine($"Queue size: {waiting_queue.Count}");
+                foreach (var item in waiting_queue)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+                Console.WriteLine("=====================================");
+                await Task.Delay(5000);
             }
         }
 

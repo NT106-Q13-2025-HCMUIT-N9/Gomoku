@@ -24,10 +24,21 @@ namespace Gomoku_Client.View
     {
         // Truyền tham số MainGameUI để có thể quay lại bằng BackButton
         private MainGameUI _mainWindow;
+        private bool _isNavigating = false;
         public Lobby(MainGameUI mainGameUI)
         {
             InitializeComponent();
             _mainWindow = mainGameUI;
+            this.Loaded += Page_Loaded;
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            _isNavigating = false;
+            if (MatchMakingButton != null)
+            {
+                MatchMakingButton.IsEnabled = true;
+            }
         }
 
         private void BackButton_Checked(object sender, RoutedEventArgs e)
@@ -44,6 +55,10 @@ namespace Gomoku_Client.View
 
         private void MatchMakingButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_isNavigating) return;
+
+            _isNavigating = true;
+            MatchMakingButton.IsEnabled = false;
             _mainWindow.ButtonClick.Stop();
             _mainWindow.ButtonClick.Play();
             if (NavigationService != null)
@@ -69,29 +84,34 @@ namespace Gomoku_Client.View
 
                 slideOutAnimation.Completed += (s, args) =>
                 {
-                    // Navigate to Matchmaking page
-                    NavigationService.Navigate(matchmakingPage);
-
-                    // Slide in the new page
-                    if (matchmakingPage.RenderTransform == null || !(matchmakingPage.RenderTransform is TranslateTransform))
+                    if (NavigationService != null)
                     {
-                        matchmakingPage.RenderTransform = new TranslateTransform();
+                        NavigationService.Navigate(matchmakingPage);
+
+                        if (matchmakingPage.RenderTransform == null || !(matchmakingPage.RenderTransform is TranslateTransform))
+                        {
+                            matchmakingPage.RenderTransform = new TranslateTransform();
+                        }
+
+                        var matchmakingTransform = (TranslateTransform)matchmakingPage.RenderTransform;
+
+                        var slideInAnimation = new DoubleAnimation
+                        {
+                            From = _mainWindow.ActualWidth,
+                            To = 0,
+                            Duration = TimeSpan.FromSeconds(0.5),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        };
+
+                        matchmakingTransform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
                     }
-
-                    var matchmakingTransform = (TranslateTransform)matchmakingPage.RenderTransform;
-
-                    var slideInAnimation = new DoubleAnimation
-                    {
-                        From = _mainWindow.ActualWidth,
-                        To = 0,
-                        Duration = TimeSpan.FromSeconds(0.5),
-                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                    };
-
-                    matchmakingTransform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
                 };
-
                 transform.BeginAnimation(TranslateTransform.XProperty, slideOutAnimation);
+            }
+            else
+            {
+                _isNavigating = false;
+                MatchMakingButton.IsEnabled = true;
             }
         }
 

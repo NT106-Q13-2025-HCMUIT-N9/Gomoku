@@ -59,12 +59,15 @@ namespace Gomoku_Client.View
                 _username = user.Info.DisplayName;
                 tb_PlayerName.Text = _username;
 
+
                 _stopwatch.Start();
                 _queueTimer.Start();
                 _movingDotStoryboard = (Storyboard)this.Resources["MovingDotStoryboard"];
                 _movingDotStoryboard?.Begin();
 
                 UserStatsModel? user_stats = await FireStoreHelper.GetUserStats(tb_PlayerName.Text);
+                UserDataModel? user_data = await FireStoreHelper.GetUserInfo(tb_PlayerName.Text);
+                img_PlayerAvatar.Source = BitmapFrame.Create(new Uri(user_data.ImagePath));
 
                 if (user_stats != null)
                 {
@@ -74,8 +77,9 @@ namespace Gomoku_Client.View
                         : "0%";
                 }
 
-                await Task.Delay(2000);
-
+                await Task.Delay(4000);
+                BackButton.Visibility = Visibility.Hidden;
+                await Task.Delay(1000);
                 ConnectToServerAndRequestMatch();
             }
             catch (Exception ex)
@@ -160,16 +164,23 @@ namespace Gomoku_Client.View
         {
             try
             {
-                _tcpClient = new TcpClient();
-                _tcpClient.Connect("127.0.0.1", 9999);
-                _stream = _tcpClient.GetStream();
-                _isConnected = true;
+                if (this.IsLoaded)
+                {
+                    _tcpClient = new TcpClient();
+                    _tcpClient.Connect("127.0.0.1", 9999);
+                    _stream = _tcpClient.GetStream();
+                    _isConnected = true;
 
-                _receiveThread = new Thread(ReceiveFromServer);
-                _receiveThread.IsBackground = true;
-                _receiveThread.Start();
+                    _receiveThread = new Thread(ReceiveFromServer);
+                    _receiveThread.IsBackground = true;
+                    _receiveThread.Start();
 
-                SendMatchRequest();
+                    SendMatchRequest();
+                }
+                else
+                {
+                    Console.WriteLine("[DEBUG] Matchmaking page not loaded, not connecting to the server!");
+                }
             }
             catch (Exception ex)
             {
@@ -331,7 +342,7 @@ namespace Gomoku_Client.View
                 grid_OpponentFound.Visibility = Visibility.Visible;
 
                 UserStatsModel? opponent_stats = await FireStoreHelper.GetUserStats(opponent_name);
-
+                UserDataModel? opponent_data = await FireStoreHelper.GetUserInfo(opponent_name);
                 if (opponent_stats != null)
                 {
                     tb_OpponentName.Text = opponent_name;
@@ -339,6 +350,7 @@ namespace Gomoku_Client.View
                     tb_OpponentWinRate.Text = opponent_stats.total_match > 0
                         ? $"{(opponent_stats.Wins / (double)opponent_stats.total_match * 100):F1}%"
                         : "0%";
+                    img_OpponentAvatar.Source = BitmapFrame.Create(new Uri(opponent_data.ImagePath));
                 }
                 else
                 {

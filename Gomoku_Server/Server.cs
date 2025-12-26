@@ -61,7 +61,7 @@ namespace Gomoku_Server
         {
             try { TcpListener?.Stop(); } catch { }
 
-            TcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            TcpListener = new TcpListener(IPAddress.Any, port);
             TcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
             Thread listenThread = new Thread(ListenForClients);

@@ -236,9 +236,16 @@ namespace Gomoku_Client
         {
             _mainWindow.Keyboard.Stop();
             _mainWindow.Keyboard.Play();
-            char inputChar = e.Text[0];
+            try
+            {
+                char inputChar = e.Text[0];
 
-            if (!(char.IsLetterOrDigit(inputChar)))
+                if (!(char.IsLetterOrDigit(inputChar)))
+                {
+                    e.Handled = true;
+                }
+            }
+            catch (Exception)
             {
                 e.Handled = true;
             }

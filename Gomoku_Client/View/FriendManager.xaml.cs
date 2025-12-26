@@ -4,6 +4,7 @@ using Google.Cloud.Firestore;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows;
@@ -220,33 +221,94 @@ namespace Gomoku_Client.View
                                     Console.WriteLine($"[DEBUG] Parsed INIT: Symbol={playerSymbol}, Opponent={opponentName}");
                                     Dispatcher.Invoke(() =>
                                     {
-                                        if (_mainWindow != null)
+
+                                        _mainWindow.MainBGM.Stop();
+
+                                        Console.WriteLine("[MATCHMAKING] Opening GamePlay");
+
+                                        var gamePlayWindow = new GamePlay(client, username, playerSymbol, opponentName, _mainWindow)
                                         {
-                                            _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
-                                            if (_mainWindow.BackgroundGrid != null) _mainWindow.BackgroundGrid.Visibility = Visibility.Collapsed;
+                                            Owner = _mainWindow,
+                                            WindowStartupLocation = WindowStartupLocation.Manual,
+                                            Left = _mainWindow.Left,
+                                            Top = _mainWindow.Top
+                                        };
 
-                                            _mainWindow.MainFrame.Visibility = Visibility.Visible;
-                                            Panel.SetZIndex(_mainWindow.MainFrame, 999);
-                                            _mainWindow.MainFrame.UpdateLayout();
+                                        gamePlayWindow.Closed += (sender, e) =>
+                                        {
+                                            bool isWinner = gamePlayWindow.FinalResult_IsLocalPlayerWinner;
+                                            bool isDraw = gamePlayWindow.FinalResult_IsDraw;
+                                            string p1 = gamePlayWindow.player1Name;
+                                            string p2 = gamePlayWindow.player2Name;
 
-                                            GamePlay gamePlayPage = new GamePlay(client, username, playerSymbol, opponentName, _mainWindow);
+                                            _mainWindow.Left = gamePlayWindow.Left;
+                                            _mainWindow.Top = gamePlayWindow.Top;
 
-                                            TranslateTransform trans = new TranslateTransform(_mainWindow.ActualWidth, 0);
-                                            gamePlayPage.RenderTransform = trans;
-                                            _mainWindow.MainFrame.Navigate(gamePlayPage);
-
-                                            Dispatcher.BeginInvoke(new Action(() =>
+                                            Border mainOverlay = new Border
                                             {
-                                                DoubleAnimation slideIn = new DoubleAnimation
+                                                Background = Brushes.Black,
+                                                Opacity = 1,
+                                                Visibility = Visibility.Visible
+                                            };
+
+                                            Grid? mainRoot = null;
+                                            try
+                                            {
+                                                mainRoot = _mainWindow.FindName("MainGrid") as Grid;
+                                            }
+                                            catch { mainRoot = null; }
+
+                                            if (mainRoot == null && _mainWindow.Content is Grid g) mainRoot = g;
+
+                                            if (mainRoot != null)
+                                            {
+                                                Grid.SetRowSpan(mainOverlay, 100);
+                                                Grid.SetColumnSpan(mainOverlay, 100);
+                                                Panel.SetZIndex(mainOverlay, 99999);
+                                                mainRoot.Children.Add(mainOverlay);
+                                            }
+
+                                            _mainWindow.Visibility = Visibility.Visible;
+
+                                            var reveal = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.8))
+                                            {
+                                                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                                            };
+
+                                            reveal.Completed += (s2, e2) =>
+                                            {
+                                                try
                                                 {
-                                                    From = _mainWindow.ActualWidth,
-                                                    To = 0,
-                                                    Duration = TimeSpan.FromSeconds(0.5),
-                                                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                                                };
-                                                trans.BeginAnimation(TranslateTransform.XProperty, slideIn);
-                                            }), System.Windows.Threading.DispatcherPriority.ContextIdle);
-                                        }
+                                                    if (mainRoot != null && mainRoot.Children.Contains(mainOverlay))
+                                                        mainRoot.Children.Remove(mainOverlay);
+                                                }
+                                                catch { }
+
+                                                _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                                _mainWindow.MainFrame.Visibility = Visibility.Visible;
+
+                                                MatchResult resultPage = new MatchResult(isWinner, p1, p2, _mainWindow, isDraw);
+                                                _mainWindow.MainFrame.Navigate(resultPage);
+
+                                                if (_mainWindow.MainBGM.Source != null) _mainWindow.MainBGM.Play();
+                                            };
+
+                                            if (mainOverlay != null)
+                                                mainOverlay.BeginAnimation(UIElement.OpacityProperty, reveal);
+                                            else
+                                            {
+                                                _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                                _mainWindow.MainFrame.Visibility = Visibility.Visible;
+
+                                                MatchResult resultPage = new MatchResult(isWinner, p1, p2, _mainWindow, isDraw);
+                                                _mainWindow.MainFrame.Navigate(resultPage);
+
+                                                if (_mainWindow.MainBGM.Source != null) _mainWindow.MainBGM.Play();
+                                            }
+                                        };
+
+                                        gamePlayWindow.Show();
+                                        _mainWindow.Visibility = Visibility.Collapsed;
                                     });
                                     return;
                                 }

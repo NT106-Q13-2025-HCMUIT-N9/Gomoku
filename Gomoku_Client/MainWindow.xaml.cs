@@ -1,3 +1,6 @@
+﻿using Firebase.Auth;
+using FirebaseAdmin.Auth;
+using Gomoku_Client.Helpers;
 using Firebase.Auth;
 using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
@@ -16,7 +19,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Gomoku_Client.Helpers;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Gomoku_Client
 {
@@ -101,8 +105,10 @@ namespace Gomoku_Client
         }
 
         bool isWrongEmail = false;
+
         private async void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
+
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
                 EmailBox.Text = "Email";
@@ -246,25 +252,39 @@ namespace Gomoku_Client
         {
             ButtonClick.Stop();
             ButtonClick?.Play();
-            string password = PasswordBox.Password;
-            string email = EmailBox.Text;
-            buttonDisable();
 
-
-            if (failedLogin)
+            if (failedLogin || isWrongEmail || isWrongPassword)
             {
-                EmailBorder.BorderBrush = new SolidColorBrush(
-                    (Color)ColorConverter.ConvertFromString("#2A2A2A")
-                );
+                EmailBorder.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A2A2A"));
+                PasswordBorder.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A2A2A"));
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
-                MainBorder.Height -= 15;
+                WrongPassText.Visibility = Visibility.Collapsed;
+                int stepsToReduce = 0;
+                if (isWrongEmail) stepsToReduce++;
+                if (isWrongPassword) stepsToReduce++;
+                if (failedLogin && !isWrongEmail) stepsToReduce++;
+
+                MainBorder.Height -= (stepsToReduce * 15);
+
+                isWrongEmail = false;
+                isWrongPassword = false;
                 failedLogin = false;
 
             }
 
+            string password = PasswordBox.Password;
+            string email = EmailBox.Text;
+
+            LoadingCircle.Visibility = Visibility.Visible;
+            LoginButton.Content = "";
+            buttonDisable();
+
+
+            
+
             try
             {
-                EmailBox_LostFocus(sender, e);
+                //EmailBox_LostFocus(sender, e);
 
                 if (string.IsNullOrEmpty(password))
                 {
@@ -274,7 +294,7 @@ namespace Gomoku_Client
                     WrongPassText.Visibility = Visibility.Visible;
                     if (isWrongPassword == false) MainBorder.Height += 15;
                     buttonEnable();
-                    LoginButton.Content = "Đăng nhập";
+                    LoginButton.Content = "Đăng Nhập";
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     isWrongPassword = true;
                 }
@@ -282,15 +302,92 @@ namespace Gomoku_Client
                 if (isWrongEmail || string.IsNullOrEmpty(password))
                 {
                     buttonEnable();
-                    LoginButton.Content = "Đăng nhập";
+                    LoginButton.Content = "Đăng Nhập";
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     return;
                 }
 
-                LoadingCircle.Visibility = Visibility.Visible;
-                LoginButton.Content = "";
+                if (!Validate.IsValidEmail(EmailBox.Text))
+                {
+                    EmailNotFoundText.Text = "Email không hợp lệ";
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    if (isWrongEmail == false) MainBorder.Height += 15;
+                    // Email không tồn tại → viền đỏ
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
 
-                var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+                    isWrongEmail = true;
+
+                    buttonEnable();
+                    LoginButton.Content = "Đăng Nhập";
+                    LoadingCircle.Visibility = Visibility.Collapsed;
+                    return;
+                }
+
+                else
+                {
+                    if (!await Validate.IsEmailExists(EmailBox.Text))
+                    {
+                        EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                        EmailBorder.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        if (isWrongEmail == false) MainBorder.Height += 15;
+                        // Email không tồn tại → viền đỏ
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#FF4655")
+                        );
+
+                        isWrongEmail = true;
+
+                        buttonEnable();
+                        LoginButton.Content = "Đăng Nhập";
+                        LoadingCircle.Visibility = Visibility.Collapsed;
+                        return;
+                    }
+                    else
+                    {
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                        );
+                        EmailNotFoundText.Visibility = Visibility.Collapsed;
+                        if (isWrongEmail == true)
+                        {
+                            MainBorder.Height -= 15;
+                            isWrongEmail = false;
+                        }
+                    }
+                }
+
+
+                var authResult = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+                var firebaseUser = authResult.User;
+
+                if (!firebaseUser.Info.IsEmailVerified)
+                {
+                    EmailNotFoundText.Text = "Email chưa được xác thực";
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    if (isWrongEmail == false)
+                    {
+                        MainBorder.Height += 15;
+                        isWrongEmail = true;
+                    }
+                    // Email không tồn tại → viền đỏ
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+
+                    buttonEnable();
+                    LoginButton.Content = "Đăng Nhập";
+                    LoadingCircle.Visibility = Visibility.Collapsed;
+                    return;
+                }
 
                 MainBGM.Stop();
                 MainGameUI mainGame = new MainGameUI();
@@ -304,8 +401,9 @@ namespace Gomoku_Client
                 mainGame.Show();
                 this.Close();
             }
-            catch (FirebaseAuthException)
+            catch (Firebase.Auth.FirebaseAuthException ex)
             {
+                Firebase.Auth.FirebaseAuthException a = ex;
                 try
                 {
                     await UserAction.LoginEmailtAsync(email, password);
@@ -323,7 +421,7 @@ namespace Gomoku_Client
                         );
                         buttonEnable();
                         failedLogin = true;
-                        LoginButton.Content = "Đăng nhập";
+                        LoginButton.Content = "Đăng Nhập";
                         LoadingCircle.Visibility = Visibility.Collapsed;
                     }
                 }

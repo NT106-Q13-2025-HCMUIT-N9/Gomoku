@@ -2,10 +2,10 @@
 using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Firestore;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Gomoku_Server
 {
@@ -13,7 +13,6 @@ namespace Gomoku_Server
     {
         private static FirebaseApp? _app = null;
         private static string _projectId = "gomoku-ltmcb";
-
         private static FirestoreDb? _db = null;
         private static object lock_db = new object();
 
@@ -25,25 +24,70 @@ namespace Gomoku_Server
                 {
                     if (_db == null)
                     {
-                        _db = FirestoreDb.Create(_projectId);
+                        AppInit();
                     }
-                    return _db;
+                    return _db!;
                 }
             }
         }
 
+        private static Stream GetEmbeddedStream(string filename)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            string? resourceName = assembly.GetManifestResourceNames()
+                .FirstOrDefault(str => str.EndsWith(filename));
+
+            if (string.IsNullOrEmpty(resourceName))
+            {
+                var existing = string.Join("\n", assembly.GetManifestResourceNames());
+                throw new Exception($"FATAL: Không tìm thấy Embedded Resource '{filename}'.\n" +
+                                    $"Hãy chắc chắn bạn đã set Build Action là 'Embedded Resource'.\n" +
+                                    $"Danh sách Resource hiện có:\n{existing}");
+            }
+
+            return assembly.GetManifestResourceStream(resourceName)!;
+        }
+
         public static void AppInit()
         {
-            string jsonFilePath = @"..\..\..\Assets\firebase_key.json";
-            string fullPath = Path.GetFullPath(jsonFilePath);
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", fullPath);
+            if (_db != null) return;
 
-            _app = FirebaseApp.Create(new AppOptions()
+            try
             {
-                Credential = CredentialFactory.FromFile<ServiceAccountCredential>(fullPath).ToGoogleCredential()
-            });
+                using (var stream = GetEmbeddedStream("firebase_key.json"))
+                {
+                    Logger.Log($"[DEBUG] stream: {stream != null}");
+                    var serviceAccount = CredentialFactory.FromStream<ServiceAccountCredential>(stream);
+                    GoogleCredential credential = serviceAccount.ToGoogleCredential();
 
-            _db = FirestoreDb.Create(_projectId);
+                    if (FirebaseApp.DefaultInstance == null)
+                    {
+                        _app = FirebaseApp.Create(new AppOptions()
+                        {
+                            Credential = credential,
+                            ProjectId = _projectId
+                        });
+                    }
+                    else
+                    {
+                        _app = FirebaseApp.DefaultInstance;
+                    }
+
+                    FirestoreDbBuilder builder = new FirestoreDbBuilder
+                    {
+                        ProjectId = _projectId,
+                        Credential = credential
+                    };
+
+                    _db = builder.Build();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"[FIREBASE ERROR] {ex.Message}");
+                throw;
+            }
         }
     }
 }

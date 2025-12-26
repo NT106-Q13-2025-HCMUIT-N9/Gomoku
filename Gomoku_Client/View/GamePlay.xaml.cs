@@ -1,3 +1,4 @@
+using Gomoku_Client.Helpers;
 using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using System;
@@ -18,8 +19,6 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Gomoku_Client.Helpers;
-
 namespace Gomoku_Client.View
 {
     public partial class GamePlay : Page
@@ -57,7 +56,27 @@ namespace Gomoku_Client.View
 
             this.mainWindow = window;
 
-            if (client == null || !client.Connected)
+            this.tcpClient = client;
+
+            this.player1Name = username;
+            this.playerSymbol = symbol;
+            this.opponentName = opponent;
+            this.player2Name = opponent;
+
+            this.Loaded += GamePlay_Loaded;
+        }
+
+        private async void SetAvatar(string username, string opponent)
+        {
+            UserDataModel? player1data = await FireStoreHelper.GetUserInfo(username);
+            Avatar1.ImageSource = BitmapFrame.Create(new Uri(player1data.ImagePath));
+            UserDataModel? player2data = await FireStoreHelper.GetUserInfo(opponent);
+            Avatar2.ImageSource = BitmapFrame.Create(new Uri(player2data.ImagePath));
+        }
+
+        private void GamePlay_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (tcpClient == null || !tcpClient.Connected)
             {
                 MessageBox.Show("Kết nối bị mất. Vui lòng thử lại.");
                 ExitToHome();
@@ -65,18 +84,11 @@ namespace Gomoku_Client.View
             }
 
             this.isConnected = true;
-            this.tcpClient = client;
-
-            this.player1Name = username;
-            this.playerSymbol = symbol;
-            this.opponentName = opponent;
-            this.player2Name = opponent;
-            
-
-            this.isPlayerTurn = (symbol == 'X');
+            this.isPlayerTurn = (playerSymbol == 'X');
             this.isGameOver = false;
 
-            SetAvatar(username, opponent);
+            SetAvatar(player1Name, opponentName);
+
             InitializeGame();
             DrawBoard();
             SetupTimers();
@@ -89,21 +101,22 @@ namespace Gomoku_Client.View
                 ? $"Lượt của bạn "
                 : $"Lượt của {player2Name}";
 
-            Console.WriteLine($"[INIT] Player: {username}, Symbol: {symbol}, IsPlayerTurn: {isPlayerTurn}, IsGameOver: {isGameOver}");
+            if (receiveThread == null || !receiveThread.IsAlive)
+            {
+                receiveThread = new Thread(ReceiveFromServer);
+                receiveThread.IsBackground = true;
+                receiveThread.Start();
+            }
 
-            receiveThread = new Thread(ReceiveFromServer);
-            receiveThread.IsBackground = true;
-            receiveThread.Start();
-            Console.WriteLine("[INIT] Receive thread started immediately");
-            StartSound();
-        }
 
-        private async void SetAvatar(string username, string opponent)
-        {
-            UserDataModel? player1data = await FireStoreHelper.GetUserInfo(username);
-            Avatar1.ImageSource = BitmapFrame.Create(new Uri(player1data.ImagePath));
-            UserDataModel? player2data = await FireStoreHelper.GetUserInfo(opponent);
-            Avatar2.ImageSource = BitmapFrame.Create(new Uri(player2data.ImagePath));
+            try
+            {
+                StartSound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi âm thanh: " + ex.Message);
+            }
         }
 
         private void StartSound()
@@ -162,23 +175,10 @@ namespace Gomoku_Client.View
             }
         }
 
-        private char GetOpponentSymbol()
-        {
-            return playerSymbol == 'X' ? 'O' : 'X';
-        }
 
-
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        private async void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[AUDIO CLEANUP ERROR] {ex.Message}");
-            }
-            Disconnect();
+            await Disconnect();
         }
 
         private async Task Disconnect()

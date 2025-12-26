@@ -16,12 +16,12 @@ namespace Server
             try
             {
                 FirebaseInfo.AppInit();
-                Console.WriteLine("[LOG]: Server Init Firebase successfully");
+                Logger.Log("[LOG]: Server Init Firebase successfully");
             }
             catch (Exception e)
             {
-                Console.WriteLine("[CRASH]: Server cannot connect to Firebase please for the love of god turn on your wifi or somthing");
-                Console.WriteLine($"[CRASH]: {e.Message}");
+                Logger.Log("[CRASH]: Server cannot connect to Firebase please for the love of god turn on your wifi or somthing");
+                Logger.Log($"[CRASH]: {e.Message}");
                 return;
             }
 
@@ -29,7 +29,6 @@ namespace Server
             Console.InputEncoding = Encoding.UTF8;
             Gomoku_Server.Server server = new Gomoku_Server.Server();
             server.Start(9999);
-            Console.WriteLine("[LOG]: Server is running on port 9999 (Unified Server)");
             Console.WriteLine("Press Ctrl + C to disconnect the server");
             Thread.Sleep(Timeout.Infinite);
         }

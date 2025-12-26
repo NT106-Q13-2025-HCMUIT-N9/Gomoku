@@ -10,8 +10,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Forms.VisualStyles;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using System.Xml.Linq;
 using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Gomoku_Client.View
@@ -169,50 +171,144 @@ namespace Gomoku_Client.View
             _mainWindow.ButtonClick.Play();
 
             Button butt = sender as Button;
+            string friendName = butt?.Name ?? "";
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            if (string.IsNullOrEmpty(friendName)) return;
+            if (string.IsNullOrEmpty(username)) return;
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(butt?.Name);
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(friendName);
 
             DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
             UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
 
+
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
-            try
+            await Task.Run(async () =>
             {
-                client.Connect(IPAddress.Parse("34.68.212.10"), 9999);
-            }
-            catch
-            {
-                NotificationManager.Instance.ShowNotification(
-                        "Lỗi",
-                        "Server có thể đang không hoạt động",
-                        Notification.NotificationType.Info,
-                        5000
-                    );
-                return;
-            }
+                try
+                {
+                    client.Connect("34.68.212.10", 9999);
+                    NetworkStream stream = client.GetStream();
 
-            if (!client.Connected) return;
+                    Console.WriteLine("[DEBUG] Đã kết nối tới Server.");
 
-            var stream = client.GetStream();
+                    user_data.MatchRequests.Add(username);
+                    await doc_ref.SetAsync(user_data);
 
-            if (!user_data.MatchRequests.Contains(username))
-            {
-                byte[] data = Encoding.UTF8.GetBytes($"[CHALLENGE_REQUEST];{username};{butt?.Name}");
-                stream.Write(data, 0, data.Length);
+                    string msg = $"[CHALLENGE_REQUEST];{username};{friendName}\n";
+                    byte[] data = Encoding.UTF8.GetBytes(msg);
+                    stream.Write(data, 0, data.Length);
 
-                NotificationManager.Instance.ShowNotification(
-                        "Thách đấu thành công",
-                        $"Đã gửi thách đấu tới {butt?.Name}",
-                        Notification.NotificationType.Info,
-                        5000
-                    );
+                    Console.WriteLine($"[DEBUG] Sent: {msg.Trim()}");
 
-                user_data.MatchRequests.Add(username);
-                await doc_ref.SetAsync(user_data);
-            }
+                    byte[] buffer = new byte[4096];
+                    while (client != null && client.Connected)
+                    {
+                        int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bytesRead == 0) break;
 
+                        string response = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+
+                        Console.WriteLine($"[RECEIVE] Message from server: {response}, received in FriendManager");
+                        string[] message = response.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string mess in message)
+                        {
+                            if (mess.StartsWith("[INIT]"))
+                            {
+                                string[] parts = mess.Split(';');
+                                if (parts.Length >= 5)
+                                {
+                                    char playerSymbol = parts[3][0];
+                                    string opponentName = parts[4];
+                                    Console.WriteLine($"[DEBUG] Parsed INIT: Symbol={playerSymbol}, Opponent={opponentName}");
+                                    Dispatcher.Invoke(() =>
+                                    {
+                                        if (_mainWindow != null)
+                                        {
+                                            _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                            if (_mainWindow.BackgroundGrid != null) _mainWindow.BackgroundGrid.Visibility = Visibility.Collapsed;
+
+                                            _mainWindow.MainFrame.Visibility = Visibility.Visible;
+                                            Panel.SetZIndex(_mainWindow.MainFrame, 999);
+                                            _mainWindow.MainFrame.UpdateLayout();
+
+                                            GamePlay gamePlayPage = new GamePlay(client, username, playerSymbol, opponentName, _mainWindow);
+
+                                            TranslateTransform trans = new TranslateTransform(_mainWindow.ActualWidth, 0);
+                                            gamePlayPage.RenderTransform = trans;
+                                            _mainWindow.MainFrame.Navigate(gamePlayPage);
+
+                                            Dispatcher.BeginInvoke(new Action(() =>
+                                            {
+                                                DoubleAnimation slideIn = new DoubleAnimation
+                                                {
+                                                    From = _mainWindow.ActualWidth,
+                                                    To = 0,
+                                                    Duration = TimeSpan.FromSeconds(0.5),
+                                                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                                                };
+                                                trans.BeginAnimation(TranslateTransform.XProperty, slideIn);
+                                            }), System.Windows.Threading.DispatcherPriority.ContextIdle);
+                                        }
+                                    });
+                                    return;
+                                }
+                            } else if (mess.StartsWith("[ALREADY_IN_MATCH]"))
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Đối thủ đang bận.",
+                                                                                  "Chờ mình chút xíu nhe bạn ơi!",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            } else if (mess.StartsWith("[CHALLENGE_DECLINE]")) {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Thách đấu bị từ chối.",
+                                                                                  "Chơi game mà nhùng! Quá gà :)",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            } else if (mess.StartsWith("[CHALLENGE_CANCELED]"))
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Lời mời đã hết hạn.",
+                                                                                  "Thử lại sau nhé!",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            }
+                            else if (mess.StartsWith("[CHALLENGE_TIMEOUT]"))
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Thách đấu bị bơ đẹp :).",
+                                                                                  "Alo Vũ à? Phải Vũ không em? Ui Vũ ơi em đừng có chối.",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[DEBUG ERROR] {ex.Message}");
+                    MessageBox.Show("Lỗi Debug: " + ex.Message);
+                }
+            });
+            /*
             // Nếu đã gửi thách đấu rồi thì lắng nghe phản hồi
 
             FirestoreChangeListener listener = doc_ref.Listen(snapshot =>
@@ -285,6 +381,7 @@ namespace Gomoku_Client.View
                 await listener.StopAsync();
                 cts.Dispose();
             }
+            */
         }
 
         private void UnfriendButton_Click(object sender, RoutedEventArgs e)

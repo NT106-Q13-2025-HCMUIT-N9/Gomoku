@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Threading;
 
@@ -36,6 +37,7 @@ namespace Gomoku_Client.View
             {
                 tb_PlayerName.Text = _playerName;
                 UserStatsModel? playerStats = await FireStoreHelper.GetUserStats(_playerName);
+                UserDataModel? playerData = await FireStoreHelper.GetUserInfo(_playerName);
                 if (playerStats != null)
                 {
                     lb_matches.Text = playerStats.total_match.ToString();
@@ -43,15 +45,24 @@ namespace Gomoku_Client.View
                         ? $"{(playerStats.Wins / (double)playerStats.total_match * 100):F1}%"
                         : "0%";
                 }
+                if (playerData != null)
+                {
+                    img_PlayerAvatar.Source = BitmapFrame.Create(new Uri(playerData.ImagePath));
+                }
 
                 tb_OpponentName.Text = _opponentName;
                 UserStatsModel? opponentStats = await FireStoreHelper.GetUserStats(_opponentName);
+                UserDataModel? opponentData = await FireStoreHelper.GetUserInfo(_opponentName);
                 if (opponentStats != null)
                 {
                     lb_OpponentMatches.Text = opponentStats.total_match.ToString();
                     tb_OpponentWinRate.Text = opponentStats.total_match > 0
                         ? $"{(opponentStats.Wins / (double)opponentStats.total_match * 100):F1}%"
                         : "0%";
+                }
+                if (opponentData != null)
+                {
+                    img_OpponentAvatar.Source = BitmapFrame.Create(new Uri(opponentData.ImagePath));
                 }
 
                 AnimateResult();

@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Google.Cloud.Firestore;
 
 namespace Gomoku_Server
 {
@@ -448,7 +449,7 @@ namespace Gomoku_Server
             }
         }
 
-        private void KeepAliveConnection(TcpClient client, string room, TimeSpan timeout)
+        private async Task KeepAliveConnection(TcpClient client, string room, TimeSpan timeout)
         {
             var startTime = DateTime.Now;
 
@@ -476,7 +477,24 @@ namespace Gomoku_Server
             Logger.Log($"[LOG]: Challenge request timeout for room: {room}");
             ServerUtils.SendMessage(client.Client, $"[CHALLENGE_TIMEOUT];{room}");
             challenges.TryRemove(room, out _);
-            client.Close();
+            try
+            {
+                string[] part = room.Split(';');
+                string p1 = part[0];
+                string p2 = part[1];
+                Google.Cloud.Firestore.DocumentReference doc_ref_p1 = FirebaseInfo.DB.Collection("UserInfo").Document(p1);
+                Google.Cloud.Firestore.DocumentReference doc_ref_p2 = FirebaseInfo.DB.Collection("UserInfo").Document(p2);
+                await doc_ref_p1.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(p2));
+                await doc_ref_p2.UpdateAsync("MatchRequests", FieldValue.ArrayRemove(p1));
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"[ERROR] Failed to update match requests in Firestore: {ex.Message}");
+            }
+            finally
+            {
+                client.Close();
+            }
         }
 
         public static void Log(string message)

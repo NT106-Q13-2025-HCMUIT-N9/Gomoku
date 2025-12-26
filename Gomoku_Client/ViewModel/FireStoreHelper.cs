@@ -56,14 +56,7 @@ namespace Gomoku_Client.ViewModel
         public static async Task SendFriendRequest(string sender, string receiver)
         {
             DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(receiver);
-            DocumentSnapshot user_doc_snap = await doc_ref.GetSnapshotAsync();
-
-            if (user_doc_snap.Exists)
-            {
-                UserDataModel receiver_data = user_doc_snap.ConvertTo<UserDataModel>();
-                receiver_data.FriendsRequests.Add(sender);
-                await doc_ref.SetAsync(receiver_data);
-            }
+            await doc_ref.UpdateAsync("FriendsRequests", FieldValue.ArrayUnion(sender));
         }
 
         public static async Task<bool> IsFriendWith(string user, string friend)
@@ -87,25 +80,12 @@ namespace Gomoku_Client.ViewModel
             try
             {
                 DocumentReference doc1_ref = FirebaseInfo.DB.Collection("UserInfo").Document(user1);
-                DocumentSnapshot user1_doc_snap = await doc1_ref.GetSnapshotAsync();
+                await doc1_ref.UpdateAsync("Friends", FieldValue.ArrayUnion(user2));
 
                 DocumentReference doc2_ref = FirebaseInfo.DB.Collection("UserInfo").Document(user2);
-                DocumentSnapshot user2_doc_snap = await doc2_ref.GetSnapshotAsync();
-                if (user2_doc_snap.Exists && user1_doc_snap.Exists)
-                {
-                    UserDataModel user1_data = user1_doc_snap.ConvertTo<UserDataModel>();
-                    user1_data.Friends.Add(user2);
-                    await doc1_ref.SetAsync(user1_data);
+                await doc2_ref.UpdateAsync("Friends", FieldValue.ArrayUnion(user1));
 
-                    UserDataModel user2_data = user2_doc_snap.ConvertTo<UserDataModel>();
-                    user2_data.Friends.Add(user1);
-                    await doc2_ref.SetAsync(user2_data);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return true;
             }
             catch (Exception)
             {
@@ -177,25 +157,12 @@ namespace Gomoku_Client.ViewModel
             try
             {
                 DocumentReference doc1_ref = FirebaseInfo.DB.Collection("UserInfo").Document(user1);
-                DocumentSnapshot user1_doc_snap = await doc1_ref.GetSnapshotAsync();
+                await doc1_ref.UpdateAsync("Friends", FieldValue.ArrayRemove(user2));
 
                 DocumentReference doc2_ref = FirebaseInfo.DB.Collection("UserInfo").Document(user2);
-                DocumentSnapshot user2_doc_snap = await doc2_ref.GetSnapshotAsync();
-                if (user2_doc_snap.Exists && user1_doc_snap.Exists)
-                {
-                    UserDataModel user1_data = user1_doc_snap.ConvertTo<UserDataModel>();
-                    user1_data.Friends.Remove(user2);
-                    await doc1_ref.SetAsync(user1_data);
+                await doc2_ref.UpdateAsync("Friends", FieldValue.ArrayRemove(user1));
 
-                    UserDataModel user2_data = user2_doc_snap.ConvertTo<UserDataModel>();
-                    user2_data.Friends.Remove(user1);
-                    await doc2_ref.SetAsync(user2_data);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return true;
             }
             catch (Exception)
             {

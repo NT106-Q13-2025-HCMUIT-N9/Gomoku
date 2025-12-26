@@ -179,9 +179,6 @@ namespace Gomoku_Client.View
 
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(friendName);
 
-            DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
-            UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
-
 
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
             await Task.Run(async () =>
@@ -193,8 +190,7 @@ namespace Gomoku_Client.View
 
                     Console.WriteLine("[DEBUG] Đã kết nối tới Server.");
 
-                    user_data.MatchRequests.Add(username);
-                    await doc_ref.SetAsync(user_data);
+                    await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayUnion(username));
 
                     string msg = $"[CHALLENGE_REQUEST];{username};{friendName}\n";
                     byte[] data = Encoding.UTF8.GetBytes(msg);

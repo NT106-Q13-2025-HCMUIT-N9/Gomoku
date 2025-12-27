@@ -1,4 +1,5 @@
 ﻿using Gomoku_Client.Model;
+using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
 using Google.Protobuf.WellKnownTypes;
 using System;
@@ -54,7 +55,7 @@ namespace Gomoku_Client.View
 
             CollectionReference match_info_ref = FirebaseInfo.DB.Collection("MatchInfo");
             Query query = match_info_ref.OrderByDescending("CreateTime").WhereArrayContains("Players", FirebaseInfo.AuthClient.User.Info.DisplayName);
-            listener = query.Listen(snapshot => { 
+            listener = query.Listen(async snapshot => { 
                 foreach(DocumentChange change in snapshot.Changes)
                 {
                     DocumentSnapshot doc = change.Document;
@@ -68,13 +69,15 @@ namespace Gomoku_Client.View
                         string sec = (match_info.Duration % 60).ToString("D2");
                         string duration = minute + " phút " + sec + " giây";
 
+                        UserDataModel? opponent_model = await FireStoreHelper.GetUserInfo(opponent ?? "");
+
                         if (match_info.isDraw)
                         {
                             Debug.WriteLine(minute);
 
                             App.Current.Dispatcher.Invoke(() =>
                             {
-                                Border drawMatchItem = UIUtils.CreateDrawMatchItem(opponent ?? "NULL", duration);
+                                Border drawMatchItem = UIUtils.CreateDrawMatchItem(opponent ?? "NULL", duration, opponent_model?.ImagePath ?? "");
                                 MatchListPanel.Children.Add(drawMatchItem);
                             });
                         }
@@ -84,7 +87,7 @@ namespace Gomoku_Client.View
                             {
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
-                                    Border drawMatchItem = UIUtils.CreateWinMatchItem(opponent ?? "NULL", duration);
+                                    Border drawMatchItem = UIUtils.CreateWinMatchItem(opponent ?? "NULL", duration, opponent_model?.ImagePath ?? "");
                                     MatchListPanel.Children.Add(drawMatchItem);
                                 });
                             }
@@ -92,7 +95,7 @@ namespace Gomoku_Client.View
                             {
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
-                                    Border drawMatchItem = UIUtils.CreateLoseMatchItem(opponent ?? "NULL", duration);
+                                    Border drawMatchItem = UIUtils.CreateLoseMatchItem(opponent ?? "NULL", duration, opponent_model?.ImagePath ?? "");
                                     MatchListPanel.Children.Add(drawMatchItem);
                                 });
                             }

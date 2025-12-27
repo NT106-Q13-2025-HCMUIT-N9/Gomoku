@@ -1,6 +1,7 @@
 ﻿using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -485,18 +486,30 @@ namespace Gomoku_Client.View
                     List<string> diff_request = user_data.FriendsRequests.Except(curr_friend_request).ToList();
                     List<string> diff_friend = user_data.Friends.Except(curr_friend_list).ToList();
 
-                    App.Current.Dispatcher.Invoke(() =>
+                    App.Current.Dispatcher.Invoke(async () =>
                     {
                         foreach (string request in diff_request)
                         {
+                            UserDataModel? request_model = await FireStoreHelper.GetUserInfo(request);
+
                             curr_friend_request.Add(request);
-                            FriendRequestsPanel.Children.Add(UIUtils.CreateFriendRequestCard(request, AcceptButton_Click, RefuseButton_Click, this.Resources));
+                            FriendRequestsPanel.Children.Add(UIUtils.CreateFriendRequestCard(request, 
+                                                                                            AcceptButton_Click, 
+                                                                                            RefuseButton_Click, 
+                                                                                            this.Resources, 
+                                                                                            request_model?.ImagePath ?? ""));
                         }
 
                         foreach (string friend in diff_friend)
                         {
+                            UserDataModel? friend_model = await FireStoreHelper.GetUserInfo(friend);
+
                             curr_friend_list.Add(friend);
-                            FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, ChallengeButton_Click, UnfriendButton_Click, this.Resources));
+                            FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, 
+                                                                                  ChallengeButton_Click, 
+                                                                                  UnfriendButton_Click, 
+                                                                                  this.Resources,
+                                                                                  friend_model?.ImagePath ?? ""));
                         }
 
                         TotalFriendsCount.Text = curr_friend_list.Count.ToString() + " bạn bè";

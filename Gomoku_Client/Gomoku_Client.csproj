@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -52,7 +55,9 @@
     <None Remove="Assets\Avatar\Random BigChungus.jpg" />
     <None Remove="Assets\Avatar\Random Charlie.jpg" />
     <None Remove="Assets\Avatar\Random CoolerFreddy.jpg" />
+    <None Remove="Assets\Avatar\Random Domixi.jpg" />
     <None Remove="Assets\Avatar\Random DonaldTrump.jpg" />
+    <None Remove="Assets\Avatar\Random DreamyBull.jpg" />
     <None Remove="Assets\Avatar\Random Epstein.jpg" />
     <None Remove="Assets\Avatar\Random Freddy.jpg" />
     <None Remove="Assets\Avatar\Random George Droid.jpg" />
@@ -65,6 +70,7 @@
     <None Remove="Assets\Avatar\Random Michael.jpg" />
     <None Remove="Assets\Avatar\Random Miku.jpg" />
     <None Remove="Assets\Avatar\Random Teto.jpg" />
+    <None Remove="Assets\Avatar\Random TheKing.jpg" />
     <None Remove="Assets\Avatar\Random Truo.jpg" />
     <None Remove="Assets\Avatar\Random Tuanas.jpg" />
     <None Remove="Assets\Avatar\Random Tus.jpg" />
@@ -120,7 +126,9 @@
     <Resource Include="Assets\Avatar\Random BigChungus.jpg" />
     <Resource Include="Assets\Avatar\Random Charlie.jpg" />
     <Resource Include="Assets\Avatar\Random CoolerFreddy.jpg" />
+    <Resource Include="Assets\Avatar\Random Domixi.jpg" />
     <Resource Include="Assets\Avatar\Random DonaldTrump.jpg" />
+    <Resource Include="Assets\Avatar\Random DreamyBull.jpg" />
     <Resource Include="Assets\Avatar\Random Epstein.jpg" />
     <Resource Include="Assets\Avatar\Random Freddy.jpg" />
     <Resource Include="Assets\Avatar\Random George Droid.jpg" />
@@ -133,6 +141,7 @@
     <Resource Include="Assets\Avatar\Random Michael.jpg" />
     <Resource Include="Assets\Avatar\Random Miku.jpg" />
     <Resource Include="Assets\Avatar\Random Teto.jpg" />
+    <Resource Include="Assets\Avatar\Random TheKing.jpg" />
     <Resource Include="Assets\Avatar\Random Truo.jpg" />
     <Resource Include="Assets\Avatar\Random Tuanas.jpg" />
     <Resource Include="Assets\Avatar\Random Tus.jpg" />
@@ -163,8 +172,8 @@
 
 	<ItemGroup>
 		<Resource Include="Assets\Images\AI_Background.gif" />
-		<Resource Include="Assets\api.env" />
-		<Resource Include="Assets\firebase_key.json" />
+		<EmbeddedResource Include="Assets\api.env" />
+		<EmbeddedResource Include="Assets\firebase_key.json" />
 		<Resource Include="Assets\Gomoku.ico" />
 		<Resource Include="Assets\Images\Login_Background.png" />
 		<Resource Include="Assets\Images\ServerBrowser_Background.gif" />
@@ -172,43 +181,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-    <Content Include="Assets\Sounds\Awaken.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\ButtonHover.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\chess.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\doodle.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\frog.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\Joy.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\Keyboard.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\LegendsNeverDie.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\LOLTheme.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\Matchmakers.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\meow.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\Sounds\RelaxedScene.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Resource Include="Assets\Avatar\T1_6sao.jpg" />
-  </ItemGroup>
+		<EmbeddedResource Include="Assets\Sounds\Awaken.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\ButtonHover.wav" />
+		<EmbeddedResource Include="Assets\Sounds\chess.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\doodle.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\frog.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\Joy.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\Keyboard.wav" />
+		<EmbeddedResource Include="Assets\Sounds\LegendsNeverDie.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\LOLTheme.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\Matchmakers.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\meow.mp3" />
+		<EmbeddedResource Include="Assets\Sounds\RelaxedScene.mp3" />
+		<Resource Include="Assets\Avatar\T1_6sao.jpg" />
+	</ItemGroup>
 
 </Project>

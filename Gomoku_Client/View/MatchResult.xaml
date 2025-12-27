@@ -84,7 +84,7 @@
                     </Border.Effect>
                     <Grid>
                         <Border CornerRadius="0" Background="#2A2E3A">
-                            <Image x:Name="img_PlayerAvatar" Source="/Assets/Images/T1.png" VerticalAlignment="Top"/>
+                            <Image x:Name="img_PlayerAvatar" Source="/Assets/Images/T1.png" Stretch="UniformToFill" VerticalAlignment="Top"/>
                         </Border>
                         <Border VerticalAlignment="Bottom" Height="140" CornerRadius="0">
                             <Border.Background>

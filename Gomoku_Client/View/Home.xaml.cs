@@ -29,7 +29,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
+using Gomoku_Client.Helpers;
 
 namespace Gomoku_Client
 {
@@ -99,10 +99,11 @@ namespace Gomoku_Client
             SecretAvatars = new ObservableCollection<AvatarItem>
             {
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tus.jpg", Name="TusMeme" },
-                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tuanas.jpg", Name="GeiLord" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Tuanas.jpg", Name="TuanKiller" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Truo.jpg", Name="MasterWibu" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97.jpg", Name="Jack Đồ Tể" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97v2.jpg", Name="Jack Chúa Quỷ" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DoMiXi.jpg", Name="Độ Mixi" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Baka.jpg", Name="Baka" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Larry.jpg", Name="Larry" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Yippe.jpg", Name="Yippe" },
@@ -110,7 +111,9 @@ namespace Gomoku_Client
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Teto.jpg", Name="Teto" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Charlie.jpg", Name="Charlie" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DonaldTrump.jpg", Name="Đô Năm Trăm" },
-                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random GermanArtist.jpg", Name="Họa sĩ Dức" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random GermanArtist.jpg", Name="Họa sĩ Đức" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random TheKing.jpg", Name="The GOAT" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DreamyBull.jpg", Name="Trâu Mộng Mơ" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Floyd.jpg", Name="George Floyd" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random George Droid.jpg", Name="George Droid" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Epstein.jpg", Name="Kẻ bí ẩn" },
@@ -122,69 +125,97 @@ namespace Gomoku_Client
             };
 
             DataContext = this;
+
+            string path = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "data.txt"
+            );
+
         }
 
-        public double MasterVolValue = 0.5;
-        public double BGMVolValue = 0.15;
-        public double SFXVolValue = 1;
+        public static double MasterVolValue;
+        public static double BGMVolValue;
+        public static double SFXVolValue;
 
         public void UpdateActualBGM()
         {
             MainBGM.Volume = MasterVolValue * BGMVolValue;
             ButtonClick.Volume = SFXVolValue * MasterVolValue;
             Keyboard.Volume = SFXVolValue * MasterVolValue;
+
+            string volumeFile = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "volume.txt"
+            );
+
+            string[] lines =
+            {
+                MasterVolValue.ToString(),
+                BGMVolValue.ToString(),
+                SFXVolValue.ToString()
+            };
+
+            File.WriteAllLines(volumeFile, lines);
         }
 
         void SoundStart()
         {
-
-            List<string> BGM = new List<string>();
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "meow.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "frog.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "chess.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "doodle.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Joy.mp3"));
-            BGM.Add(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Sounds", "Matchmakers.mp3"));
-            int BGMNumber = Random.Shared.Next(0, 6);
-
-            string buttonPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "ButtonHover.wav"
-            );
-
-            string keyboardPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "Keyboard.wav"
-            );
-
-
-            MainBGM.MediaOpened += (s, e) =>
+            try
             {
-                MainBGM.Play();
-            };
+                List<string> BGM = new List<string>();
 
-            MainBGM.MediaEnded += (s, e) =>
+                string[] bgmFiles = {
+                    "meow.mp3", "frog.mp3", "chess.mp3",
+                    "doodle.mp3", "Joy.mp3", "Matchmakers.mp3"
+                };
+
+                foreach (var file in bgmFiles)
+                {
+                    string path = AudioHelper.ExtractResourceToTemp($"Assets/Sounds/{file}");
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        BGM.Add(path);
+                    }
+                }
+
+                string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
+                string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
+
+                if (BGM.Count > 0)
+                {
+                    int BGMNumber = Random.Shared.Next(0, BGM.Count);
+
+                    MainBGM.MediaOpened += (s, e) => MainBGM.Play();
+
+                    MainBGM.MediaEnded += (s, e) =>
+                    {
+                        BGMNumber = Random.Shared.Next(0, BGM.Count);
+                        MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                        MainBGM.Play();
+                    };
+
+                    MainBGM.MediaFailed += (s, e) =>
+                    {
+                        Debug.WriteLine($"Lỗi phát nhạc: {e.ErrorException.Message}");
+                    };
+
+                    MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
+                }
+
+                if (!string.IsNullOrEmpty(buttonPath))
+                {
+                    ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+                }
+
+                if (!string.IsNullOrEmpty(keyboardPath))
+                {
+                    Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+                }
+            }
+            catch (Exception ex)
             {
-                BGMNumber = Random.Shared.Next(0, 6);
-                MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-                //MainBGM.Position = TimeSpan.Zero;
-                MainBGM.Play();
-            };
-
-            MainBGM.MediaFailed += (s, e) =>
-            {
-                MessageBox.Show(e.ErrorException.Message);
-            };
-
-            MainBGM.Open(new Uri(BGM[BGMNumber], UriKind.Absolute));
-
-            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
-
-            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
+                Debug.WriteLine($"Lỗi khởi tạo âm thanh MainGameUI: {ex.Message}");
+            }
         }
 
 
@@ -416,7 +447,7 @@ namespace Gomoku_Client
                 {
                     UserStatsModel user_stats = doc_snap.ConvertTo<UserStatsModel>();
 
-                    App.Current.Dispatcher.Invoke(() =>
+                    Dispatcher.Invoke(() =>
                     {
                         lb_matches.Text = user_stats.total_match.ToString();
                         lb_winrate.Text = user_stats.total_match > 0
@@ -477,7 +508,7 @@ namespace Gomoku_Client
             Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(username);
             try
             {
-                client.Connect(IPAddress.Parse("127.0.0.1"), 9999);
+                client.Connect(IPAddress.Parse("34.68.212.10"), 9999);
             }
             catch
             {
@@ -521,78 +552,191 @@ namespace Gomoku_Client
         {
             if (UserState.currentState == State.InMatch)
             {
-                NotificationManager.Instance.ShowNotification(
-                    "Chấp nhận thách đấu thất bại",
-                    "Hiện giờ bạn không thể tham gia trận đấu khác",
-                    Notification.NotificationType.Info,
-                    5000
-                    );
-                client.Close();
+                NotificationManager.Instance.ShowNotification("Lỗi", "Bạn đang trong trận đấu khác!", Notification.NotificationType.Info, 3000);
                 return;
             }
-            UserState.currentState = State.InMatch;
-            NetworkStream stream = client.GetStream();
-            byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}");
-            stream.Write(data, 0, data.Length);
 
-            NotificationManager.Instance.ShowNotification(
-                    $"Đã chấp nhận lời thách đấu của {challenger}",
-                    "Chuẩn bị vào trận đấu!",
-                    Notification.NotificationType.Info,
-                    5000
-                    );
-
-            Task.Run(() =>
+            try
             {
-                try
+                NetworkStream stream = client.GetStream();
+                byte[] data = Encoding.UTF8.GetBytes($"{response};{challenger};{me}\n");
+                stream.Write(data, 0, data.Length);
+
+                NotificationManager.Instance.ShowNotification("Thách đấu", $"Đã chấp nhận {challenger}. Đang vào trận...", Notification.NotificationType.Info, 3000);
+
+                Task.Run(() =>
                 {
-                    byte[] buffer = new byte[1024];
-                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    if (bytesRead > 0)
+                    try
                     {
-                        string serverResponse = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
-                        Console.WriteLine($"[DEBUG] Server response: {serverResponse}");
-
-                        if (serverResponse.StartsWith("[INIT]"))
+                        byte[] buffer = new byte[2048];
+                        while (client != null && client.Connected)
                         {
-                            string[] parts = serverResponse.Split(';');
-                            if (parts.Length >= 4)
-                            {
-                                
-                                int clock1 = int.Parse(parts[1]);
-                                int clock2 = int.Parse(parts[2]);
-                                char playerSymbol = parts[3][0];
-                                string opponentName = parts[4];
-                                Console.WriteLine($"[DEBUG] Received Match Init, Player 1 clock: {clock1}, Player 2 clock: {clock2}, LocalPlayer symbol: {playerSymbol}, Opponent: {opponentName}");
-                                Dispatcher.Invoke(() =>
-                                {
-                                    Console.WriteLine("[CHALLENGE] Navigating to GamePlay");
-                                    Console.WriteLine($"[CHALLENGE] TcpClient.Connected: {client?.Connected}");
-                                    Console.WriteLine($"[CHALLENGE] Stream.CanRead: {stream?.CanRead}");
+                            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                            if (bytesRead == 0) break;
 
-                                    GamePlay gamePlayPage = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, this);
-                                    this.NavigateWithAnimation(gamePlayPage);
-                                });
+                            string serverResponse = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+                            Console.WriteLine($"[DEBUG] Home Recv: {serverResponse}");
+
+                            string[] messages = serverResponse.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                            foreach (var msg in messages)
+                            {
+                                if (msg.StartsWith("[INIT]"))
+                                {
+                                    string[] parts = msg.Split(';');
+
+                                    if (parts.Length >= 5)
+                                    {
+                                        char playerSymbol = parts[3][0];
+                                        string opponentName = parts[4];
+
+                                        Console.WriteLine($"[DEBUG] Parsed INIT: Symbol={playerSymbol}, Opponent={opponentName}");
+
+                                        Dispatcher.Invoke(() =>
+                                        {
+
+                                            this.MainBGM.Stop();
+
+                                            Console.WriteLine("[MATCHMAKING] Opening GamePlay");
+
+                                            var gamePlayWindow = new GamePlay(client, tb_PlayerName.Text, playerSymbol, opponentName, this)
+                                            {
+                                                Owner = this,
+                                                WindowStartupLocation = WindowStartupLocation.Manual,
+                                                Left = this.Left,
+                                                Top = this.Top
+                                            };
+
+                                            gamePlayWindow.Closed += (sender, e) =>
+                                            {
+                                                bool isWinner = gamePlayWindow.FinalResult_IsLocalPlayerWinner;
+                                                bool isDraw = gamePlayWindow.FinalResult_IsDraw;
+                                                string p1 = gamePlayWindow.player1Name;
+                                                string p2 = gamePlayWindow.player2Name;
+
+                                                this.Left = gamePlayWindow.Left;
+                                                this.Top = gamePlayWindow.Top;
+
+                                                Dispatcher.Invoke(() =>
+                                                {
+                                                    try
+                                                    {
+                                                        this.Visibility = Visibility.Visible;
+                                                    }
+                                                    catch { }
+
+                                                    Border mainOverlay = new Border
+                                                    {
+                                                        Background = Brushes.Black,
+                                                        Opacity = 1,
+                                                        Visibility = Visibility.Visible
+                                                    };
+
+                                                    Grid? mainRoot = null;
+                                                    try
+                                                    {
+                                                        mainRoot = this.FindName("MainGrid") as Grid;
+                                                    }
+                                                    catch { mainRoot = null; }
+
+                                                    if (mainRoot == null && this.Content is Grid g) mainRoot = g;
+
+                                                    if (mainRoot != null)
+                                                    {
+                                                        Grid.SetRowSpan(mainOverlay, 100);
+                                                        Grid.SetColumnSpan(mainOverlay, 100);
+                                                        Panel.SetZIndex(mainOverlay, 99999);
+                                                        mainRoot.Children.Add(mainOverlay);
+                                                    }
+
+                                                    Action navigateAction = () =>
+                                                    {
+                                                        try
+                                                        {
+                                                            if (mainRoot != null && mainRoot.Children.Contains(mainOverlay))
+                                                                mainRoot.Children.Remove(mainOverlay);
+                                                        }
+                                                        catch { }
+
+                                                        this.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                                        this.MainFrame.Visibility = Visibility.Visible;
+
+                                                        MatchResult resultPage = new MatchResult(isWinner, p1, p2, this, isDraw);
+                                                        try
+                                                        {
+                                                            this.MainFrame.Navigate(resultPage);
+                                                        }
+                                                        catch (Exception ex)
+                                                        {
+                                                            Debug.WriteLine($"[ERROR] Navigate resultPage: {ex.Message}");
+                                                        }
+
+                                                        try
+                                                        {
+                                                            if (this.MainBGM.Source != null) this.MainBGM.Play();
+                                                        }
+                                                        catch { }
+                                                    };
+
+                                                    bool navigated = false;
+
+                                                    var reveal = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.8))
+                                                    {
+                                                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                                                    };
+
+                                                    reveal.Completed += (s2, e2) =>
+                                                    {
+                                                        if (navigated) return;
+                                                        navigated = true;
+                                                        navigateAction();
+                                                    };
+
+                                                    if (mainOverlay != null)
+                                                        mainOverlay.BeginAnimation(UIElement.OpacityProperty, reveal);
+                                                    else
+                                                    {
+                                                        navigated = true;
+                                                        navigateAction();
+                                                    }
+
+                                                    var fallback = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
+                                                    fallback.Tick += (fs, fe) =>
+                                                    {
+                                                        fallback.Stop();
+                                                        if (!navigated)
+                                                        {
+                                                            navigated = true;
+                                                            navigateAction();
+                                                        }
+                                                    };
+                                                    fallback.Start();
+                                                });
+                                            };
+
+                                            gamePlayWindow.Show();
+                                            this.Visibility = Visibility.Collapsed;
+                                        });
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"[ERROR] Invalid INIT packet length: {parts.Length}");
+                                    }
+                                }
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[ERROR] Failed to receive match start: {ex.Message}");
-                    App.Current.Dispatcher.Invoke(() =>
+                    catch (Exception ex)
                     {
-                        NotificationManager.Instance.ShowNotification(
-                            "Lỗi kết nối",
-                            "Không thể bắt đầu trận đấu",
-                            Notification.NotificationType.Info,
-                            5000
-                        );
-                        UserState.currentState = State.Ready;
-                        client.Close();
-                    });
-                }
-            });
+                        Console.WriteLine($"[ERROR] Accept Loop Error: {ex}");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] Setup Accept Error: {ex.Message}");
+            }
         }
 
         void declineChallenge(TcpClient client, string response, string challenger, string me)

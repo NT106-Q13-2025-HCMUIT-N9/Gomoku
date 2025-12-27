@@ -1,8 +1,13 @@
+﻿using Firebase.Auth;
 using Firebase.Auth;
+using FirebaseAdmin.Auth;
+using Gomoku_Client.Helpers;
 using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
+using System;
 using System.Diagnostics;
+using System.IO;
 using System.Media;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +21,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace Gomoku_Client
 {
@@ -27,59 +34,95 @@ namespace Gomoku_Client
         public MediaPlayer ButtonClick = new MediaPlayer();
         public MediaPlayer Keyboard = new MediaPlayer();
         public MediaPlayer MainBGM = new MediaPlayer();
+        private MainGameUI mainWindow;
+
+        string volumeFile = System.IO.Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "volume.txt"
+        );
+
         public MainWindow()
         {
             InitializeComponent();
+
+
+            double[] defaultVolumes = { 0.5, 0.15, 0.1 };
+            double[] volumes = new double[3];
+
+            if (!File.Exists(volumeFile))
+            {
+                SaveVolumes(volumeFile, defaultVolumes);
+                volumes = defaultVolumes;
+            }
+            else
+            {
+                string[] lines = File.ReadAllLines(volumeFile);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    if (i < lines.Length && double.TryParse(lines[i], out double v))
+                        volumes[i] = Math.Clamp(v, 0.0, 1.0);
+                    else
+                        volumes[i] = defaultVolumes[i];
+                }
+
+                // sửa file nếu thiếu / hỏng
+                SaveVolumes(volumeFile, volumes);
+            }
+
+            MainGameUI.MasterVolValue = volumes[0];
+            MainGameUI.BGMVolValue = volumes[1];
+            MainGameUI.SFXVolValue = volumes[2];
+
             StartSound();
+        }
+
+        void SaveVolumes(string path, double[] v)
+        {
+            File.WriteAllLines(path, new[]
+            {
+                v[0].ToString(),
+                v[1].ToString(),
+                v[2].ToString()
+            });
         }
 
         void StartSound()
         {
-            string buttonPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "ButtonHover.wav"
-            );
-
-            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
-
-            string keyboardPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "Keyboard.wav"
-            );
-
-            string BGMPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "RelaxedScene.mp3"
-            );
-
-            MainBGM.MediaOpened += (s, e) =>
+            try
             {
-                MainBGM.Play();
-            };
+                string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
+                string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
+                string bgmPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/RelaxedScene.mp3");
 
-            MainBGM.MediaEnded += (s, e) =>
+                if (buttonPath != null)
+                    ButtonClick.Open(new Uri(buttonPath));
+                    ButtonClick.Volume = MainGameUI.SFXVolValue * MainGameUI.MasterVolValue;
+
+                if (keyboardPath != null)
+                {
+                    Keyboard.Open(new Uri(keyboardPath));
+                    Keyboard.Volume = MainGameUI.SFXVolValue * MainGameUI.MasterVolValue;
+                }
+
+                if (bgmPath != null)
+                {
+                    MainBGM.Open(new Uri(bgmPath));
+                    MainBGM.Volume = MainGameUI.BGMVolValue * MainGameUI.MasterVolValue;
+
+                    MainBGM.MediaOpened += (s, e) => MainBGM.Play();
+
+                    MainBGM.MediaEnded += (s, e) =>
+                    {
+                        //MainBGM.Position = TimeSpan.Zero;
+                        MainBGM.Play();
+                    };
+                }
+            }
+            catch (Exception ex)
             {
-                MainBGM.Open(new Uri(BGMPath, UriKind.Absolute));
-                //MainBGM.Position = TimeSpan.Zero;
-                MainBGM.Play();
-            };
-
-            MainBGM.MediaFailed += (s, e) =>
-            {
-                MessageBox.Show(e.ErrorException.Message);
-            };
-
-            MainBGM.Open(new Uri(BGMPath, UriKind.Absolute));
-            MainBGM.Volume = 0.2;
-
-            Keyboard.Open(new Uri(keyboardPath, UriKind.Absolute));
-            Keyboard.Volume = 0.1;
+                Debug.WriteLine($"Lỗi StartSound: {ex.Message}");
+            }
         }
         private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
@@ -112,8 +155,10 @@ namespace Gomoku_Client
         }
 
         bool isWrongEmail = false;
+
         private async void EmailBox_LostFocus(object sender, RoutedEventArgs e)
         {
+
             if (string.IsNullOrWhiteSpace(EmailBox.Text))
             {
                 EmailBox.Text = "Email";
@@ -122,7 +167,7 @@ namespace Gomoku_Client
                     (Color)ColorConverter.ConvertFromString("#2A2A2A")
                 );
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
-                if(isWrongEmail == true)
+                if (isWrongEmail == true)
                 {
                     MainBorder.Height -= 15;
                     isWrongEmail = false;
@@ -137,7 +182,7 @@ namespace Gomoku_Client
                     (Color)ColorConverter.ConvertFromString("#FF4655")
                 );
                 EmailNotFoundText.Visibility = Visibility.Visible;
-                if(isWrongEmail == false) MainBorder.Height += 15;
+                if (isWrongEmail == false) MainBorder.Height += 15;
                 // Email không tồn tại → viền đỏ
                 EmailBorder.BorderBrush = new SolidColorBrush(
                     (Color)ColorConverter.ConvertFromString("#FF4655")
@@ -175,7 +220,8 @@ namespace Gomoku_Client
                         }
                         return;
                     }
-                }catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -190,7 +236,7 @@ namespace Gomoku_Client
 
                     isWrongEmail = true;
                 }
-                
+
             }
         }
 
@@ -202,7 +248,7 @@ namespace Gomoku_Client
                 PasswordPlaceholder.Visibility = Visibility.Visible;
         }
 
-        
+
 
         private void Hyperlink_Click(object sender, RoutedEventArgs e)
         {
@@ -252,29 +298,43 @@ namespace Gomoku_Client
             SignUpText.IsHitTestVisible = true;
         }
 
+        bool isLogin = false;
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            ButtonClick.Stop();
-            ButtonClick?.Play();
-            string password = PasswordBox.Password;
-            string email = EmailBox.Text;
-            buttonDisable();
-            
+            isLogin = true;
+                ButtonClick.Stop();
+                ButtonClick?.Play();
 
-            if (failedLogin)
+
+            LoadingCircle.Visibility = Visibility.Visible;
+            LoginButton.Content = "";
+            buttonDisable();
+
+            if (failedLogin || isWrongEmail || isWrongPassword)
             {
-                EmailBorder.BorderBrush = new SolidColorBrush(
-                    (Color)ColorConverter.ConvertFromString("#2A2A2A")
-                );
+                EmailBorder.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A2A2A"));
+                PasswordBorder.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2A2A2A"));
                 EmailNotFoundText.Visibility = Visibility.Collapsed;
-                MainBorder.Height -= 15;
+                WrongPassText.Visibility = Visibility.Collapsed;
+                int stepsToReduce = 0;
+                if (isWrongEmail) stepsToReduce++;
+                if (isWrongPassword) stepsToReduce++;
+                if (failedLogin && !isWrongEmail) stepsToReduce++;
+
+                MainBorder.Height -= (stepsToReduce * 15);
+
+                isWrongEmail = false;
+                isWrongPassword = false;
                 failedLogin = false;
 
             }
 
+            string password = PasswordBox.Password;
+            string email = EmailBox.Text;
+
             try
             {
-                EmailBox_LostFocus(sender, e);
+                //EmailBox_LostFocus(sender, e);
 
                 if (string.IsNullOrEmpty(password))
                 {
@@ -284,7 +344,7 @@ namespace Gomoku_Client
                     WrongPassText.Visibility = Visibility.Visible;
                     if (isWrongPassword == false) MainBorder.Height += 15;
                     buttonEnable();
-                    LoginButton.Content = "Đăng nhập";
+                    LoginButton.Content = "Đăng Nhập";
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     isWrongPassword = true;
                 }
@@ -292,15 +352,92 @@ namespace Gomoku_Client
                 if (isWrongEmail || string.IsNullOrEmpty(password))
                 {
                     buttonEnable();
-                    LoginButton.Content = "Đăng nhập";
+                    LoginButton.Content = "Đăng Nhập";
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     return;
                 }
 
-                LoadingCircle.Visibility = Visibility.Visible;
-                LoginButton.Content = "";
+                if (!Validate.IsValidEmail(EmailBox.Text))
+                {
+                    EmailNotFoundText.Text = "Email không hợp lệ";
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    if (isWrongEmail == false) MainBorder.Height += 15;
+                    // Email không tồn tại → viền đỏ
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
 
-                var user = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+                    isWrongEmail = true;
+
+                    buttonEnable();
+                    LoginButton.Content = "Đăng Nhập";
+                    LoadingCircle.Visibility = Visibility.Collapsed;
+                    return;
+                }
+
+                else
+                {
+                    if (!await Validate.IsEmailExists(EmailBox.Text))
+                    {
+                        EmailNotFoundText.Text = "Không tìm thấy tài khoản với email này";
+                        EmailBorder.BorderBrush = Brushes.Red;
+                        EmailNotFoundText.Visibility = Visibility.Visible;
+                        if (isWrongEmail == false) MainBorder.Height += 15;
+                        // Email không tồn tại → viền đỏ
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#FF4655")
+                        );
+
+                        isWrongEmail = true;
+
+                        buttonEnable();
+                        LoginButton.Content = "Đăng Nhập";
+                        LoadingCircle.Visibility = Visibility.Collapsed;
+                        return;
+                    }
+                    else
+                    {
+                        EmailBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#2A2A2A")
+                        );
+                        EmailNotFoundText.Visibility = Visibility.Collapsed;
+                        if (isWrongEmail == true)
+                        {
+                            MainBorder.Height -= 15;
+                            isWrongEmail = false;
+                        }
+                    }
+                }
+
+
+                var authResult = await FirebaseInfo.AuthClient.SignInWithEmailAndPasswordAsync(email, password);
+                var firebaseUser = authResult.User;
+
+                if (!firebaseUser.Info.IsEmailVerified)
+                {
+                    EmailNotFoundText.Text = "Email chưa được xác thực";
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+                    EmailNotFoundText.Visibility = Visibility.Visible;
+                    if (isWrongEmail == false)
+                    {
+                        MainBorder.Height += 15;
+                        isWrongEmail = true;
+                    }
+                    // Email không tồn tại → viền đỏ
+                    EmailBorder.BorderBrush = new SolidColorBrush(
+                        (Color)ColorConverter.ConvertFromString("#FF4655")
+                    );
+
+                    buttonEnable();
+                    LoginButton.Content = "Đăng Nhập";
+                    LoadingCircle.Visibility = Visibility.Collapsed;
+                    return;
+                }
 
                 MainBGM.Stop();
                 MainGameUI mainGame = new MainGameUI();
@@ -309,20 +446,21 @@ namespace Gomoku_Client
                 mainGame.Width = this.Width;
                 mainGame.Height = this.Height;
                 mainGame.WindowState = this.WindowState;
-                
+
                 this.Hide();
                 mainGame.Show();
                 this.Close();
             }
-            catch (FirebaseAuthException)
+            catch (Firebase.Auth.FirebaseAuthException ex)
             {
+                Firebase.Auth.FirebaseAuthException a = ex;
                 try
                 {
                     await UserAction.LoginEmailtAsync(email, password);
                 }
                 catch (AuthException auth_ex)
                 {
-                    if(auth_ex.Message == "INVALID_LOGIN_CREDENTIALS")
+                    if (auth_ex.Message == "INVALID_LOGIN_CREDENTIALS")
                     {
                         EmailNotFoundText.Text = "Email hoặc mật khẩu không chính xác";
                         EmailNotFoundText.Visibility = Visibility.Visible;
@@ -333,11 +471,12 @@ namespace Gomoku_Client
                         );
                         buttonEnable();
                         failedLogin = true;
-                        LoginButton.Content = "Đăng nhập";
+                        LoginButton.Content = "Đăng Nhập";
                         LoadingCircle.Visibility = Visibility.Collapsed;
                     }
                 }
             }
+            isLogin = false;
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
@@ -368,23 +507,23 @@ namespace Gomoku_Client
             ButtonClick.Stop();
             ButtonClick?.Play();
             if (!isShowing)
-          {
-            // Hiện mật khẩu
-            PasswordVisible.Text = PasswordBox.Password;
-            PasswordVisible.Visibility = Visibility.Visible;
-            PasswordBox.Visibility = Visibility.Collapsed;
-            TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
-          }
-          else
-          {
-            // Ẩn mật khẩu
-            PasswordBox.Password = PasswordVisible.Text;
-            PasswordBox.Visibility = Visibility.Visible;
-            PasswordVisible.Visibility = Visibility.Collapsed;
-            TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
-          }
+            {
+                // Hiện mật khẩu
+                PasswordVisible.Text = PasswordBox.Password;
+                PasswordVisible.Visibility = Visibility.Visible;
+                PasswordBox.Visibility = Visibility.Collapsed;
+                TogglePasswordIcon.Data = (Geometry)FindResource("EyeOffIcon");
+            }
+            else
+            {
+                // Ẩn mật khẩu
+                PasswordBox.Password = PasswordVisible.Text;
+                PasswordBox.Visibility = Visibility.Visible;
+                PasswordVisible.Visibility = Visibility.Collapsed;
+                TogglePasswordIcon.Data = (Geometry)FindResource("EyeIcon");
+            }
 
-          isShowing = !isShowing;
+            isShowing = !isShowing;
         }
 
         private void PasswordBox_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -397,7 +536,7 @@ namespace Gomoku_Client
             }
             if (e.Key == Key.Enter)
             {
-                LoginButton_Click(sender, e);
+                if(!isLogin) LoginButton_Click(sender, e);
             }
         }
 
@@ -427,7 +566,7 @@ namespace Gomoku_Client
                 }
             }
 
-            if(string.IsNullOrEmpty(PasswordBox.Password))
+            if (string.IsNullOrEmpty(PasswordBox.Password))
             {
                 PasswordPlaceholder.Visibility = Visibility.Visible;
             }
@@ -459,7 +598,7 @@ namespace Gomoku_Client
 
         private void PasswordBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if(PasswordPlaceholder.Visibility == Visibility.Visible)
+            if (PasswordPlaceholder.Visibility == Visibility.Visible)
             {
                 PasswordPlaceholder.Visibility = Visibility.Collapsed;
             }

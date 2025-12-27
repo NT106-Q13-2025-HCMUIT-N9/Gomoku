@@ -5,16 +5,21 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Assets\**" />
+    <EmbeddedResource Remove="Assets\**" />
+    <None Remove="Assets\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="Google.Cloud.Firestore" Version="4.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Assets\api.env" />
-    <Resource Include="Assets\firebase_key.json" />
+    <EmbeddedResource Include="Assets\firebase_key.json" />
   </ItemGroup>
 
 </Project>

@@ -16,7 +16,8 @@ namespace Gomoku_Client.View
             string name,
             Action<object, RoutedEventArgs> AcceptButton_Click,
             Action<object, RoutedEventArgs> RefuseButton_Click,
-            ResourceDictionary resource
+            ResourceDictionary resource,
+            string image_path
         )
         {
             Border newFriendRequestCard = new Border();
@@ -42,7 +43,7 @@ namespace Gomoku_Client.View
 
             ImageBrush avatarBrush = new ImageBrush()
             {
-                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                ImageSource = new BitmapImage(new Uri(image_path)),
                 Stretch = Stretch.UniformToFill
             };
             avatar.Background = avatarBrush;
@@ -137,7 +138,8 @@ namespace Gomoku_Client.View
             string name,
             Action<object, RoutedEventArgs> ChallengeButton_Click,
             Action<object, RoutedEventArgs> UnfriendButton_Click,
-            ResourceDictionary resource
+            ResourceDictionary resource,
+            string image_path
         )
         {
             Border newFriendCard = new Border();
@@ -163,7 +165,7 @@ namespace Gomoku_Client.View
 
             ImageBrush avatarBrush = new ImageBrush()
             {
-                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                ImageSource = new BitmapImage(new Uri(image_path)),
                 Stretch = Stretch.UniformToFill
             };
             avatar.Background = avatarBrush;
@@ -267,7 +269,7 @@ namespace Gomoku_Client.View
             return newFriendCard;
         }
 
-        public static Border CreateDrawMatchItem(string opponentName, string duration)
+        public static Border CreateDrawMatchItem(string opponentName, string duration, string image_path)
         {
             Border mainBorder = new Border
             {
@@ -324,7 +326,7 @@ namespace Gomoku_Client.View
 
             avatarBorder.Background = new ImageBrush
             {
-                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                ImageSource = new BitmapImage(new Uri(image_path)),
                 Stretch = Stretch.UniformToFill
             };
             opponentPanel.Children.Add(avatarBorder);
@@ -355,7 +357,7 @@ namespace Gomoku_Client.View
             return mainBorder;
         }
 
-        public static Border CreateWinMatchItem(string opponentName, string duration)
+        public static Border CreateWinMatchItem(string opponentName, string duration, string image_path)
         {
             Border mainBorder = new Border
             {
@@ -363,7 +365,7 @@ namespace Gomoku_Client.View
                 Margin = new Thickness(0),
                 BorderBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#00D946"),
                 BorderThickness = new Thickness(0, 0, 6, 0),
-                Name = opponentName
+                Name = opponentName,
             };
 
             LinearGradientBrush backgroundBrush = new LinearGradientBrush
@@ -412,7 +414,7 @@ namespace Gomoku_Client.View
 
             avatarBorder.Background = new ImageBrush
             {
-                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                ImageSource = new BitmapImage(new Uri(image_path)),
                 Stretch = Stretch.UniformToFill
             };
             opponentPanel.Children.Add(avatarBorder);
@@ -443,7 +445,7 @@ namespace Gomoku_Client.View
             return mainBorder;
         }
 
-        public static Border CreateLoseMatchItem(string opponentName, string duration)
+        public static Border CreateLoseMatchItem(string opponentName, string duration, string image_path)
         {
             Border mainBorder = new Border
             {
@@ -500,7 +502,7 @@ namespace Gomoku_Client.View
 
             avatarBorder.Background = new ImageBrush
             {
-                ImageSource = new BitmapImage(new Uri("pack://application:,,,/Assets/Gomoku.ico")),
+                ImageSource = new BitmapImage(new Uri(image_path)),
                 Stretch = Stretch.UniformToFill
             };
             opponentPanel.Children.Add(avatarBorder);

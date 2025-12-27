@@ -9,7 +9,7 @@
         Icon="\Assets\Gomoku.ico"
         Title="Gomoku" Height="720" Width="1280" 
         WindowStyle="SingleBorderWindow" 
-        WindowStartupLocation="CenterScreen" 
+        WindowStartupLocation="CenterOwner" 
         ResizeMode="NoResize"
         Background="#0F1923"
         Loaded="Window_Loaded"

@@ -380,6 +380,10 @@ namespace Gomoku_Client
 
         public void NavigateToLobby()
         {
+            MainFrame.Content = null;
+            StackPanelMenu.Visibility = Visibility.Visible;
+            MainFrame.Visibility = Visibility.Collapsed;
+
             MainFrame.Navigate(new Lobby(this));
         }
         private void HistoryButton_Checked(object sender, RoutedEventArgs e)

@@ -1,23 +1,22 @@
-
 <h1 align="center"><b><i>GOMOKU</i></b></h1>
 
 <p align="center">
   <img src="Gomoku_Client/Assets/Gomoku.ico" width="100" style="border-radius:10%">
 </p>
 
-
 <p align="center">
-  An online multiplayer board game, developed using the Client–Server model.<br>
-  The game allows players to connect via the Internet and compete in real time.<br>
-  The first player to form <b>five consecutive stones</b> in a row (horizontal, vertical, or diagonal) wins.<br>
-  <sub><i>(In Viet Nam, this game is commonly called as <b>Caro</b>)</i></sub><br>
+  An online multiplayer board game.<br>
+  First player to form <b>five consecutive stones</b> in a row (horizontal, vertical, or diagonal) wins.<br>
+  <sub><i>(In casual Vietnamese conversation, this game is known as <b>Caro</b>.)</i></sub><br>
 </p>
 
 ## About
-This project was built as a final project for the **Network Programming (NT106)** course at the **University of Information Technology (UIT)**.
+This application was built as a final project for the **Network Programming (NT106)** course at the **University of Information Technology (UIT)**.
 
 Created by **Group 9** ([see team members](#authors)) **- Class NT106.Q13**, this application demonstrates a complete implementation of standard networking concepts, including TCP socket communication, multi-threading, and cloud deployment, wrapped in a modern WPF interface.
 
+> [!WARNING]
+> As of **December 30th, 2025**, the _Gomoku_ project has been archived. This means that it will no longer receive bug fixes, patches, etc.
 
 ## Main Features
 - Online Gomoku gameplay
@@ -40,15 +39,19 @@ Created by **Group 9** ([see team members](#authors)) **- Class NT106.Q13**, thi
 
 ## Technologies Used
 
-- **Language:** C#
+- **Language:** C# / XAML
 
 - **GUI Framework:** WPF
 
 - **Architecture:** Client–Server Model (MVVM on Client)
 
+- **Authentication:** Firebase
+
 - **Networking:** TCP/IP Sockets
 
 - **Cloud Service:** Google Cloud Platform (GCP)
+
+- **Database:** Firestore
 
 - **Platform:** Windows Desktop
 
@@ -59,33 +62,30 @@ Created by **Group 9** ([see team members](#authors)) **- Class NT106.Q13**, thi
 
 - Stable Internet connection for online gameplay
 
-
-
 ## How To Play
-1. Download [`Gomoku_Client.exe`](https://github.com/NT106-Q13-2025-HCMUIT-N9/Gomoku/releases/download/v1.0.0/Gomoku_Client.exe)
+1. Head to the [Releases](https://github.com/NT106-Q13-2025-HCMUIT-N9/Gomoku/releases) page and download the latest `Gomoku_Client.exe`.
 
-2. Run the `.exe` file
+2. Run the file you just downloaded.
 
-3. Create an account using your email address and verify it
+3. Create an account using your email address and verify it.
 
-4. Log in and then you can play now
+4. Log in and enjoy the fun!
 
 ## Future Development
-The following features are planned for future releases:
+> [!NOTE]
+> The **Future Development** section has been dropped due to the conclusion of the associated course.
 
-- Ranked matchmaking system: 
+~~The following features are planned for future releases:~~
 
-    - Implementation of an ELO rating system
+- ~~Ranked matchmaking system:~~
+    - ~~Implementation of an ELO rating system~~
+    - ~~Leaderboards to display top players~~
 
-    - Leaderboards to display top players
-- PvE mode (vs Bot):
+- ~~PvE mode (vs Bot):~~
+    - ~~Single-player mode against an AI opponent~~
 
-    - Single-player mode against an AI opponent
-
-- Custom avatar upload:
-
-    - Allow players to upload and use their own avatars
-
+- ~~Custom avatar upload:~~
+    - ~~Allow players to upload and use their own avatars~~
 
 ## Authors
 
@@ -97,6 +97,11 @@ The following features are planned for future releases:
 
 - **Phan Anh Tú** - _24521913_ - [[zr0x8](https://github.com/zr0x8)]
 
-
 ## License
 Distributed under the MIT License. See LICENSE for more information.
+
+## More
+If you have any questions regarding the project (how to build and host this on your own, etc.), please contact **the project leader** or **zr0x8** via the following emails:
+
+- **hdatuan** (project leader): `24521922@gm.uit.edu.vn`
+- **zr0x8**: `24521913@gm.uit.edu.vn`

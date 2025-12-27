@@ -1,3 +1,4 @@
+using Gomoku_Client.Helpers;
 using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using System;
@@ -18,11 +19,10 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Gomoku_Client.Helpers;
-
+using System.ComponentModel;
 namespace Gomoku_Client.View
 {
-    public partial class GamePlay : Page
+    public partial class GamePlay : Window
     {
         private const int boardSize = 15;
         private const double cellSize = 46.5;
@@ -39,13 +39,15 @@ namespace Gomoku_Client.View
         private TimeSpan player1TimeLeft = TimeSpan.FromMinutes(5);
         private TimeSpan player2TimeLeft = TimeSpan.FromMinutes(5);
 
-        private string player1Name = "YOU";
-        private string player2Name = "OPPONENT";
-
         private TcpClient tcpClient;
         private Thread receiveThread;
         private bool isConnected = false;
         private MainGameUI mainWindow;
+
+        public bool FinalResult_IsLocalPlayerWinner { get; private set; } = false;
+        public bool FinalResult_IsDraw { get; private set; } = false;
+        public string player1Name { get; private set; } = "YOU";
+        public string player2Name { get; private set; } = "OPPONENT";
 
         //SoundMaker
         public MediaPlayer MainBGM = new MediaPlayer();
@@ -57,26 +59,40 @@ namespace Gomoku_Client.View
 
             this.mainWindow = window;
 
-            if (client == null || !client.Connected)
-            {
-                MessageBox.Show("Kết nối bị mất. Vui lòng thử lại.");
-                ExitToHome();
-                return;
-            }
-
-            this.isConnected = true;
             this.tcpClient = client;
 
             this.player1Name = username;
             this.playerSymbol = symbol;
             this.opponentName = opponent;
             this.player2Name = opponent;
-            
 
-            this.isPlayerTurn = (symbol == 'X');
+            this.Loaded += GamePlay_Loaded;
+            this.Closing += GamePlay_Closing;
+        }
+
+        private async void SetAvatar(string username, string opponent)
+        {
+            UserDataModel? player1data = await FireStoreHelper.GetUserInfo(username);
+            Avatar1.ImageSource = BitmapFrame.Create(new Uri(player1data.ImagePath));
+            UserDataModel? player2data = await FireStoreHelper.GetUserInfo(opponent);
+            Avatar2.ImageSource = BitmapFrame.Create(new Uri(player2data.ImagePath));
+        }
+
+        private void GamePlay_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (tcpClient == null || !tcpClient.Connected)
+            {
+                MessageBox.Show("Kết nối bị mất. Vui lòng thử lại.");
+                ExitToHome();
+                return;
+            }
+            UserState.currentState = State.InMatch;
+            this.isConnected = true;
+            this.isPlayerTurn = (playerSymbol == 'X');
             this.isGameOver = false;
 
-            SetAvatar(username, opponent);
+            SetAvatar(player1Name, opponentName);
+
             InitializeGame();
             DrawBoard();
             SetupTimers();
@@ -89,21 +105,54 @@ namespace Gomoku_Client.View
                 ? $"Lượt của bạn "
                 : $"Lượt của {player2Name}";
 
-            Console.WriteLine($"[INIT] Player: {username}, Symbol: {symbol}, IsPlayerTurn: {isPlayerTurn}, IsGameOver: {isGameOver}");
+            if (receiveThread == null || !receiveThread.IsAlive)
+            {
+                receiveThread = new Thread(ReceiveFromServer);
+                receiveThread.IsBackground = true;
+                receiveThread.Start();
+            }
 
-            receiveThread = new Thread(ReceiveFromServer);
-            receiveThread.IsBackground = true;
-            receiveThread.Start();
-            Console.WriteLine("[INIT] Receive thread started immediately");
-            StartSound();
+
+            try
+            {
+                StartSound();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi âm thanh: " + ex.Message);
+            }
         }
 
-        private async void SetAvatar(string username, string opponent)
+        private async void GamePlay_Closing(object? sender, CancelEventArgs e)
         {
-            UserDataModel? player1data = await FireStoreHelper.GetUserInfo(username);
-            Avatar1.ImageSource = BitmapFrame.Create(new Uri(player1data.ImagePath));
-            UserDataModel? player2data = await FireStoreHelper.GetUserInfo(opponent);
-            Avatar2.ImageSource = BitmapFrame.Create(new Uri(player2data.ImagePath));
+            try
+            {
+                isGameOver = true;
+                player1Timer?.Stop();
+                player2Timer?.Stop();
+
+                try
+                {
+                    if (isConnected)
+                    {
+                        SendResignToServer();
+                        SendMatchEnd();
+                    }
+                }
+                catch { }
+                isConnected = false;
+
+                await Disconnect();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] GamePlay_Closing: {ex}");
+                tcpClient.Close();
+            }
+            finally
+            {
+                UserState.currentState = State.Ready;
+            }
         }
 
         private void StartSound()
@@ -122,8 +171,8 @@ namespace Gomoku_Client.View
                 string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
                 string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
 
-                double BGMVolume = mainWindow.MasterVolValue * mainWindow.BGMVolValue;
-                double SFXVolume = mainWindow.MasterVolValue * mainWindow.SFXVolValue;
+                double BGMVolume = MainGameUI.MasterVolValue * MainGameUI.BGMVolValue;
+                double SFXVolume = MainGameUI.MasterVolValue * MainGameUI.SFXVolValue;
 
                 MainBGM.Volume = BGMVolume;
                 ButtonClick.Volume = SFXVolume;
@@ -162,30 +211,10 @@ namespace Gomoku_Client.View
             }
         }
 
-        private char GetOpponentSymbol()
+
+        private async void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            return playerSymbol == 'X' ? 'O' : 'X';
-        }
-
-
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                MainBGM.Stop();
-                MainBGM.Close();
-
-                ButtonClick.Stop();
-                ButtonClick.Close();
-
-                Keyboard.Stop();
-                Keyboard.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"[AUDIO CLEANUP ERROR] {ex.Message}");
-            }
-            Disconnect();
+            await Disconnect();
         }
 
         private async Task Disconnect()
@@ -531,14 +560,6 @@ namespace Gomoku_Client.View
             });
         }
 
-        private bool CheckWin(int row, int col, int player)
-        {
-            return CheckDirection(row, col, 0, 1, player) ||
-                   CheckDirection(row, col, 1, 0, player) ||
-                   CheckDirection(row, col, 1, 1, player) ||
-                   CheckDirection(row, col, 1, -1, player);
-        }
-
         private bool CheckDirection(int row, int col, int dRow, int dCol, int player)
         {
             int count = 1;
@@ -566,82 +587,25 @@ namespace Gomoku_Client.View
         private void GameOver(bool? player1Wins, string message)
         {
             isGameOver = true;
-            player1Timer.Stop();
-            player2Timer.Stop();
+            player1Timer?.Stop();
+            player2Timer?.Stop();
+
+            MainBGM.Stop();
+
+            if (player1Wins == null)
+            {
+                FinalResult_IsDraw = true;
+                FinalResult_IsLocalPlayerWinner = false;
+            }
+            else
+            {
+                FinalResult_IsDraw = false;
+                FinalResult_IsLocalPlayerWinner = player1Wins.Value;
+            }
 
             Dispatcher.Invoke(() =>
             {
-                bool isLocalPlayerWinner = player1Wins.HasValue && player1Wins.Value;
-                bool isDraw = !player1Wins.HasValue;
-
-                Border blackOverlay = new Border
-                {
-                    Background = new SolidColorBrush(Colors.Black),
-                    Opacity = 0,
-                    Width = mainWindow.ActualWidth,
-                    Height = mainWindow.ActualHeight
-                };
-
-                var rootGrid = this.Content as Grid;
-                if (rootGrid != null)
-                {
-                    rootGrid.Children.Add(blackOverlay);
-                    Panel.SetZIndex(blackOverlay, 9999);
-                }
-
-                var fadeToBlack = new DoubleAnimation
-                {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.5),
-                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn }
-                };
-
-                fadeToBlack.Completed += (s, args) =>
-                {
-                    MatchResult resultPage = new MatchResult(
-                        isLocalPlayerWinner,
-                        player1Name,
-                        player2Name,
-                        mainWindow,
-                        isDraw
-                    );
-
-                    resultPage.Opacity = 0;
-
-                    if (mainWindow != null)
-                    {
-                        try
-                        {
-                            mainWindow.NavigateWithAnimation(resultPage);
-
-                            Dispatcher.BeginInvoke(new Action(() =>
-                            {
-                                var fadeIn = new DoubleAnimation
-                                {
-                                    From = 0,
-                                    To = 1,
-                                    Duration = TimeSpan.FromSeconds(0.5),
-                                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-                                };
-                                resultPage.BeginAnimation(OpacityProperty, fadeIn);
-                            }), DispatcherPriority.Loaded);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"[ERROR] Navigation failed: {ex.Message}");
-                            MessageBox.Show(message);
-                            ExitToHome();
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show(message);
-                        ExitToHome();
-                    }
-                };
-
-                blackOverlay.BeginAnimation(OpacityProperty, fadeToBlack);
+                this.Close();
             });
         }
 
@@ -745,16 +709,47 @@ namespace Gomoku_Client.View
                     SendMatchEnd();
                     isConnected = false;
                 }
-                Disconnect();
+
+                _ = Disconnect();
 
                 Dispatcher.Invoke(() =>
                 {
-                    mainWindow?.NavigateToLobby();
+                    Border blackOverlay = new Border
+                    {
+                        Background = Brushes.Black,
+                        Opacity = 0,
+                        Visibility = Visibility.Visible
+                    };
+
+                    Grid.SetRowSpan(blackOverlay, 100);
+                    Grid.SetColumnSpan(blackOverlay, 100);
+                    Panel.SetZIndex(blackOverlay, 99999);
+
+                    if (this.Content is Grid rootGrid)
+                    {
+                        rootGrid.Children.Add(blackOverlay);
+                    }
+
+                    DoubleAnimation fadeAnim = new DoubleAnimation
+                    {
+                        From = 0,
+                        To = 1,
+                        Duration = TimeSpan.FromSeconds(0.8),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+
+                    fadeAnim.Completed += (s, e) =>
+                    {
+                        this.Close();
+                    };
+
+                    blackOverlay.BeginAnimation(UIElement.OpacityProperty, fadeAnim);
                 });
             }
             catch (Exception ex)
             {
-                Window.GetWindow(this)?.Close();
+                Console.WriteLine($"[ERROR] ExitToHome: {ex.Message}");
+                Dispatcher.Invoke(() => this.Close());
             }
         }
 

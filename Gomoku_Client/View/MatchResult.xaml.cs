@@ -64,8 +64,6 @@ namespace Gomoku_Client.View
                 {
                     img_OpponentAvatar.Source = BitmapFrame.Create(new Uri(opponentData.ImagePath));
                 }
-            
-
 
                 AnimateResult();
             }

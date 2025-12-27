@@ -1,4 +1,5 @@
-﻿using Gomoku_Client.Model;
+﻿using Gomoku_Client.Helpers;
+using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -35,14 +36,10 @@ namespace Gomoku_Client
 
         void StartSound()
         {
-            string buttonPath = System.IO.Path.Combine(
-                AppDomain.CurrentDomain.BaseDirectory,
-                "Assets",
-                "Sounds",
-                "ButtonHover.wav"
-            );
+            string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
 
-            ButtonClick.Open(new Uri(buttonPath, UriKind.Absolute));
+            if (buttonPath != null)
+                ButtonClick.Open(new Uri(buttonPath));
         }
 
         private void Email_GotFocus(object sender, RoutedEventArgs e)
@@ -56,7 +53,7 @@ namespace Gomoku_Client
 
         private async void Email_LostFocus(object sender, RoutedEventArgs e)
         {
-            if(string.IsNullOrWhiteSpace(EmailBox.Text) && textChanged == true)
+            if (string.IsNullOrWhiteSpace(EmailBox.Text) && textChanged == true)
             {
                 EmailNotFoundText.Text = "Email không hợp lệ";
                 EmailBox.Text = "Email khôi phục";
@@ -163,9 +160,9 @@ namespace Gomoku_Client
             else
             {
                 //Loading
-                
+
                 try
-                { 
+                {
                     await UserAction.SendResetAsync(EmailBox.Text);
                     //MessageBox.Show($"Đã gửi link để cập nhập mật khẩu vào email: {EmailBox.Text}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
 
@@ -176,18 +173,19 @@ namespace Gomoku_Client
                     var border = (Border)((Grid)ConfirmationOverlay).Children[0];
                     storyboard.Begin(border);
 
-                    
+
 
                     //Loaded
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     buttonEnable();
                     SendOTPButton.Content = "Gửi mã xác thực";
 
-                    
+
 
                     storyboard.Begin(border);
                 }
-                catch (AuthException auth_ex) {
+                catch (AuthException auth_ex)
+                {
                     AuthException a = auth_ex;
                     //MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
@@ -227,7 +225,7 @@ namespace Gomoku_Client
             _mainWindow.Keyboard.Stop();
             _mainWindow.Keyboard?.Play();
             textChanged = true;
-            if (e.Key == Key.Space) 
+            if (e.Key == Key.Space)
             {
                 e.Handled = true;
             }

@@ -59,14 +59,13 @@ namespace Gomoku_Client.View
                 _username = user.Info.DisplayName;
                 tb_PlayerName.Text = _username;
 
-
                 _stopwatch.Start();
                 _queueTimer.Start();
                 _movingDotStoryboard = (Storyboard)this.Resources["MovingDotStoryboard"];
                 _movingDotStoryboard?.Begin();
 
-                UserStatsModel? user_stats = await FireStoreHelper.GetUserStats(tb_PlayerName.Text);
-                UserDataModel? user_data = await FireStoreHelper.GetUserInfo(tb_PlayerName.Text);
+                UserStatsModel? user_stats = await FireStoreHelper.GetUserStats(_username);
+                UserDataModel? user_data = await FireStoreHelper.GetUserInfo(_username);
                 img_PlayerAvatar.Source = BitmapFrame.Create(new Uri(user_data.ImagePath));
 
                 if (user_stats != null)
@@ -166,7 +165,7 @@ namespace Gomoku_Client.View
             {
                 if (this.IsLoaded)
                 {
-                    _tcpClient = new TcpClient(AddressFamily.InterNetwork);
+                    _tcpClient = new TcpClient();
                     _tcpClient.Connect("34.68.212.10", 9999);
                     _stream = _tcpClient.GetStream();
                     _isConnected = true;
@@ -335,7 +334,6 @@ namespace Gomoku_Client.View
                 if (_receiveThread != null && _receiveThread.IsAlive)
                 {
                     _receiveThread.Join(500);
-                    Console.WriteLine("[MATCHMAKING] Receive thread stopped");
                 }
 
                 grid_OpponentFound.Opacity = 0;
@@ -343,6 +341,7 @@ namespace Gomoku_Client.View
 
                 UserStatsModel? opponent_stats = await FireStoreHelper.GetUserStats(opponent_name);
                 UserDataModel? opponent_data = await FireStoreHelper.GetUserInfo(opponent_name);
+
                 if (opponent_stats != null)
                 {
                     tb_OpponentName.Text = opponent_name;
@@ -366,81 +365,138 @@ namespace Gomoku_Client.View
                 sp_FindingOpponent.Visibility = Visibility.Collapsed;
                 BackButton.Visibility = Visibility.Collapsed;
 
-                var fadeIn = new DoubleAnimation
+                var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.3))
                 {
-                    From = 0,
-                    To = 1,
-                    Duration = TimeSpan.FromSeconds(0.3),
                     EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
                 grid_OpponentFound.BeginAnimation(OpacityProperty, fadeIn);
-
-                await Task.Delay(100);
 
                 if (!(grid_OpponentFound.RenderTransform is TranslateTransform))
                 {
                     grid_OpponentFound.RenderTransform = new TranslateTransform();
                 }
                 var translateTransform = (TranslateTransform)grid_OpponentFound.RenderTransform;
-
-                var slideInAnimation = new DoubleAnimation
+                var slideInAnimation = new DoubleAnimation(100, 0, TimeSpan.FromSeconds(0.4))
                 {
-                    From = 100,
-                    To = 0,
-                    Duration = TimeSpan.FromSeconds(0.4),
                     EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
                 };
                 translateTransform.BeginAnimation(TranslateTransform.XProperty, slideInAnimation);
 
                 await Task.Delay(3000);
 
-                var slideOut = new DoubleAnimation
+                Border blackOverlay = new Border
                 {
-                    From = 0,
-                    To = -_mainWindow.ActualWidth,
-                    Duration = TimeSpan.FromSeconds(0.5),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                    Background = Brushes.Black,
+                    Opacity = 0,
+                    Visibility = Visibility.Visible
                 };
 
-                if (this.RenderTransform == null || !(this.RenderTransform is TranslateTransform))
+                if (this.Content is Grid rootGrid)
                 {
-                    this.RenderTransform = new TranslateTransform();
+                    Grid.SetRowSpan(blackOverlay, 100);
+                    Grid.SetColumnSpan(blackOverlay, 100);
+                    Panel.SetZIndex(blackOverlay, 9999);
+                    rootGrid.Children.Add(blackOverlay);
                 }
 
-                var transform = (TranslateTransform)this.RenderTransform;
+                var fadeToBlack = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.8));
 
-                slideOut.Completed += (s, args) =>
+                fadeToBlack.Completed += (s, args) =>
                 {
+
                     Dispatcher.Invoke(() =>
                     {
-                        Console.WriteLine("[MATCHMAKING] Navigating to GamePlay");
-                        Console.WriteLine($"[MATCHMAKING] TcpClient.Connected: {_tcpClient?.Connected}");
-                        Console.WriteLine($"[MATCHMAKING] Stream.CanRead: {_stream?.CanRead}");
 
-                        GamePlay gamePlayPage = new GamePlay(_tcpClient, _username, playerSymbol, opponent_name, _mainWindow);
+                        _mainWindow.MainBGM.Stop();
 
-                        var slideIn = new DoubleAnimation
-                        {
-                            From = _mainWindow.ActualWidth,
-                            To = 0,
-                            Duration = TimeSpan.FromSeconds(0.5),
-                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                        Console.WriteLine("[MATCHMAKING] Opening GamePlay");
+
+                        var gamePlayWindow = new GamePlay(_tcpClient, _username, playerSymbol, opponent_name, _mainWindow) {
+                            Owner = _mainWindow,
+                            WindowStartupLocation = WindowStartupLocation.Manual,
+                            Left = _mainWindow.Left,
+                            Top = _mainWindow.Top
                         };
 
-                        gamePlayPage.RenderTransform = new TranslateTransform(_mainWindow.ActualWidth, 0);
-                        NavigationService.Navigate(gamePlayPage);
-
-                        Dispatcher.BeginInvoke(new Action(() =>
+                        gamePlayWindow.Closed += (sender, e) =>
                         {
-                            var gameTransform = (TranslateTransform)gamePlayPage.RenderTransform;
-                            gameTransform.BeginAnimation(TranslateTransform.XProperty, slideIn);
-                        }), DispatcherPriority.Loaded);
+                            bool isWinner = gamePlayWindow.FinalResult_IsLocalPlayerWinner;
+                            bool isDraw = gamePlayWindow.FinalResult_IsDraw;
+                            string p1 = gamePlayWindow.player1Name;
+                            string p2 = gamePlayWindow.player2Name;
+
+                            _mainWindow.Left = gamePlayWindow.Left;
+                            _mainWindow.Top = gamePlayWindow.Top;
+
+                            Border mainOverlay = new Border
+                            {
+                                Background = Brushes.Black,
+                                Opacity = 1,
+                                Visibility = Visibility.Visible
+                            };
+
+                            Grid? mainRoot = null;
+                            try
+                            {
+                                mainRoot = _mainWindow.FindName("MainGrid") as Grid;
+                            }
+                            catch { mainRoot = null; }
+
+                            if (mainRoot == null && _mainWindow.Content is Grid g) mainRoot = g;
+
+                            if (mainRoot != null)
+                            {
+                                Grid.SetRowSpan(mainOverlay, 100);
+                                Grid.SetColumnSpan(mainOverlay, 100);
+                                Panel.SetZIndex(mainOverlay, 99999);
+                                mainRoot.Children.Add(mainOverlay);
+                            }
+
+                            _mainWindow.Visibility = Visibility.Visible;
+
+                            var reveal = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.8))
+                            {
+                                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                            };
+
+                            reveal.Completed += (s2, e2) =>
+                            {
+                                try
+                                {
+                                    if (mainRoot != null && mainRoot.Children.Contains(mainOverlay))
+                                        mainRoot.Children.Remove(mainOverlay);
+                                }
+                                catch { }
+
+                                _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                _mainWindow.MainFrame.Visibility = Visibility.Visible;
+
+                                MatchResult resultPage = new MatchResult(isWinner, p1, p2, _mainWindow, isDraw);
+                                _mainWindow.MainFrame.Navigate(resultPage);
+
+                                if (_mainWindow.MainBGM.Source != null) _mainWindow.MainBGM.Play();
+                            };
+
+                            if (mainOverlay != null)
+                                mainOverlay.BeginAnimation(UIElement.OpacityProperty, reveal);
+                            else
+                            {
+                                _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                _mainWindow.MainFrame.Visibility = Visibility.Visible;
+
+                                MatchResult resultPage = new MatchResult(isWinner, p1, p2, _mainWindow, isDraw);
+                                _mainWindow.MainFrame.Navigate(resultPage);
+
+                                if (_mainWindow.MainBGM.Source != null) _mainWindow.MainBGM.Play();
+                            }
+                        };
+
+                        gamePlayWindow.Show();
+                        _mainWindow.Visibility = Visibility.Collapsed;
                     });
                 };
 
-                transform.BeginAnimation(TranslateTransform.XProperty, slideOut);
-
-                _mainWindow.MainBGM.Stop();
+                blackOverlay.BeginAnimation(OpacityProperty, fadeToBlack);
             }
             catch (Exception ex)
             {

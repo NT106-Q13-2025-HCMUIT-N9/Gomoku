@@ -1,17 +1,21 @@
 ﻿using Gomoku_Client.Model;
 using Gomoku_Client.ViewModel;
 using Google.Cloud.Firestore;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Forms.VisualStyles;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using System.Xml.Linq;
 using static Google.Rpc.Context.AttributeContext.Types;
 
 namespace Gomoku_Client.View
@@ -78,8 +82,8 @@ namespace Gomoku_Client.View
 
             await FireStoreHelper.SendFriendRequest(username, FriendUsernameInput.Text);
             NotificationManager.Instance.ShowNotification(
-                "Success",
-                $"Friend request has been sent to {FriendUsernameInput.Text}",
+                "Thành công",
+                $"Thư tình đã được gửi đến {FriendUsernameInput.Text}",
                 Notification.NotificationType.Info,
                 3000
             );
@@ -169,50 +173,201 @@ namespace Gomoku_Client.View
             _mainWindow.ButtonClick.Play();
 
             Button butt = sender as Button;
+            string friendName = butt?.Name ?? "";
             string username = FirebaseInfo.AuthClient.User.Info.DisplayName;
+            if (string.IsNullOrEmpty(friendName)) return;
+            if (string.IsNullOrEmpty(username)) return;
             CancellationTokenSource cts = new CancellationTokenSource();
 
-            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(butt?.Name);
+            Google.Cloud.Firestore.DocumentReference doc_ref = FirebaseInfo.DB.Collection("UserInfo").Document(friendName);
 
-            DocumentSnapshot doc_snap = await doc_ref.GetSnapshotAsync();
-            UserDataModel user_data = doc_snap.ConvertTo<UserDataModel>();
 
             TcpClient client = new TcpClient(AddressFamily.InterNetwork);
-            try
+            await Task.Run(async () =>
             {
-                client.Connect(IPAddress.Parse("34.68.212.10"), 9999);
-            }
-            catch
-            {
-                NotificationManager.Instance.ShowNotification(
-                        "Lỗi",
-                        "Server có thể đang không hoạt động",
-                        Notification.NotificationType.Info,
-                        5000
-                    );
-                return;
-            }
+                try
+                {
+                    client.Connect("34.68.212.10", 9999);
+                    NetworkStream stream = client.GetStream();
 
-            if (!client.Connected) return;
+                    Console.WriteLine("[DEBUG] Đã kết nối tới Server.");
 
-            var stream = client.GetStream();
+                    await doc_ref.UpdateAsync("MatchRequests", FieldValue.ArrayUnion(username));
 
-            if (!user_data.MatchRequests.Contains(username))
-            {
-                byte[] data = Encoding.UTF8.GetBytes($"[CHALLENGE_REQUEST];{username};{butt?.Name}");
-                stream.Write(data, 0, data.Length);
+                    string msg = $"[CHALLENGE_REQUEST];{username};{friendName}\n";
+                    byte[] data = Encoding.UTF8.GetBytes(msg);
+                    stream.Write(data, 0, data.Length);
 
-                NotificationManager.Instance.ShowNotification(
-                        "Thách đấu thành công",
-                        $"Đã gửi thách đấu tới {butt?.Name}",
-                        Notification.NotificationType.Info,
-                        5000
-                    );
+                    Console.WriteLine($"[DEBUG] Sent: {msg.Trim()}");
 
-                user_data.MatchRequests.Add(username);
-                await doc_ref.SetAsync(user_data);
-            }
+                    byte[] buffer = new byte[4096];
+                    while (client != null && client.Connected)
+                    {
+                        int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                        if (bytesRead == 0) break;
 
+                        string response = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
+
+                        Console.WriteLine($"[RECEIVE] Message from server: {response}, received in FriendManager");
+                        string[] message = response.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (string mess in message)
+                        {
+                            if (mess.StartsWith("[INIT]"))
+                            {
+                                string[] parts = mess.Split(';');
+                                if (parts.Length >= 5)
+                                {
+                                    char playerSymbol = parts[3][0];
+                                    string opponentName = parts[4];
+                                    Console.WriteLine($"[DEBUG] Parsed INIT: Symbol={playerSymbol}, Opponent={opponentName}");
+                                    Dispatcher.Invoke(() =>
+                                    {
+
+                                        _mainWindow.MainBGM.Stop();
+
+                                        Console.WriteLine("[MATCHMAKING] Opening GamePlay");
+
+                                        var gamePlayWindow = new GamePlay(client, username, playerSymbol, opponentName, _mainWindow)
+                                        {
+                                            Owner = _mainWindow,
+                                            WindowStartupLocation = WindowStartupLocation.Manual,
+                                            Left = _mainWindow.Left,
+                                            Top = _mainWindow.Top
+                                        };
+
+                                        gamePlayWindow.Closed += (sender, e) =>
+                                        {
+                                            bool isWinner = gamePlayWindow.FinalResult_IsLocalPlayerWinner;
+                                            bool isDraw = gamePlayWindow.FinalResult_IsDraw;
+                                            string p1 = gamePlayWindow.player1Name;
+                                            string p2 = gamePlayWindow.player2Name;
+
+                                            _mainWindow.Left = gamePlayWindow.Left;
+                                            _mainWindow.Top = gamePlayWindow.Top;
+
+                                            Border mainOverlay = new Border
+                                            {
+                                                Background = Brushes.Black,
+                                                Opacity = 1,
+                                                Visibility = Visibility.Visible
+                                            };
+
+                                            Grid? mainRoot = null;
+                                            try
+                                            {
+                                                mainRoot = _mainWindow.FindName("MainGrid") as Grid;
+                                            }
+                                            catch { mainRoot = null; }
+
+                                            if (mainRoot == null && _mainWindow.Content is Grid g) mainRoot = g;
+
+                                            if (mainRoot != null)
+                                            {
+                                                Grid.SetRowSpan(mainOverlay, 100);
+                                                Grid.SetColumnSpan(mainOverlay, 100);
+                                                Panel.SetZIndex(mainOverlay, 99999);
+                                                mainRoot.Children.Add(mainOverlay);
+                                            }
+
+                                            _mainWindow.Visibility = Visibility.Visible;
+
+                                            var reveal = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.8))
+                                            {
+                                                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                                            };
+
+                                            reveal.Completed += (s2, e2) =>
+                                            {
+                                                try
+                                                {
+                                                    if (mainRoot != null && mainRoot.Children.Contains(mainOverlay))
+                                                        mainRoot.Children.Remove(mainOverlay);
+                                                }
+                                                catch { }
+
+                                                _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                                _mainWindow.MainFrame.Visibility = Visibility.Visible;
+
+                                                MatchResult resultPage = new MatchResult(isWinner, p1, p2, _mainWindow, isDraw);
+                                                _mainWindow.MainFrame.Navigate(resultPage);
+
+                                                if (_mainWindow.MainBGM.Source != null) _mainWindow.MainBGM.Play();
+                                            };
+
+                                            if (mainOverlay != null)
+                                                mainOverlay.BeginAnimation(UIElement.OpacityProperty, reveal);
+                                            else
+                                            {
+                                                _mainWindow.StackPanelMenu.Visibility = Visibility.Collapsed;
+                                                _mainWindow.MainFrame.Visibility = Visibility.Visible;
+
+                                                MatchResult resultPage = new MatchResult(isWinner, p1, p2, _mainWindow, isDraw);
+                                                _mainWindow.MainFrame.Navigate(resultPage);
+
+                                                if (_mainWindow.MainBGM.Source != null) _mainWindow.MainBGM.Play();
+                                            }
+                                        };
+
+                                        gamePlayWindow.Show();
+                                        _mainWindow.Visibility = Visibility.Collapsed;
+                                    });
+                                    return;
+                                }
+                            } else if (mess.StartsWith("[ALREADY_IN_MATCH]"))
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Đối thủ đang bận.",
+                                                                                  "Chờ mình chút xíu nhe bạn ơi!",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            } else if (mess.StartsWith("[CHALLENGE_DECLINE]")) {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Thách đấu bị từ chối.",
+                                                                                  "Chơi game mà nhùng! Quá gà :)",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            } else if (mess.StartsWith("[CHALLENGE_CANCELED]"))
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Lời mời đã hết hạn.",
+                                                                                  "Thử lại sau nhé!",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            }
+                            else if (mess.StartsWith("[CHALLENGE_TIMEOUT]"))
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    NotificationManager.Instance.ShowNotification("Thách đấu bị bơ đẹp :).",
+                                                                                  "Alo Vũ à? Phải Vũ không em? Ui Vũ ơi em đừng có chối.",
+                                                                                  Notification.NotificationType.Info,
+                                                                                  3000);
+                                });
+                                client.Close();
+                                return;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[DEBUG ERROR] {ex.Message}");
+                    MessageBox.Show("Lỗi Debug: " + ex.Message);
+                }
+            });
+            /*
             // Nếu đã gửi thách đấu rồi thì lắng nghe phản hồi
 
             FirestoreChangeListener listener = doc_ref.Listen(snapshot =>
@@ -285,6 +440,7 @@ namespace Gomoku_Client.View
                 await listener.StopAsync();
                 cts.Dispose();
             }
+            */
         }
 
         private void UnfriendButton_Click(object sender, RoutedEventArgs e)
@@ -330,18 +486,30 @@ namespace Gomoku_Client.View
                     List<string> diff_request = user_data.FriendsRequests.Except(curr_friend_request).ToList();
                     List<string> diff_friend = user_data.Friends.Except(curr_friend_list).ToList();
 
-                    App.Current.Dispatcher.Invoke(() =>
+                    App.Current.Dispatcher.Invoke(async () =>
                     {
                         foreach (string request in diff_request)
                         {
+                            UserDataModel? request_model = await FireStoreHelper.GetUserInfo(request);
+
                             curr_friend_request.Add(request);
-                            FriendRequestsPanel.Children.Add(UIUtils.CreateFriendRequestCard(request, AcceptButton_Click, RefuseButton_Click, this.Resources));
+                            FriendRequestsPanel.Children.Add(UIUtils.CreateFriendRequestCard(request, 
+                                                                                            AcceptButton_Click, 
+                                                                                            RefuseButton_Click, 
+                                                                                            this.Resources, 
+                                                                                            request_model?.ImagePath ?? ""));
                         }
 
                         foreach (string friend in diff_friend)
                         {
+                            UserDataModel? friend_model = await FireStoreHelper.GetUserInfo(friend);
+
                             curr_friend_list.Add(friend);
-                            FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, ChallengeButton_Click, UnfriendButton_Click, this.Resources));
+                            FriendsListPanel.Children.Add(UIUtils.CreateFriendCard(friend, 
+                                                                                  ChallengeButton_Click, 
+                                                                                  UnfriendButton_Click, 
+                                                                                  this.Resources,
+                                                                                  friend_model?.ImagePath ?? ""));
                         }
 
                         TotalFriendsCount.Text = curr_friend_list.Count.ToString() + " bạn bè";

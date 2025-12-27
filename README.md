@@ -63,7 +63,7 @@ Created by **Group 9** ([see team members](#authors)) **- Class NT106.Q13**, thi
 - Stable Internet connection for online gameplay
 
 ## How To Play
-1. Head to the [Releases](https://github.com/NT106-Q13-2025-HCMUIT-N9/Gomoku/releases) page and download the latest `Gomoku_Client.exe`.
+1. Head to the latest [Release](https://github.com/NT106-Q13-2025-HCMUIT-N9/Gomoku/releases/latest) and download `Gomoku_Client.exe`.
 
 2. Run the file you just downloaded.
 

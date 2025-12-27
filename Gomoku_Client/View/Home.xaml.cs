@@ -103,6 +103,7 @@ namespace Gomoku_Client
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Truo.jpg", Name="MasterWibu" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97.jpg", Name="Jack Đồ Tể" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random J97v2.jpg", Name="Jack Chúa Quỷ" },
+                new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random DoMiXi.jpg", Name="Độ Mixi" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Baka.jpg", Name="Baka" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Larry.jpg", Name="Larry" },
                 new AvatarItem { Image="pack://application:,,,/Assets/Avatar/Random Yippe.jpg", Name="Yippe" },
@@ -554,8 +555,6 @@ namespace Gomoku_Client
                 NotificationManager.Instance.ShowNotification("Lỗi", "Bạn đang trong trận đấu khác!", Notification.NotificationType.Info, 3000);
                 return;
             }
-
-            UserState.currentState = State.InMatch;
 
             try
             {

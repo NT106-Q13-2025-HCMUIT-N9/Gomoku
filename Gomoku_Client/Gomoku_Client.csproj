@@ -55,6 +55,7 @@
     <None Remove="Assets\Avatar\Random BigChungus.jpg" />
     <None Remove="Assets\Avatar\Random Charlie.jpg" />
     <None Remove="Assets\Avatar\Random CoolerFreddy.jpg" />
+    <None Remove="Assets\Avatar\Random Domixi.jpg" />
     <None Remove="Assets\Avatar\Random DonaldTrump.jpg" />
     <None Remove="Assets\Avatar\Random DreamyBull.jpg" />
     <None Remove="Assets\Avatar\Random Epstein.jpg" />
@@ -125,6 +126,7 @@
     <Resource Include="Assets\Avatar\Random BigChungus.jpg" />
     <Resource Include="Assets\Avatar\Random Charlie.jpg" />
     <Resource Include="Assets\Avatar\Random CoolerFreddy.jpg" />
+    <Resource Include="Assets\Avatar\Random Domixi.jpg" />
     <Resource Include="Assets\Avatar\Random DonaldTrump.jpg" />
     <Resource Include="Assets\Avatar\Random DreamyBull.jpg" />
     <Resource Include="Assets\Avatar\Random Epstein.jpg" />

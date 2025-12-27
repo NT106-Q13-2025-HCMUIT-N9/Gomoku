@@ -82,8 +82,8 @@ namespace Gomoku_Client.View
 
             await FireStoreHelper.SendFriendRequest(username, FriendUsernameInput.Text);
             NotificationManager.Instance.ShowNotification(
-                "Success",
-                $"Friend request has been sent to {FriendUsernameInput.Text}",
+                "Thành công",
+                $"Thư tình đã được gửi đến {FriendUsernameInput.Text}",
                 Notification.NotificationType.Info,
                 3000
             );

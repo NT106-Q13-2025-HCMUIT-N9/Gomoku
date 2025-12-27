@@ -9,6 +9,7 @@
 
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <DebugType>embedded</DebugType>
+    <ApplicationIcon>Gomoku.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -99,6 +100,10 @@
     <None Remove="Assets\Sounds\Matchmakers.mp3" />
     <None Remove="Assets\Sounds\meow.mp3" />
     <None Remove="Assets\Sounds\RelaxedScene.mp3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Gomoku.ico" />
   </ItemGroup>
 
   <ItemGroup>
@@ -194,6 +199,21 @@
 		<EmbeddedResource Include="Assets\Sounds\meow.mp3" />
 		<EmbeddedResource Include="Assets\Sounds\RelaxedScene.mp3" />
 		<Resource Include="Assets\Avatar\T1_6sao.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 </Project>

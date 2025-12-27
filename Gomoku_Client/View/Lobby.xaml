@@ -123,11 +123,11 @@
                         Content="TÌM TRẬN"
                         FontSize="60"
                         Click="MatchMakingButton_Click">
-                        <Button.Background>
-                            <ImageBrush ImageSource="/Assets/Images/Matchmaking_Background.png" 
+                    <Button.Background>
+                        <ImageBrush ImageSource="/Assets/Images/Matchmaking_Background.png" 
                             Stretch="UniformToFill"
                             Opacity="0.7"/>
-                        </Button.Background>
+                    </Button.Background>
                 </Button>
 
                 <!-- AI button (top right) -->
@@ -250,8 +250,7 @@
                 <Grid Grid.Row="2" Grid.Column="0" ClipToBounds="True">
                     <Button x:Name="ServerBrowserButton" 
                             Style="{StaticResource LobbyModeButton}"
-                            Background="White"
-                            BorderBrush="#FFD700"
+                            BorderBrush="#5c5c5c"
                             Click="ServerBrowserButton_Click"
                             FontSize="60">
                         <Grid ClipToBounds="False">
@@ -264,6 +263,98 @@
                                        HorizontalAlignment="Center"
                                        VerticalAlignment="Center"
                                        Panel.ZIndex="2"/>
+                            <!-- under development banner (inside button) -->
+                            <Border Height="60"
+                                VerticalAlignment="Center"
+                                RenderTransformOrigin="0.5,0.5"
+                                Panel.ZIndex="10"
+                                Margin="-183,0,-175,0"
+                                ClipToBounds="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0" SpreadMethod="Repeat" MappingMode="Absolute">
+                                        <LinearGradientBrush.GradientStops>
+                                            <GradientStop Color="#FFD700" Offset="0"/>
+                                            <GradientStop Color="#FFD700" Offset="0.5"/>
+                                            <GradientStop Color="#000000" Offset="0.5"/>
+                                            <GradientStop Color="#000000" Offset="1"/>
+                                        </LinearGradientBrush.GradientStops>
+                                        <LinearGradientBrush.Transform>
+                                            <TransformGroup>
+                                                <SkewTransform AngleX="-30"/>
+                                                <ScaleTransform ScaleX="0.05"/>
+                                            </TransformGroup>
+                                        </LinearGradientBrush.Transform>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.RenderTransform>
+                                    <RotateTransform Angle="-23"/>
+                                </Border.RenderTransform>
+                                <Border.Effect>
+                                    <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="5" Opacity="0.8"/>
+                                </Border.Effect>
+
+                                <!-- black border -->
+                                <Grid>
+                                    <Rectangle Fill="#000000" Height="2" VerticalAlignment="Top"/>
+                                    <Rectangle Fill="#000000" Height="2" VerticalAlignment="Bottom"/>
+
+                                    <!-- canvas (this make the text move, pls dont change if not needed) -->
+                                    <Canvas ClipToBounds="True">
+                                        <Canvas x:Name="ScrollingTextContainerServerBrowser" Canvas.Top="12">
+                                            <Canvas.RenderTransform>
+                                                <TranslateTransform x:Name="ScrollTransformServerBrowser" X="0"/>
+                                            </Canvas.RenderTransform>
+                                            <Canvas.Triggers>
+                                                <EventTrigger RoutedEvent="Canvas.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard RepeatBehavior="Forever">
+                                                            <DoubleAnimation Storyboard.TargetName="ScrollTransformServerBrowser"
+                                                 Storyboard.TargetProperty="X"
+                                                 From="0"
+                                                 To="-600"
+                                                 Duration="0:0:10"
+                                                 RepeatBehavior="Forever"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Canvas.Triggers>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                FontFamily="Segoe UI Black"
+                                                FontSize="24"
+                                                FontWeight="ExtraBold"
+                                                Foreground="#000000"
+                                                Canvas.Left="0">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                FontFamily="Segoe UI Black"
+                                                FontSize="24"
+                                                FontWeight="ExtraBold"
+                                                Foreground="#000000"
+                                                Canvas.Left="600">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+
+                                            <TextBlock Text="⚠ ĐANG PHÁT TRIỂN ⚠    " 
+                                                FontFamily="Segoe UI Black"
+                                                FontSize="24"
+                                                FontWeight="ExtraBold"
+                                                Foreground="#000000"
+                                                Canvas.Left="1200">
+                                                <TextBlock.Effect>
+                                                    <DropShadowEffect Color="#FFD700" BlurRadius="3" ShadowDepth="0" Opacity="0.5"/>
+                                                </TextBlock.Effect>
+                                            </TextBlock>
+                                        </Canvas>
+                                    </Canvas>
+                                </Grid>
+                            </Border>
                         </Grid>
                     </Button>
                 </Grid>

@@ -86,7 +86,7 @@ namespace Gomoku_Client.View
                 ExitToHome();
                 return;
             }
-
+            UserState.currentState = State.InMatch;
             this.isConnected = true;
             this.isPlayerTurn = (playerSymbol == 'X');
             this.isGameOver = false;
@@ -139,7 +139,7 @@ namespace Gomoku_Client.View
                         SendMatchEnd();
                     }
                 }
-                catch {}
+                catch { }
                 isConnected = false;
 
                 await Disconnect();
@@ -148,6 +148,10 @@ namespace Gomoku_Client.View
             {
                 Console.WriteLine($"[ERROR] GamePlay_Closing: {ex}");
                 tcpClient.Close();
+            }
+            finally
+            {
+                UserState.currentState = State.Ready;
             }
         }
 
@@ -167,8 +171,8 @@ namespace Gomoku_Client.View
                 string buttonPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/ButtonHover.wav");
                 string keyboardPath = AudioHelper.ExtractResourceToTemp("Assets/Sounds/Keyboard.wav");
 
-                double BGMVolume = mainWindow.MasterVolValue * mainWindow.BGMVolValue;
-                double SFXVolume = mainWindow.MasterVolValue * mainWindow.SFXVolValue;
+                double BGMVolume = MainGameUI.MasterVolValue * MainGameUI.BGMVolValue;
+                double SFXVolume = MainGameUI.MasterVolValue * MainGameUI.SFXVolValue;
 
                 MainBGM.Volume = BGMVolume;
                 ButtonClick.Volume = SFXVolume;

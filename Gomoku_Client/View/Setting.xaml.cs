@@ -13,9 +13,9 @@ namespace Gomoku_Client.View
             InitializeComponent();
 
 
-            GeneralVolumeSlider.Value = mainGameUI.MasterVolValue * 100;
-            BackgroundVolumeSlider.Value = mainGameUI.BGMVolValue * 100;
-            SfxVolumeSlider.Value = mainGameUI.SFXVolValue * 100;
+            GeneralVolumeSlider.Value = MainGameUI.MasterVolValue * 100;
+            BackgroundVolumeSlider.Value = MainGameUI.BGMVolValue * 100;
+            SfxVolumeSlider.Value = MainGameUI.SFXVolValue * 100;
 
             AddSliderHoverEffects(GeneralSliderContainer, GeneralDecBtn, GeneralIncBtn);
             AddSliderHoverEffects(BackgroundVolumeSliderContainer, BackgroundVolumeDecBtn, BackgroundVolumeIncBtn);
@@ -161,7 +161,7 @@ namespace Gomoku_Client.View
         {
             if (_mainWindow != null && BackgroundVolumeSlider != null)
             {
-                _mainWindow.BGMVolValue = e.NewValue / 100.0;
+                MainGameUI.BGMVolValue = e.NewValue / 100.0;
 
                 _mainWindow.UpdateActualBGM();
             }
@@ -171,7 +171,7 @@ namespace Gomoku_Client.View
         {
             if (_mainWindow != null && GeneralVolumeSlider != null)
             {
-                _mainWindow.MasterVolValue = e.NewValue / 100.0;
+                MainGameUI.MasterVolValue = e.NewValue / 100.0;
 
                 _mainWindow.UpdateActualBGM();
             }
@@ -181,7 +181,7 @@ namespace Gomoku_Client.View
         {
             if (_mainWindow != null && SfxVolumeSlider != null)
             {
-                _mainWindow.SFXVolValue = e.NewValue / 100.0;
+                MainGameUI.SFXVolValue = e.NewValue / 100.0;
 
                 _mainWindow.UpdateActualBGM();
             }

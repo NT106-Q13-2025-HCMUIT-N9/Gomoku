@@ -124,17 +124,37 @@ namespace Gomoku_Client
             };
 
             DataContext = this;
+
+            string path = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "data.txt"
+            );
+
         }
 
-        public double MasterVolValue = 0.5;
-        public double BGMVolValue = 0.15;
-        public double SFXVolValue = 1;
+        public static double MasterVolValue;
+        public static double BGMVolValue;
+        public static double SFXVolValue;
 
         public void UpdateActualBGM()
         {
             MainBGM.Volume = MasterVolValue * BGMVolValue;
             ButtonClick.Volume = SFXVolValue * MasterVolValue;
             Keyboard.Volume = SFXVolValue * MasterVolValue;
+
+            string volumeFile = System.IO.Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                "volume.txt"
+            );
+
+            string[] lines =
+            {
+                MasterVolValue.ToString(),
+                BGMVolValue.ToString(),
+                SFXVolValue.ToString()
+            };
+
+            File.WriteAllLines(volumeFile, lines);
         }
 
         void SoundStart()

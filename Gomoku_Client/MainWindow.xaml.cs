@@ -223,8 +223,6 @@ namespace Gomoku_Client
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
-
                     EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
                     EmailBox.BorderBrush = Brushes.Red;
                     EmailNotFoundText.Visibility = Visibility.Visible;

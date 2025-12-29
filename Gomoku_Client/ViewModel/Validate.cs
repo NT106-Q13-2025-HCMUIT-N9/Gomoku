@@ -1,6 +1,7 @@
 ﻿using Gomoku_Client.Model;
 using Google.Cloud.Firestore;
 using System.Diagnostics;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Gomoku_Client.ViewModel
@@ -11,6 +12,12 @@ namespace Gomoku_Client.ViewModel
         {
             string pattern = @"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$";
             return Regex.IsMatch(email, pattern);
+        }
+
+        public static async Task<bool> IsValidUsername(string username)
+        {
+            string pattern = @"^([0-9]+|0[xX][0-9a-fA-F]+|0[bB][01]+)$";
+            return !Regex.IsMatch(username, pattern) && Ascii.IsValid(username);
         }
 
         public static async Task<bool> IsUsernamExists(string username)

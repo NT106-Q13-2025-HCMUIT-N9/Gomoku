@@ -300,8 +300,17 @@ namespace Gomoku_Client.View
 
         private void ConfirmSurrenderButton_Click(object sender, RoutedEventArgs e)
         {
-            SendResignToServer();
-            SurrenderConfirmationOverlay.Visibility = Visibility.Collapsed;
+            if (isConnected)
+            {
+                SurrenderConfirmationOverlay.Visibility = Visibility.Collapsed;
+                SendResignToServer();
+                isConnected = false;
+            }
+
+            player1Timer?.Stop();
+            player2Timer?.Stop();
+            ExitToHome();
+            return;
         }
 
         private void CancelSurrenderButton_Click(object sender, RoutedEventArgs e)
@@ -560,29 +569,6 @@ namespace Gomoku_Client.View
             });
         }
 
-        private bool CheckDirection(int row, int col, int dRow, int dCol, int player)
-        {
-            int count = 1;
-            count += CountStones(row, col, dRow, dCol, player);
-            count += CountStones(row, col, -dRow, -dCol, player);
-            return count >= 5;
-        }
-
-        private int CountStones(int row, int col, int dRow, int dCol, int player)
-        {
-            int count = 0;
-            int r = row + dRow;
-            int c = col + dCol;
-
-            while (r >= 0 && r < boardSize && c >= 0 && c < boardSize && board[r, c] == player)
-            {
-                count++;
-                r += dRow;
-                c += dCol;
-            }
-
-            return count;
-        }
 
         private void GameOver(bool? player1Wins, string message)
         {
@@ -1157,7 +1143,6 @@ namespace Gomoku_Client.View
                         {
                             isPlayerTurn = true;
                             UpdateGameStatus();
-                            MessageBox.Show(parts[1], "Nước đi không hợp lệ", MessageBoxButton.OK, MessageBoxImage.Warning);
                         });
                     }
                     break;

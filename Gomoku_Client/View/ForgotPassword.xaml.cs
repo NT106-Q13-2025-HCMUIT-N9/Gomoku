@@ -103,8 +103,6 @@ namespace Gomoku_Client
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
-
                     EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
                     EmailNotFoundText.Visibility = Visibility.Visible;
                     GetEmailGrid.Height = 220;
@@ -187,9 +185,7 @@ namespace Gomoku_Client
                 catch (AuthException auth_ex)
                 {
                     AuthException a = auth_ex;
-                    //MessageBox.Show($"Lỗi: {auth_ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 
-                    //Loaded
                     LoadingCircle.Visibility = Visibility.Collapsed;
                     buttonEnable();
                     SendOTPButton.Content = "Gửi mã xác thực";
@@ -210,7 +206,6 @@ namespace Gomoku_Client
             ButtonClick?.Play();
             if (_mainWindow == null)
             {
-                MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             _mainWindow.MainFrame.Visibility = Visibility.Collapsed;
@@ -292,8 +287,6 @@ namespace Gomoku_Client
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
-
                         EmailNotFoundText.Text = "Xảy ra lỗi không biết rõ";
                         EmailNotFoundText.Visibility = Visibility.Visible;
                         GetEmailGrid.Height = 220;

@@ -44,7 +44,6 @@ namespace Gomoku_Client.View
             _mainWindow.ButtonClick.Play();
             if (_mainWindow == null)
             {
-                MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             _mainWindow.ShowMenuWithAnimation();
@@ -197,6 +196,11 @@ namespace Gomoku_Client.View
                     string msg = $"[CHALLENGE_REQUEST];{username};{friendName}\n";
                     byte[] data = Encoding.UTF8.GetBytes(msg);
                     stream.Write(data, 0, data.Length);
+
+                    NotificationManager.Instance.ShowNotification($"Đã gửi lời thách đấu đến {friendName}.",
+                                                                  "Chờ đối thủ phản hồi nhé!",
+                                                                  Notification.NotificationType.Info,
+                                                                  3000);
 
                     Console.WriteLine($"[DEBUG] Sent: {msg.Trim()}");
 
@@ -364,7 +368,6 @@ namespace Gomoku_Client.View
                 catch (Exception ex)
                 {
                     Console.WriteLine($"[DEBUG ERROR] {ex.Message}");
-                    MessageBox.Show("Lỗi Debug: " + ex.Message);
                 }
             });
             /*

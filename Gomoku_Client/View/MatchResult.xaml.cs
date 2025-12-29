@@ -69,7 +69,12 @@ namespace Gomoku_Client.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load match result: {ex.Message}");
+                NotificationManager.Instance.ShowNotification(
+                    "Lỗi",
+                    "Không hiển thị được kết quả trận đấu",
+                    Notification.NotificationType.Info,
+                    3000
+                );
                 ReturnToLobby();
             }
         }

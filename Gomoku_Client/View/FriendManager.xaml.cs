@@ -198,6 +198,11 @@ namespace Gomoku_Client.View
                     byte[] data = Encoding.UTF8.GetBytes(msg);
                     stream.Write(data, 0, data.Length);
 
+                    NotificationManager.Instance.ShowNotification($"Đã gửi lời thách đấu đến {friendName}.",
+                                                                  "Chờ đối thủ phản hồi nhé!",
+                                                                  Notification.NotificationType.Info,
+                                                                  3000);
+
                     Console.WriteLine($"[DEBUG] Sent: {msg.Trim()}");
 
                     byte[] buffer = new byte[4096];

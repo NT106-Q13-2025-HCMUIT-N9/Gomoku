@@ -1143,7 +1143,6 @@ namespace Gomoku_Client.View
                         {
                             isPlayerTurn = true;
                             UpdateGameStatus();
-                            MessageBox.Show(parts[1], "Nước đi không hợp lệ", MessageBoxButton.OK, MessageBoxImage.Warning);
                         });
                     }
                     break;

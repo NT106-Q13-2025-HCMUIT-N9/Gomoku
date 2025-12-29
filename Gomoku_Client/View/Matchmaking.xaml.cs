@@ -83,7 +83,12 @@ namespace Gomoku_Client.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load user data: {ex.Message}");
+                NotificationManager.Instance.ShowNotification(
+                                "Lỗi",
+                                "Tải dữ liệu người dùng thất bại",
+                                Notification.NotificationType.Info,
+                                3000
+                            );
                 NavigationService?.GoBack();
             }
         }
@@ -183,7 +188,12 @@ namespace Gomoku_Client.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Không thể kết nối đến server: {ex.Message}");
+                NotificationManager.Instance.ShowNotification(
+                    "Lỗi",    
+                    "Không thể kết nối đến server",
+                    Notification.NotificationType.Info,
+                    3000
+                );
                 BackButton_Checked(null, null);
             }
         }
@@ -267,8 +277,12 @@ namespace Gomoku_Client.View
                 case "[ALREADY_IN_MATCH]":
                     Dispatcher.Invoke(() =>
                     {
-                        MessageBox.Show("Bạn đang trong một trận đấu khác", "Thông báo",
-                            MessageBoxButton.OK, MessageBoxImage.Warning);
+                        NotificationManager.Instance.ShowNotification(
+                                "Lỗi",
+                                "Bạn đang ở trong trận đấu khác",
+                                Notification.NotificationType.Info,
+                                3000
+                            );
                         BackButton_Checked(null, null);
                     });
                     break;
@@ -276,8 +290,12 @@ namespace Gomoku_Client.View
                 case "[INVALID_REQUEST]":
                     Dispatcher.Invoke(() =>
                     {
-                        MessageBox.Show("Yêu cầu không hợp lệ", "Lỗi",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
+                        NotificationManager.Instance.ShowNotification(
+                                "Lỗi",
+                                "Yêu cầu không hợp lệ",
+                                Notification.NotificationType.Info,
+                                3000
+                            );
                         BackButton_Checked(null, null);
                     });
                     break;
@@ -500,7 +518,12 @@ namespace Gomoku_Client.View
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Failed to load opponent data: {ex.Message}");
+                NotificationManager.Instance.ShowNotification(
+                    "Lỗi",
+                    "Tải dữ liệu thất bại",
+                    Notification.NotificationType.Info,
+                    3000
+                );
                 NavigationService?.GoBack();
             }
         }

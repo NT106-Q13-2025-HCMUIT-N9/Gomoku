@@ -47,7 +47,6 @@ namespace Gomoku_Client.View
             _mainWindow.ButtonClick.Play();
             if (_mainWindow == null)
             {
-                MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             _mainWindow.ShowMenuWithAnimation();

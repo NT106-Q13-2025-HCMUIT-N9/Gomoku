@@ -90,6 +90,15 @@ namespace Gomoku_Client
                         UsernameMsg.Visibility = Visibility.Visible;
                         if (!isWrongUsername) MainBorder.Height += 15;
                         isWrongUsername = true;
+                    }else if (!await Validate.IsValidUsername(UsernameBox.Text))
+                    {
+                        UsernameMsg.Text = "Username không hợp lệ vui lòng chọn tên khác";
+                        UsernameBorder.BorderBrush = new SolidColorBrush(
+                            (Color)ColorConverter.ConvertFromString("#FF4655")
+                        );
+                        UsernameMsg.Visibility = Visibility.Visible;
+                        if (!isWrongUsername) MainBorder.Height += 15;
+                        isWrongUsername = true;
                     }
                     else
                     {
@@ -105,8 +114,6 @@ namespace Gomoku_Client
                     }
                 }catch (Exception ex)
                 {
-                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
-
                     UsernameMsg.Text = "Xảy ra lỗi không biết rõ";
                     UsernameBorder.BorderBrush = new SolidColorBrush(
                         (Color)ColorConverter.ConvertFromString("#FF4655")
@@ -184,8 +191,6 @@ namespace Gomoku_Client
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Critical-Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Information);
-
                     EmailMsg.Text = "Xảy ra lỗi không biết rõ";
                     EmailBorder.BorderBrush = new SolidColorBrush(
                             (Color)ColorConverter.ConvertFromString("#FF4655")
@@ -203,7 +208,6 @@ namespace Gomoku_Client
             ButtonClick?.Play();
             if (_mainWindow == null)
             {
-                MessageBox.Show("Không tìm thấy cửa sổ chính.", "Lỗi", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
             _mainWindow.MainFrame.Visibility = Visibility.Collapsed;

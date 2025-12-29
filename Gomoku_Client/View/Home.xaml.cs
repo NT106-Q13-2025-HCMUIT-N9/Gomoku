@@ -345,32 +345,6 @@ namespace Gomoku_Client
             }
         }
 
-        private void SignOut_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ButtonClick.Stop();
-                ButtonClick.Play();
-                FirebaseInfo.AuthClient.SignOut();
-
-                MainWindow main = new MainWindow();
-                // Sao chép vị trí và kích thước
-                main.Left = this.Left;
-                main.Top = this.Top;
-                main.Width = this.Width;
-                main.Height = this.Height;
-                main.WindowState = this.WindowState;
-
-                this.Hide();
-                main.Show();
-                this.Close();
-            }
-            catch (FirebaseAuthException ex)
-            {
-                MessageBox.Show($"Lỗi: {ex.Reason}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
         private void PlayButton_Checked(object sender, RoutedEventArgs e)
         {
             ButtonClick.Stop();

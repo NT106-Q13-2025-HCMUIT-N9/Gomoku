@@ -237,7 +237,7 @@ namespace Gomoku_Server
 
             AddActiveMatchDisplay(name1, name2);
 
-            int clock1 = 300;
+            int clock1 = 305;
             int clock2 = 300;
 
             MatchHandle matchHandle = new MatchHandle(player1, player2, clock1, clock2, name1, name2);

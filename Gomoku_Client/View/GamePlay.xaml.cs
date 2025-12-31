@@ -78,6 +78,20 @@ namespace Gomoku_Client.View
             Avatar2.ImageSource = BitmapFrame.Create(new Uri(player2data.ImagePath));
         }
 
+        private async void SetText()
+        {
+            if (playerSymbol == 'X')
+            {
+                colorSymbol1.Text = "QUÂN ĐEN";
+                colorSymbol2.Text = "QUÂN TRẮNG";
+            }
+            else
+            {
+                colorSymbol1.Text = "QUÂN TRẮNG";
+                colorSymbol2.Text = "QUÂN ĐEN";
+            }
+        }
+
         private void GamePlay_Loaded(object sender, RoutedEventArgs e)
         {
             if (tcpClient == null || !tcpClient.Connected)
@@ -92,7 +106,7 @@ namespace Gomoku_Client.View
             this.isGameOver = false;
 
             SetAvatar(player1Name, opponentName);
-
+            SetText();
             InitializeGame();
             DrawBoard();
             SetupTimers();
@@ -1161,6 +1175,11 @@ namespace Gomoku_Client.View
                     Console.WriteLine($"[UNKNOWN] {message}");
                     break;
             }
+        }
+
+        private void ClosingGP(object sender, CancelEventArgs e)
+        {
+            MainBGM.Stop();
         }
     }
 }

@@ -1,26 +1,34 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
-using System.Windows.Resources;
+using System.Reflection;
 
 namespace Gomoku_Client.Helpers
 {
     public static class AudioHelper
     {
         /// <summary>
-        /// Trích xuất file âm thanh từ Resource (trong file exe) ra thư mục Temp của Windows
-        /// để MediaPlayer có thể đọc được.
+        /// Trích xuất file từ Embedded Resource ra thư mục Temp.
         /// </summary>
-        /// <param name="resourcePath">Đường dẫn tương đối (VD: "Assets/Sounds/click.wav")</param>
-        /// <returns>Đường dẫn vật lý đến file tạm, hoặc null nếu lỗi.</returns>
-        public static string ExtractResourceToTemp(string resourcePath)
+        /// <param name="relativeResourcePath">Đường dẫn tương đối dùng dấu gạch chéo. 
+        /// VD: "Assets/Sounds/bgm.mp3"</param>
+        /// <returns>Đường dẫn vật lý đến file tạm</returns>
+        public static string ExtractResourceToTemp(string relativeResourcePath)
         {
             try
             {
-                string fileName = Path.GetFileName(resourcePath);
+                // 1. Lấy Assembly hiện tại
+                Assembly assembly = Assembly.GetExecutingAssembly();
 
+                // 2. Chuyển đổi đường dẫn file thành định dạng của Embedded Resource (dùng dấu chấm)
+                // Giả sử Namespace gốc của bạn là "Gomoku_Client"
+                string rootNamespace = "Gomoku_Client";
+                string resourceName = $"{rootNamespace}.{relativeResourcePath.Replace('/', '.').Replace('\\', '.')}";
+
+                // 3. Thiết lập thư mục tạm
+                string fileName = Path.GetFileName(relativeResourcePath);
                 string tempFolder = Path.Combine(Path.GetTempPath(), "Gomoku_TempAssets");
+
                 if (!Directory.Exists(tempFolder))
                 {
                     Directory.CreateDirectory(tempFolder);
@@ -28,30 +36,35 @@ namespace Gomoku_Client.Helpers
 
                 string destinationPath = Path.Combine(tempFolder, fileName);
 
+                // 4. Nếu file đã tồn tại rồi thì không cần giải nén lại (tối ưu hiệu năng)
                 if (File.Exists(destinationPath))
                 {
                     return destinationPath;
                 }
 
-                Uri uri = new Uri($"pack://application:,,,/{resourcePath}", UriKind.Absolute);
-                StreamResourceInfo info = Application.GetResourceStream(uri);
-
-                if (info == null)
+                // 5. Đọc Stream từ Embedded Resource
+                using (Stream stream = assembly.GetManifestResourceStream(resourceName))
                 {
-                    Debug.WriteLine($"[AudioHelper] Không tìm thấy resource: {resourcePath}");
-                    return null;
+                    if (stream == null)
+                    {
+                        Debug.WriteLine($"[AudioHelper] LỖI: Không tìm thấy Resource '{resourceName}'.");
+                        // Mẹo: Nếu lỗi, hãy chạy dòng code dưới đây để xem danh sách tên tất cả Resource đang có:
+                        // foreach (var name in assembly.GetManifestResourceNames()) Debug.WriteLine(name);
+                        return null;
+                    }
+
+                    using (FileStream fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
+                    {
+                        stream.CopyTo(fileStream);
+                    }
                 }
 
-                using (var fileStream = File.Create(destinationPath))
-                {
-                    info.Stream.CopyTo(fileStream);
-                }
-
+                Debug.WriteLine($"[AudioHelper] Đã giải nén thành công: {destinationPath}");
                 return destinationPath;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[AudioHelper] Lỗi giải nén âm thanh: {ex.Message}");
+                Debug.WriteLine($"[AudioHelper] Lỗi hệ thống: {ex.Message}");
                 return null;
             }
         }

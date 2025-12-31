@@ -9,7 +9,7 @@
         ResizeMode="NoResize"
         mc:Ignorable="d"
         Title="Gomoku | Match In Progress" Height="720" Width="1280"
-        FontFamily="Segoe UI" >
+        FontFamily="Segoe UI" Closing="ClosingGP" >
 
     <!-- ********************************** TÀI NGUYÊN STYLE CHUNG ********************************** -->
     <Window.Resources>
@@ -152,7 +152,7 @@
 
                     <Border x:Name="BackgroundTag1" Background="#00D946" CornerRadius="4" Padding="12,4"
                     HorizontalAlignment="Center" Margin="0,12,0,20">
-                        <TextBlock Text="QUÂN ĐEN" FontSize="12"
+                        <TextBlock x:Name="colorSymbol1" Text="QUÂN ĐEN" FontSize="12"
                            FontWeight="Bold" Foreground="Black"/>
                     </Border>
 
@@ -197,7 +197,7 @@
 
                     <Border x:Name="BackgroundTag2" Background="#ECECEC" CornerRadius="4" Padding="12,4"
                     HorizontalAlignment="Center" Margin="0,12,0,20">
-                        <TextBlock Text="QUÂN TRẮNG" FontSize="12"
+                        <TextBlock x:Name="colorSymbol2" Text="QUÂN TRẮNG" FontSize="12"
                            FontWeight="Bold" Foreground="#1A1A2E"/>
                     </Border>
 

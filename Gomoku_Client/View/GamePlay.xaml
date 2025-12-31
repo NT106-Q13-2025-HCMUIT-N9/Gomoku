@@ -9,7 +9,7 @@
         ResizeMode="NoResize"
         mc:Ignorable="d"
         Title="Gomoku | Match In Progress" Height="720" Width="1280"
-        FontFamily="Segoe UI" >
+        FontFamily="Segoe UI" Closing="ClosingGP" >
 
     <!-- ********************************** TÀI NGUYÊN STYLE CHUNG ********************************** -->
     <Window.Resources>

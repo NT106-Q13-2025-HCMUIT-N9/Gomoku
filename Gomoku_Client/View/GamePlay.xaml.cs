@@ -1162,5 +1162,10 @@ namespace Gomoku_Client.View
                     break;
             }
         }
+
+        private void ClosingGP(object sender, CancelEventArgs e)
+        {
+            MainBGM.Stop();
+        }
     }
 }

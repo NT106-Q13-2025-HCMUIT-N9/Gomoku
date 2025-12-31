@@ -230,7 +230,7 @@
                       VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
-
+                <Border Height="80"/>
                 <!-- sound section -->
                 <TextBlock Text="SOUND SETTINGS" Style="{StaticResource SectionHeader}"/>
 
@@ -377,110 +377,6 @@
                         </Grid>
                     </Grid>
                 </Border>
-
-                <!-- display section -->
-                <TextBlock Text="DISPLAY SETTINGS" Style="{StaticResource SectionHeader}"/>
-
-                <!-- che do cu khoai tay =)) -->
-                <Border Style="{StaticResource SettingRow}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="POTATO MODE" 
-                                   Style="{StaticResource SettingLabel}"
-                                   Grid.Column="0"/>
-
-                        <StackPanel Grid.Column="1" 
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Right">
-                            <Button Content="OFF" 
-                                    Style="{StaticResource OptionButton}"
-                                    Tag="Selected"/>
-                            <Button Content="ON" 
-                                    Style="{StaticResource OptionButton}"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- quality -->
-                <Border Style="{StaticResource SettingRow}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="CHẤT LƯỢNG HÌNH ẢNH" 
-                                   Style="{StaticResource SettingLabel}"
-                                   Grid.Column="0"/>
-
-                        <StackPanel Grid.Column="1" 
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Right">
-                            <Button Content="THẤP" 
-                                    Style="{StaticResource OptionButton}"
-                                    Tag="Selected"/>
-                            <Button Content="TRUNG BÌNH" 
-                                    Style="{StaticResource OptionButton}"/>
-                            <Button Content="CAO" 
-                                    Style="{StaticResource OptionButton}"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- icon -->
-                <Border Style="{StaticResource SettingRow}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="ICON QUÂN CỜ" 
-                                   Style="{StaticResource SettingLabel}"
-                                   Grid.Column="0"/>
-
-                        <StackPanel Grid.Column="1" 
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Right">
-                            <Button Content="ĐEN TRẮNG" 
-                                    Style="{StaticResource OptionButton}"
-                                    Tag="Selected"/>
-                            <Button Content=" X  /  O " 
-                                    Style="{StaticResource OptionButton}"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- dummy -->
-                <Border Style="{StaticResource SettingRow}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="dummy" 
-                                   Style="{StaticResource SettingLabel}"
-                                   Grid.Column="0"/>
-
-                        <StackPanel Grid.Column="1" 
-                                    Orientation="Horizontal"
-                                    HorizontalAlignment="Right">
-                            <Button Content="bat" 
-                                    Style="{StaticResource OptionButton}"
-                                    Tag="Selected"/>
-                            <Button Content="tat" 
-                                    Style="{StaticResource OptionButton}"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- bottom spacing -->
-                <Border Height="50"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

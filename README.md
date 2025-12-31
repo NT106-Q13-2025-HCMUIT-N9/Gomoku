@@ -16,7 +16,7 @@ This application was built as a final project for the **Network Programming (NT1
 Created by **Group 9** ([see team members](#authors)) **- Class NT106.Q13**, this application demonstrates a complete implementation of standard networking concepts, including TCP socket communication, multi-threading, and cloud deployment, wrapped in a modern WPF interface.
 
 > [!WARNING]
-> As of **December 30th, 2025**, the _Gomoku_ project has been archived. This means that it will no longer receive bug fixes, patches, etc.
+> As of **December 31th, 2025**, the _Gomoku_ project has been archived. This means that it will no longer receive bug fixes, patches, etc.
 
 ## Main Features
 - Online Gomoku gameplay

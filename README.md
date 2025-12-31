@@ -105,3 +105,5 @@ If you have any questions regarding the project (how to build and host this on y
 
 - **hdatuan** (project leader): `24521922@gm.uit.edu.vn`
 - **zr0x8**: `24521913@gm.uit.edu.vn`
+
+Project information/status is updated [here](https://docs.google.com/spreadsheets/d/1FS1UmKGigviaUOmkjJRxcXTSjsKFE3mb2fhkgKLW0nA/edit?usp=sharing).
